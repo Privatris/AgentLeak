@@ -335,9 +335,8 @@ wls = compute_wls(scenarios, traces)
 ```bibtex
 @inproceedings{elyagoubi2025agentleak,
   title={AgentLeak: A Full-Stack Benchmark for Privacy Leakage Detection
-         in Tool-Using and Multi-Agent LLM Systems},
+         in Multi-Agent LLM Systems},
   author={El Yagoubi, Faouzi and Al Mallah, Ranwa},
-  booktitle={NeurIPS Datasets and Benchmarks Track},
   year={2025},
   url={https://github.com/Privatris/AgentLeak}
 }
@@ -358,21 +357,11 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 
 ---
 
-## 📄 License
+## License
 
 MIT License - See [LICENSE](LICENSE) for details.
 
 Developed at **Polytechnique Montréal**
-
----
-
-
-## 🙏 Acknowledgments
-
-AgentLeak integrates best practices from:
-- **PrivacyLens** (NeurIPS 2024): Contextual Integrity framework, SurgeryKit refinement
-- **Contextual Integrity Theory** (Helen Nissenbaum): Privacy norm formalization
-- **Enterprise Partners**: Privacy incident validation and real-world testing
 
 ---
 
