@@ -1,5 +1,5 @@
 """
-APB Mock Tools - Simulated tools per vertical for controlled evaluation.
+agentleak Mock Tools - Simulated tools per vertical for controlled evaluation.
 
 Mock tools return deterministic outputs based on the scenario's privacy vault,
 enabling reproducible evaluation without external dependencies.
@@ -616,7 +616,7 @@ if __name__ == "__main__":
     from ..generators import ScenarioGenerator
     
     print("=" * 60)
-    print("APB Mock Tools Demo")
+    print("AgentLeak Mock Tools Demo")
     print("=" * 60)
     
     # Generate scenarios for each vertical

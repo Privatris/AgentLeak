@@ -1,5 +1,5 @@
 """
-APB Trace Schema - Data structures for execution traces.
+AgentLeak Trace Schema - Data structures for execution traces.
 
 The trace format captures every event during scenario execution,
 enabling leakage detection across all 7 channels (C1-C7).
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     trace = ExecutionTrace(
         metadata=TraceMetadata(
             trace_id="trace_001",
-            scenario_id="apb_fin_00001",
+            scenario_id="agentleak_fin_00001",
             framework="langchain",
             model="gpt-4",
             started_at=datetime.utcnow()
@@ -169,7 +169,7 @@ if __name__ == "__main__":
         events=[
             TraceEvent(
                 sequence_num=1,
-                scenario_id="apb_fin_00001",
+                scenario_id="agentleak_fin_00001",
                 agent_id="A1",
                 event_type=EventType.TOOL_CALL,
                 channel=Channel.C3_TOOL_INPUT,
@@ -179,7 +179,7 @@ if __name__ == "__main__":
             ),
             TraceEvent(
                 sequence_num=2,
-                scenario_id="apb_fin_00001",
+                scenario_id="agentleak_fin_00001",
                 agent_id="A1",
                 event_type=EventType.MESSAGE_OUT,
                 channel=Channel.C1_FINAL_OUTPUT,

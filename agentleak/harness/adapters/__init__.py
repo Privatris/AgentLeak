@@ -1,7 +1,7 @@
 """
-APB Framework Adapters - Integrations with popular agent frameworks.
+agentleak Framework Adapters - Integrations with popular agent frameworks.
 
-This module provides adapters for various agent frameworks, allowing APB
+This module provides adapters for various agent frameworks, allowing agentleak
 to capture execution traces from different agent architectures.
 
 Supported frameworks:

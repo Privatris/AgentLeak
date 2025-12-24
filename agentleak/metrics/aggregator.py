@@ -1,5 +1,5 @@
 """
-APB Metrics Aggregator - Aggregate metrics across multiple runs.
+AgentLeak Metrics Aggregator - Aggregate metrics across multiple runs.
 
 Provides statistical aggregation with confidence intervals.
 """
@@ -258,7 +258,7 @@ class MetricsAggregator:
         
         lines = [
             "=" * 50,
-            "APB Benchmark Metrics Summary",
+            "agentleak Benchmark Metrics Summary",
             "=" * 50,
             "",
             f"Total Runs: {metrics.total_runs}",

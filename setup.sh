@@ -1,5 +1,5 @@
 #!/bin/bash
-# APB Quick Setup Script
+# agentleak Quick Setup Script
 # Usage: curl -sSL https://raw.githubusercontent.com/YOURORG/AgentLeak/main/setup.sh | bash
 
 set -e
@@ -25,12 +25,12 @@ fi
 source .venv/bin/activate
 
 # Install package
-echo "📦 Installing APB..."
+echo "📦 Installing agentleak..."
 pip install -e . -q
 
 # Verify installation
 echo "🧪 Verifying installation..."
-python -c "from apb import __version__; print(f'✓ APB {__version__} installed')"
+python -c "from agentleak import __version__; print(f'✓ agentleak {__version__} installed')"
 
 # Run quick test
 echo "🧪 Running quick test..."
@@ -42,4 +42,4 @@ echo ""
 echo "Quick commands:"
 echo "  pytest tests/ -v              # Run tests"
 echo "  python scripts/quick_eval.py  # Quick benchmark"
-echo "  python -m apb.cli --help      # CLI help"
+echo "  python -m agentleak.cli --help      # CLI help"

@@ -1,5 +1,5 @@
 """
-APB Trace Collector - Unified trace collection across all 7 channels.
+AgentLeak Trace Collector - Unified trace collection across all 7 channels.
 
 The TraceCollector provides a centralized way to capture events from
 different sources (tool calls, memory writes, logs, etc.) and ensures
@@ -92,7 +92,7 @@ class TraceBuffer:
 
 class TraceCollector:
     """
-    Centralized trace collection for APB scenarios.
+    Centralized trace collection for agentleak scenarios.
     
     Provides hooks for capturing events from various sources:
     - Tool call interceptors
@@ -397,7 +397,7 @@ class TraceCollector:
 
 if __name__ == "__main__":
     print("=" * 70)
-    print("APB Trace Collector Demo")
+    print("AgentLeak Trace Collector Demo")
     print("=" * 70)
     
     collector = TraceCollector("demo_001", verbose=True)

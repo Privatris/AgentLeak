@@ -1,4 +1,4 @@
-"""APB Attacks - 15 attack classes across 4 families."""
+"""AgentLeak Attacks - 15 attack classes across 4 families."""
 
 from agentleak.attacks.attack_module import (
     AttackPayload,

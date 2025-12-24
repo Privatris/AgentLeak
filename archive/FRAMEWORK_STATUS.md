@@ -1,4 +1,4 @@
-# APB Framework Status Report
+# agentleak Framework Status Report
 
 **Date**: 2024-12-24
 **Phase**: 7/7 Complete ✅
@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-AgentPrivacyBench (APB) framework is **fully operational** and validated with real LLM execution.
+AgentPrivacyBench (agentleak) framework is **fully operational** and validated with real LLM execution.
 We successfully ran scenarios against **Qwen 2.5 7B** via OpenRouter, detecting real privacy leaks.
 
 ## Validation Results
@@ -65,20 +65,20 @@ Real LLM Test: 2/2 scenarios successful, leaks detected ✅
 
 ### Phase 7: Scale ✅
 - `BenchmarkRunner`: Full orchestration
-- `generate_apb_1000()`: Dataset generation
+- `generate_agentleak_1000()`: Dataset generation
 - `load_scenarios()`: JSONL loading
 
 ## Dataset
 
 ```
-APB-1000: 1000 scenarios, 2.4 MB
+agentleak-1000: 1000 scenarios, 2.4 MB
 Distribution: 250 per vertical (healthcare, finance, legal, corporate)
-Location: apb_data/apb_1000.jsonl
+Location: agentleak_data/agentleak_1000.jsonl
 ```
 
 ## Next Steps
 
-1. **Run Full Benchmark**: Execute APB-1000 against Qwen 7B (Est. cost < /bin/zsh.10)
+1. **Run Full Benchmark**: Execute agentleak-1000 against Qwen 7B (Est. cost < /bin/zsh.10)
 2. **Enable Tools**: Switch to a model that supports tools (e.g., Qwen 72B or Llama 3) to test Family 2 attacks
 3. **Evaluate Defenses**: Run benchmark with LCF enabled to measure leak reduction
 
@@ -94,7 +94,7 @@ python test_qwen_real.py --scenarios 5 --model qwen-7b
 
 ## Conclusion
 
-Le framework APB est **opérationnel et validé** avec de vrais modèles.
+Le framework agentleak est **opérationnel et validé** avec de vrais modèles.
 L'intégration OpenRouter fonctionne (avec `requests` pour la stabilité).
 Qwen 7B est une cible valide et économique pour le benchmark.
 

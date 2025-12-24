@@ -1,5 +1,5 @@
 """
-APB Detection Results Schema - Data structures for leakage detection results.
+AgentLeak Detection Results Schema - Data structures for leakage detection results.
 """
 
 from __future__ import annotations
@@ -91,7 +91,7 @@ class BenchmarkResults(BaseModel):
     
     # Identification
     run_id: str
-    benchmark_name: str = Field(default="apb")
+    benchmark_name: str = Field(default="agentleak")
     run_at: datetime = Field(default_factory=datetime.utcnow)
     
     # Configuration
@@ -133,7 +133,7 @@ class BenchmarkResults(BaseModel):
 if __name__ == "__main__":
     # Quick test
     result = DetectionResult(
-        scenario_id="apb_fin_00001",
+        scenario_id="agentleak_fin_00001",
         trace_id="trace_001",
         leaked=True,
         total_leaks=2,

@@ -1,5 +1,5 @@
 """
-APB MetaGPT Adapter - Integration with MetaGPT multi-agent software company.
+AgentLeak MetaGPT Adapter - Integration with MetaGPT multi-agent software company.
 
 MetaGPT simulates a software company with:
 - Roles: Product Manager, Architect, Engineer, QA
@@ -286,7 +286,7 @@ if __name__ == "__main__":
     from ...schemas.scenario import Vertical
     
     print("=" * 60)
-    print("APB MetaGPT Adapter Demo")
+    print("AgentLeak MetaGPT Adapter Demo")
     print("=" * 60)
     
     gen = ScenarioGenerator(seed=42)

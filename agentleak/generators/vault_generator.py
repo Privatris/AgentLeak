@@ -1,5 +1,5 @@
 """
-APB Vault Generator - Creates privacy vaults per vertical.
+AgentLeak Vault Generator - Creates privacy vaults per vertical.
 
 Each vertical (Healthcare, Finance, Legal, Corporate) has specific
 record types, field schemas, and sensitivity weights.
@@ -318,7 +318,7 @@ if __name__ == "__main__":
     gen = VaultGenerator(seed=42)
     
     print("=" * 70)
-    print("APB Vault Generator - Examples")
+    print("AgentLeak Vault Generator - Examples")
     print("=" * 70)
     
     for vertical in Vertical:

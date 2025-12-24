@@ -1,5 +1,5 @@
 """
-APB Leakage Detection Pipeline - Two-stage sensitive info extraction and judgment.
+AgentLeak Leakage Detection Pipeline - Two-stage sensitive info extraction and judgment.
 
 Implements the evaluation approach from PrivacyLens:
 1. Extract sensitive information items from trajectories

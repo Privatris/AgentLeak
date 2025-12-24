@@ -1,4 +1,4 @@
-"""APB Schema modules."""
+"""AgentLeak Schema modules."""
 
 from agentleak.schemas.scenario import (
     AdversaryLevel,

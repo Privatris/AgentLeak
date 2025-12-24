@@ -1,5 +1,5 @@
 """
-APB Pareto Calculator - Privacy-utility tradeoff analysis.
+AgentLeak Pareto Calculator - Privacy-utility tradeoff analysis.
 
 Calculates Pareto frontiers and area under the curve (AUC)
 for comparing agents/defenses on privacy-utility tradeoff.

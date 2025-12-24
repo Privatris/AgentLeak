@@ -1,5 +1,5 @@
 """
-APB Pattern Auditor - Stage 2: Regex-based detection for realistic canaries.
+AgentLeak Pattern Auditor - Stage 2: Regex-based detection for realistic canaries.
 
 Tier 2 canaries use valid formats but reserved/unlikely ranges:
 - SSN: 900-999 prefix (reserved for advertising)
@@ -252,7 +252,7 @@ class PatternAuditor:
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("APB Pattern Auditor Demo")
+    print("AgentLeak Pattern Auditor Demo")
     print("=" * 60)
     
     # Sample text with various PII

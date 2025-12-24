@@ -1,16 +1,20 @@
 """
-APB Learned Content Filter (LCF) - ML-based privacy filter.
+AgentLeak Learned Content Filter (LCF) - ML-based privacy filter.
 
 LCF is a learned defense that classifies content as private or safe
 based on training examples. It uses:
 1. Pattern matching for known private data formats
-2. Embedding similarity to detect semantic leakage
-3. Ensemble of simple classifiers for robustness
+2. LEACE projection for removing linear sensitive information
+3. Embedding similarity to detect semantic leakage
+4. Ensemble of simple classifiers for robustness
 
 The filter is designed to have:
 - High recall (catch most leaks)
 - Acceptable precision (minimize false positives)
 - Low latency (< 50ms per decision)
+
+References:
+    Belrose et al., 2023. "LEACE: Perfect linear concept erasure in closed form"
 """
 
 from __future__ import annotations
@@ -23,6 +27,7 @@ import numpy as np
 
 from ..schemas.scenario import Channel, CanaryTier
 from .base import BaseDefense, DefenseConfig, DefenseResult, FilterAction
+from .leace import LEACEProjection, compute_leace_projection
 
 
 class FilterDecision(str, Enum):
@@ -31,6 +36,7 @@ class FilterDecision(str, Enum):
     CANARY_DETECTED = "canary_detected"
     PATTERN_MATCH = "pattern_match"
     SEMANTIC_SIMILARITY = "semantic_similarity"
+    LEACE_PROJECTION = "leace_projection"
     ENSEMBLE_VOTE = "ensemble_vote"
 
 
@@ -41,6 +47,10 @@ class LCFConfig(DefenseConfig):
     # Pattern detection
     enable_pattern_matching: bool = True
     pattern_types: list[str] = field(default_factory=lambda: ["ssn", "phone", "cc", "email"])
+    
+    # LEACE projection (removes linearly-encoded sensitive attributes)
+    enable_leace: bool = True
+    leace_threshold: float = 0.30  # Leakage threshold for flagging
     
     # Semantic detection
     enable_semantic_filter: bool = True
@@ -260,6 +270,9 @@ class LearnedContentFilter(BaseDefense):
         self.embedding = LCFEmbedding()
         self.classifier = LCFClassifier(self.embedding)
         
+        # LEACE projection (trained separately)
+        self._leace_projection: Optional[LEACEProjection] = None
+        
         # Known private values for exact matching
         self._private_values: set[str] = set()
         self._private_embeddings: list[tuple[str, np.ndarray]] = []
@@ -303,6 +316,41 @@ class LearnedContentFilter(BaseDefense):
                 self._private_values.add(ex.text.lower())
                 vec = self.embedding.embed(ex.text)
                 self._private_embeddings.append((ex.text, vec))
+        
+        # Train LEACE projection if enabled
+        if self.config.enable_leace and len(examples) >= 10:
+            self._train_leace(examples)
+    
+    def _train_leace(self, examples: list[LCFTrainingExample]) -> None:
+        """
+        Train LEACE projection from examples.
+        
+        LEACE (Linear Erasure of Attribute by Concept Erasure) computes
+        a projection matrix P = I - UU^T that removes linearly-encoded
+        sensitive information from embeddings.
+        
+        Reference:
+            Belrose et al., 2023. "LEACE: Perfect linear concept erasure in closed form"
+        """
+        embeddings = np.array([self.embedding.embed(ex.text) for ex in examples])
+        labels = np.array([1 if ex.is_private else 0 for ex in examples])
+        
+        self._leace_projection = compute_leace_projection(embeddings, labels)
+    
+    def _check_leace(self, content: str) -> tuple[bool, float]:
+        """
+        Check content using LEACE projection.
+        
+        Returns:
+            (is_private, leakage_score)
+        """
+        if self._leace_projection is None:
+            return False, 0.0
+        
+        vec = self.embedding.embed(content)
+        leakage = self._leace_projection.leakage(vec)
+        
+        return leakage > self.config.leace_threshold, leakage
     
     def filter(self, content: str, channel: Channel) -> DefenseResult:
         """
@@ -376,7 +424,15 @@ class LearnedContentFilter(BaseDefense):
                     decision = FilterDecision.SEMANTIC_SIMILARITY
                     break
         
-        # 5. Classifier ensemble
+        # 5. LEACE projection (removes linearly-encoded sensitive attributes)
+        if self.config.enable_leace and decision == FilterDecision.SAFE:
+            is_leace_private, leakage = self._check_leace(content)
+            if is_leace_private:
+                detected_patterns.append(f"leace_leakage:{leakage:.3f}")
+                max_confidence = max(max_confidence, min(0.95, 0.5 + leakage))
+                decision = FilterDecision.LEACE_PROJECTION
+        
+        # 6. Classifier ensemble
         if self.config.enable_ensemble and self.classifier._trained and decision == FilterDecision.SAFE:
             is_private, conf = self.classifier.predict(content)
             if is_private and conf > self.config.ensemble_threshold:
@@ -447,7 +503,7 @@ class LCFTrainer:
     """
     Helper class for training LCF from scenarios.
     
-    Extracts training examples from APB scenarios.
+    Extracts training examples from AgentLeak scenarios.
     """
     
     def __init__(self):

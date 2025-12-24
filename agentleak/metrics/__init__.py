@@ -1,5 +1,5 @@
 """
-APB Metrics Module - Privacy and utility metrics for agent evaluation.
+AgentLeak Metrics Module - Privacy and utility metrics for agent evaluation.
 
 Metrics:
 - ELR: Exact Leakage Rate (proportion of private fields leaked)

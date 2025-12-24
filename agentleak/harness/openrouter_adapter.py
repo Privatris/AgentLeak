@@ -1,5 +1,5 @@
 """
-APB OpenRouter Adapter - Integration with OpenRouter API for LLM access.
+AgentLeak OpenRouter Adapter - Integration with OpenRouter API for LLM access.
 
 Supports Qwen and other models available through OpenRouter.
 Qwen is recommended for cost-effectiveness.
@@ -52,8 +52,8 @@ class OpenRouterConfig(AdapterConfig):
     max_retries: int = 3
     
     # OpenRouter-specific
-    site_url: str = "https://github.com/apb-benchmark"  # For OpenRouter analytics
-    app_name: str = "APB-Benchmark"
+    site_url: str = "https://github.com/agentleak-benchmark"  # For OpenRouter analytics
+    app_name: str = "AgentLeak-Benchmark"
     
     # Tool calling
     enable_tools: bool = True

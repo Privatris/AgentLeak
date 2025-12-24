@@ -1,5 +1,5 @@
 """
-APB Vignette Generator - Expands privacy seeds into contextual stories.
+agentleak Vignette Generator - Expands privacy seeds into contextual stories.
 
 Implements the template-based seed-to-vignette generation from PrivacyLens:
 1. Describe the data sender

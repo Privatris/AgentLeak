@@ -1,5 +1,5 @@
 """
-APB Canary Matcher - Stage 1: Exact match detection for obvious canaries.
+AgentLeak Canary Matcher - Stage 1: Exact match detection for obvious canaries.
 
 Tier 1 canaries use the format CANARY_<TYPE>_<RANDOM> and are designed
 to be trivially detectable via exact string matching.
@@ -176,7 +176,7 @@ class CanaryMatcher:
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("APB Canary Matcher Demo")
+    print("AgentLeak Canary Matcher Demo")
     print("=" * 60)
     
     # Sample text with canaries

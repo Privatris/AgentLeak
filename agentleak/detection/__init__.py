@@ -1,6 +1,6 @@
-# APB Detection Pipeline
+# AgentLeak Detection Pipeline
 """
-3-Stage Leakage Detection Pipeline for APB.
+3-Stage Leakage Detection Pipeline for agentleak.
 
 The detection pipeline operates in three stages to handle the 3-tier canary system:
 

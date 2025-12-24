@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-APB Benchmark Runner - Generate numerical results matching paper Tables 3-8.
+AgentLeak Benchmark Runner - Generate numerical results matching paper Tables 3-8.
 
-This script runs the full APB-1000 benchmark across all frameworks and models,
+This script runs the full AgentLeak-1000 benchmark across all frameworks and models,
 generating the numerical results presented in the paper:
 
 - Table 4: Per-vertical benchmark statistics
@@ -64,7 +64,7 @@ class BenchmarkConfig:
     """Configuration for benchmark run."""
     
     # Data
-    dataset_path: str = "apb_data/apb_1000.jsonl"
+    dataset_path: str = "agentleak_data/agentleak_1000.jsonl"
     output_dir: str = "benchmark_results"
     
     # Frameworks to test
@@ -152,7 +152,7 @@ class BenchmarkResults:
 # =============================================================================
 
 class BenchmarkRunner:
-    """Run APB benchmark across frameworks and generate paper results."""
+    """Run AgentLeak benchmark across frameworks and generate paper results."""
     
     def __init__(self, config: BenchmarkConfig):
         self.config = config
@@ -193,7 +193,7 @@ class BenchmarkRunner:
         self.load_scenarios()
         
         print("\n" + "=" * 70)
-        print("APB BENCHMARK")
+        print("AgentLeak BENCHMARK")
         print("=" * 70)
         
         # Compute per-vertical stats (Table 4)
@@ -610,7 +610,7 @@ def format_latex_tables(results: BenchmarkResults) -> str:
 # =============================================================================
 
 def main():
-    parser = argparse.ArgumentParser(description="Run APB benchmark")
+    parser = argparse.ArgumentParser(description="Run AgentLeak benchmark")
     parser.add_argument("--full", action="store_true", help="Run full benchmark")
     parser.add_argument("--quick", action="store_true", help="Quick test with 10 scenarios")
     parser.add_argument("--frameworks", nargs="+", default=None, help="Frameworks to test")

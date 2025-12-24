@@ -1,5 +1,5 @@
 """
-APB Privacy Mitigation - Defense strategies inspired by AgentDAM.
+AgentLeak Privacy Mitigation - Defense strategies inspired by AgentDAM.
 
 Implements multiple mitigation approaches:
 1. Privacy-aware system prompts with Chain-of-Thought reasoning

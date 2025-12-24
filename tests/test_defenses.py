@@ -1,5 +1,5 @@
 """
-Tests for APB Defenses Module.
+Tests for agentleak Defenses Module.
 
 Tests cover:
 - LearnedContentFilter (LCF)

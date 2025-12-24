@@ -2,7 +2,6 @@
 
 **A Full-Stack Benchmark for Privacy Leakage Detection in Tool-Using and Multi-Agent LLM Systems**
 
-[![NeurIPS 2025](https://img.shields.io/badge/NeurIPS%202025-Datasets%20%26%20Benchmarks-red)]()
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)]()
 [![Tests Passing](https://img.shields.io/badge/tests-255%20passing-brightgreen)]()
 [![License MIT](https://img.shields.io/badge/license-MIT-green)]()
@@ -11,13 +10,13 @@
 
 ## Overview
 
-**AgentLeak** is the first comprehensive benchmark for measuring privacy leakage in LLM-based agent systems. Unlike existing privacy benchmarks that only audit final outputs, AgentLeak evaluates **all 7 data leakage channels** where private information can escape: final responses, inter-agent messages, tool arguments, tool outputs, memory writes, logs, and persisted artifacts.
+**AgentLeak** is a comprehensive benchmark for measuring privacy leakage in LLM-based agent systems. Unlike existing privacy benchmarks that only audit final outputs, AgentLeak evaluates **all 7 data leakage channels** where private information can escape: final responses, inter-agent messages, tool arguments, tool outputs, memory writes, logs, and persisted artifacts.
 
 ### Key Statistics
 - **1,000 realistic scenarios** across 4 verticals (healthcare, finance, legal, corporate)
 - **15-class attack taxonomy** organized in 4 families
 - **7 leakage channels** with standardized detection methods
-- **3-tier canary system** validated with enterprise partner
+- **3-tier canary system** for robust leakage detection
 - **255 comprehensive tests** covering all components
 - **Framework-agnostic harness** for LangChain, CrewAI, AutoGPT, MetaGPT
 
@@ -326,19 +325,18 @@ wls = compute_wls(scenarios, traces)
 | **Privacy-utility Pareto** | ✅ Yes | ❌ No | ⚠️ Partial | ❌ No |
 | **Reproducible** | ✅ Lite subset | ⚠️ Expensive | ⚠️ Expensive | ✅ Yes |
 | **Scenarios** | **1000** | 493 | ~200 | 440 |
-| **Enterprise validation** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 
 ---
 
 ##  Citation
 
 ```bibtex
-@inproceedings{elyagoubi2025agentleak,
+@misc{elyagoubi2025agentleak,
   title={AgentLeak: A Full-Stack Benchmark for Privacy Leakage Detection
          in Tool-Using and Multi-Agent LLM Systems},
   author={El Yagoubi, Faouzi and Al Mallah, Ranwa},
-  booktitle={NeurIPS Datasets and Benchmarks Track},
   year={2025},
+  institution={Polytechnique Montréal},
   url={https://github.com/Privatris/AgentLeak}
 }
 ```
@@ -370,9 +368,9 @@ Developed at **Polytechnique Montréal**
 ## 🙏 Acknowledgments
 
 AgentLeak integrates best practices from:
-- **PrivacyLens** (NeurIPS 2024): Contextual Integrity framework, SurgeryKit refinement
+- **PrivacyLens** (NeurIPS 2024): Contextual Integrity framework
 - **Contextual Integrity Theory** (Helen Nissenbaum): Privacy norm formalization
-- **Enterprise Partners**: Privacy incident validation and real-world testing
+- **LEACE** (NeurIPS 2023): Concept erasure techniques
 
 ---
 
@@ -380,6 +378,6 @@ AgentLeak integrates best practices from:
 
 **Making Agent Privacy Leakage Measurable, Reproducible, and Comparable**
 
-[⭐ Star us on GitHub](https://github.com/Privatris/AgentLeak) | [📖 Read the Paper](#) | [🐛 Report Issues](https://github.com/Privatris/AgentLeak/issues)
+[⭐ Star us on GitHub](https://github.com/Privatris/AgentLeak) | [🐛 Report Issues](https://github.com/Privatris/AgentLeak/issues)
 
 </div>

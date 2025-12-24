@@ -1,13 +1,11 @@
 """
-APB CLI Module - Command-line interface for Agent Privacy Benchmark.
+AgentLeak CLI Module - Command-line interface for AgentLeak benchmark.
 
 Usage:
-    python -m apb.cli.run_apb --model gpt-4o --privacy-test
-
-Inspired by AgentDAM's run_agentdam.py with enhanced features.
+    python -m agentleak.cli.run_agentleak --model gpt-4o --privacy-test
 """
 
-from .run_apb import main, create_arg_parser, ResultTracker
+from .run_agentleak import main, create_arg_parser, ResultTracker
 
 __all__ = [
     "main",

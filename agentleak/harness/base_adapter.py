@@ -1,7 +1,7 @@
 """
-APB Base Adapter - Abstract interface for agent framework integration.
+AgentLeak Base Adapter - Abstract interface for agent framework integration.
 
-The adapter pattern allows APB to evaluate any agent framework
+The adapter pattern allows agentleak to evaluate any agent framework
 (LangChain, AutoGen, CrewAI, etc.) through a unified interface.
 """
 
@@ -350,7 +350,7 @@ if __name__ == "__main__":
     from ..generators import ScenarioGenerator
     
     print("=" * 60)
-    print("APB Base Adapter Demo")
+    print("AgentLeak Base Adapter Demo")
     print("=" * 60)
     
     # Generate a sample scenario

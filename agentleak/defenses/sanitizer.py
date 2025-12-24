@@ -1,5 +1,5 @@
 """
-APB Output Sanitizer - Rule-based output filtering.
+AgentLeak Output Sanitizer - Rule-based output filtering.
 
 A simpler, regex-based defense that doesn't require training.
 Useful as a baseline or fallback.

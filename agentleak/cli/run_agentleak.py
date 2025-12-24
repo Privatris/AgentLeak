@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-APB Command-Line Interface - End-to-end benchmark execution.
+AgentLeak Command-Line Interface - End-to-end benchmark execution.
 
 Inspired by AgentDAM's run_agentdam.py with enhanced features:
 - Multi-model support (GPT, Claude, Llama)
@@ -9,7 +9,7 @@ Inspired by AgentDAM's run_agentdam.py with enhanced features:
 - Comprehensive result logging
 
 Usage:
-    python -m apb.cli.run_apb \\
+    python -m agentleak.cli.run_agentleak \\
         --test-config-dir ./data/healthcare/ \\
         --model gpt-4o \\
         --privacy-test \\
@@ -32,7 +32,7 @@ from typing import Any, Optional
 # Setup logging
 LOG_FOLDER = "log_files"
 Path(LOG_FOLDER).mkdir(parents=True, exist_ok=True)
-LOG_FILE = f"{LOG_FOLDER}/apb_{time.strftime('%Y%m%d_%H%M%S')}_{random.randint(0, 10000)}.log"
+LOG_FILE = f"{LOG_FOLDER}/agentleak_{time.strftime('%Y%m%d_%H%M%S')}_{random.randint(0, 10000)}.log"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -42,7 +42,7 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout),
     ],
 )
-logger = logging.getLogger("apb")
+logger = logging.getLogger("agentleak")
 
 
 # =============================================================================
@@ -52,18 +52,18 @@ logger = logging.getLogger("apb")
 def create_arg_parser() -> argparse.ArgumentParser:
     """Create the argument parser with all options."""
     parser = argparse.ArgumentParser(
-        description="APB - Agent Privacy Benchmark: End-to-end privacy evaluation",
+        description="AgentLeak - Privacy Benchmark for LLM Agents: End-to-end privacy evaluation",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   # Run with GPT-4o on healthcare tasks
-  python -m apb.cli.run_apb --model gpt-4o --vertical healthcare --privacy-test
+  python -m agentleak.cli.run_agentleak --model gpt-4o --vertical healthcare --privacy-test
 
   # Run with privacy mitigation
-  python -m apb.cli.run_apb --model gpt-4o --mitigation cot_prompt --privacy-test
+  python -m agentleak.cli.run_agentleak --model gpt-4o --mitigation cot_prompt --privacy-test
 
   # Run on specific task configs
-  python -m apb.cli.run_apb --test-config-dir ./data/finance_privacy/ --model gpt-4o-mini
+  python -m agentleak.cli.run_agentleak --test-config-dir ./data/finance_privacy/ --model gpt-4o-mini
         """
     )
     
@@ -93,7 +93,7 @@ Examples:
     parser.add_argument(
         "--test-config-dir",
         type=str,
-        default="./data/apb_tasks/",
+        default="./data/agentleak_tasks/",
         help="Directory containing task configuration JSON files"
     )
     
@@ -335,7 +335,7 @@ class ResultTracker:
         summary = self.get_summary()
         
         print("\n" + "=" * 60)
-        print("APB BENCHMARK RESULTS")
+        print("AGENTLEAK BENCHMARK RESULTS")
         print("=" * 60)
         print(f"Total Tasks:         {summary['total_tasks']}")
         print(f"Successful Runs:     {summary['successful_runs']}")
@@ -450,7 +450,7 @@ def run_single_task(
 
 
 def main():
-    """Main entry point for APB CLI."""
+    """Main entry point for AgentLeak CLI."""
     parser = create_arg_parser()
     args = parser.parse_args()
     
@@ -462,7 +462,7 @@ def main():
         logging.getLogger().setLevel(logging.DEBUG)
     
     logger.info("=" * 60)
-    logger.info("APB - Agent Privacy Benchmark")
+    logger.info("AgentLeak - Privacy Benchmark for LLM Agents")
     logger.info("=" * 60)
     logger.info(f"Model: {args.model}")
     logger.info(f"Vertical: {args.vertical or 'all'}")

@@ -1,5 +1,5 @@
 """
-APB Scenario Generator - Creates complete benchmark scenarios.
+AgentLeak Scenario Generator - Creates complete benchmark scenarios.
 
 Generates scenarios with:
 - Task objectives per vertical
@@ -214,7 +214,7 @@ ATTACK_PAYLOADS = {
 # =============================================================================
 
 class ScenarioGenerator:
-    """Generates complete APB benchmark scenarios."""
+    """Generates complete agentleak benchmark scenarios."""
     
     def __init__(self, seed: Optional[int] = None):
         self.vault_gen = VaultGenerator(seed)
@@ -227,7 +227,7 @@ class ScenarioGenerator:
         """Generate next scenario ID."""
         self._scenario_counter += 1
         prefix = vertical.value[:3].lower()
-        return f"apb_{prefix}_{self._scenario_counter:05d}"
+        return f"agentleak_{prefix}_{self._scenario_counter:05d}"
     
     def _select_task(self, vertical: Vertical) -> dict:
         """Select a random task template for the vertical."""
@@ -421,7 +421,7 @@ class ScenarioGenerator:
         Generate a set of scenarios with specified distribution.
         
         Args:
-            name: Name for the scenario set (e.g., "apb_lite_100")
+            name: Name for the scenario set (e.g., "agentleak_lite_100")
             total_count: Total number of scenarios
             vertical_distribution: Optional {Vertical: ratio} dict
             adversary_distribution: Optional {AdversaryLevel: ratio} dict
@@ -462,7 +462,7 @@ class ScenarioGenerator:
         
         return ScenarioSet(
             name=name,
-            description=f"APB benchmark set with {len(scenarios)} scenarios",
+            description=f"agentleak benchmark set with {len(scenarios)} scenarios",
             scenarios=scenarios[:total_count],  # Ensure exact count
         )
 
@@ -480,21 +480,21 @@ def generate_scenario(
     return ScenarioGenerator(seed).generate(vertical, adversary_level=adversary_level)
 
 
-def generate_apb_lite(seed: Optional[int] = None) -> ScenarioSet:
-    """Generate APB-Lite: 100 scenarios for quick evaluation."""
-    return ScenarioGenerator(seed).generate_set("apb_lite_100", total_count=100)
+def generate_agentleak_lite(seed: Optional[int] = None) -> ScenarioSet:
+    """Generate AgentLeak-Lite: 100 scenarios for quick evaluation."""
+    return ScenarioGenerator(seed).generate_set("agentleak_lite_100", total_count=100)
 
 
-def generate_apb_full(seed: Optional[int] = None) -> ScenarioSet:
-    """Generate APB-Full: 1000 scenarios for complete benchmark."""
-    return ScenarioGenerator(seed).generate_set("apb_full_1000", total_count=1000)
+def generate_agentleak_full(seed: Optional[int] = None) -> ScenarioSet:
+    """Generate AgentLeak-Full: 1000 scenarios for complete benchmark."""
+    return ScenarioGenerator(seed).generate_set("agentleak_full_1000", total_count=1000)
 
 
 if __name__ == "__main__":
     gen = ScenarioGenerator(seed=42)
     
     print("=" * 70)
-    print("APB Scenario Generator - Examples")
+    print("AgentLeak Scenario Generator - Examples")
     print("=" * 70)
     
     # Single scenario
@@ -515,7 +515,7 @@ if __name__ == "__main__":
     print(f"  Canaries: {len(s.get_canaries())}")
     
     # Scenario set
-    print("\n📦 APB-Lite Generation (10 scenarios for demo)")
+    print("\n📦 AgentLeak-Lite Generation (10 scenarios for demo)")
     print("-" * 50)
     scenario_set = gen.generate_set("demo_set", total_count=10)
     print(f"  Name: {scenario_set.name}")

@@ -1,5 +1,5 @@
 """
-APB AgentGPT Adapter - Integration with AgentGPT web-based autonomous agent.
+agentleak AgentGPT Adapter - Integration with AgentGPT web-based autonomous agent.
 
 AgentGPT is a browser-based autonomous agent that:
 - Creates and executes task chains
@@ -304,7 +304,7 @@ if __name__ == "__main__":
     from ...schemas.scenario import Vertical
     
     print("=" * 60)
-    print("APB AgentGPT Adapter Demo")
+    print("AgentLeak AgentGPT Adapter Demo")
     print("=" * 60)
     
     gen = ScenarioGenerator(seed=42)

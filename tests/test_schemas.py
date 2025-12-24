@@ -1,4 +1,4 @@
-"""Tests for APB schema modules - Phase 0 validation."""
+"""Tests for agentleak schema modules - Phase 0 validation."""
 
 import json
 from datetime import datetime, timezone

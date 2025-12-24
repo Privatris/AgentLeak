@@ -1,11 +1,11 @@
 """
-APB Utility Evaluator - WebArena-style task success evaluation.
+AgentLeak Utility Evaluator - WebArena-style task success evaluation.
 
 Inspired by WebArena/VisualWebArena evaluation harness:
 - Multiple evaluation types (string match, HTML content, URL, function)
 - Configurable success criteria
 - Support for program-based HTML evaluation
-- Integration with APB's privacy metrics
+- Integration with agentleak's privacy metrics
 
 This evaluator measures whether the agent successfully completed
 its assigned task (the "utility" dimension), complementing the

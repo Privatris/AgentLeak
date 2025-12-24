@@ -1,5 +1,5 @@
 """
-Tests for APB Metrics Module.
+Tests for agentleak Metrics Module.
 
 Tests cover:
 - MetricsCalculator (ELR, WLS, ASR, TSR)
@@ -409,7 +409,7 @@ class TestMetricsAggregator:
         
         summary = agg.summary()
         
-        assert "APB Benchmark" in summary
+        assert "agentleak Benchmark" in summary
         assert "ELR" in summary
         assert "TSR" in summary
     

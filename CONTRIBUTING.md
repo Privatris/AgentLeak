@@ -1,6 +1,6 @@
 # Contributing to AgentLeak
 
-Thank you for your interest in contributing to APB! This document provides guidelines for contributions.
+Thank you for your interest in contributing to agentleak! This document provides guidelines for contributions.
 
 ## 🚀 Quick Setup
 
@@ -23,7 +23,7 @@ pytest tests/ -v
 ## 📁 Project Structure
 
 ```
-apb/
+agentleak/
 ├── schemas/          # Data models (Pydantic)
 ├── generators/       # Data generation
 ├── attacks/          # Attack implementations
@@ -44,7 +44,7 @@ pytest tests/ -v
 pytest tests/test_schemas.py -v
 
 # With coverage
-pytest tests/ --cov=apb --cov-report=html
+pytest tests/ --cov=agentleak --cov-report=html
 ```
 
 ## 📝 Code Style
@@ -57,23 +57,23 @@ We use:
 
 ```bash
 # Format code
-black apb/ tests/
-isort apb/ tests/
+black agentleak/ tests/
+isort agentleak/ tests/
 
 # Check linting
-flake8 apb/ tests/
+flake8 agentleak/ tests/
 
 # Type check
-mypy apb/
+mypy agentleak/
 ```
 
 ## 🔧 Adding a New Framework Adapter
 
-1. Create adapter file in `apb/harness/adapters/`
+1. Create adapter file in `agentleak/harness/adapters/`
 2. Implement `BaseAdapter` interface:
 
 ```python
-from apb.harness.base_adapter import BaseAdapter, AdapterConfig
+from agentleak.harness.base_adapter import BaseAdapter, AdapterConfig
 
 class MyFrameworkConfig(AdapterConfig):
     # Framework-specific settings
@@ -104,12 +104,12 @@ class MyFrameworkAdapter(BaseAdapter):
         pass
 ```
 
-3. Register in `apb/harness/adapters/__init__.py`
+3. Register in `agentleak/harness/adapters/__init__.py`
 4. Add tests in `tests/test_harness.py`
 
 ## 🎭 Adding a New Attack Class
 
-1. Define attack in `apb/attacks/attack_module.py`:
+1. Define attack in `agentleak/attacks/attack_module.py`:
 
 ```python
 class MyNewAttack(AttackClass):
@@ -123,12 +123,12 @@ class MyNewAttack(AttackClass):
 ```
 
 2. Register in `ATTACK_REGISTRY`
-3. Add test payloads in `apb/attacks/payloads/`
+3. Add test payloads in `agentleak/attacks/payloads/`
 4. Add tests in `tests/test_attacks.py`
 
 ## 📊 Adding New Metrics
 
-1. Implement in `apb/metrics/`:
+1. Implement in `agentleak/metrics/`:
 
 ```python
 def compute_my_metric(
@@ -140,15 +140,15 @@ def compute_my_metric(
     return value
 ```
 
-2. Add to `apb/metrics/__init__.py`
+2. Add to `agentleak/metrics/__init__.py`
 3. Add tests in `tests/test_metrics.py`
 
 ## 🛡️ Adding a New Defense
 
-1. Create defense in `apb/defenses/`:
+1. Create defense in `agentleak/defenses/`:
 
 ```python
-from apb.defenses.base_defense import BaseDefense
+from agentleak.defenses.base_defense import BaseDefense
 
 class MyDefense(BaseDefense):
     def __init__(self, strength: float = 0.5):
@@ -163,7 +163,7 @@ class MyDefense(BaseDefense):
         return False
 ```
 
-2. Register in `apb/defenses/__init__.py`
+2. Register in `agentleak/defenses/__init__.py`
 3. Add to benchmark runner
 4. Add tests
 
@@ -179,7 +179,7 @@ class MyDefense(BaseDefense):
 2. Create a feature branch: `git checkout -b feature/my-feature`
 3. Make changes and add tests
 4. Ensure all tests pass: `pytest tests/ -v`
-5. Format code: `black apb/ tests/ && isort apb/ tests/`
+5. Format code: `black agentleak/ tests/ && isort agentleak/ tests/`
 6. Commit with descriptive message
 7. Push and create PR
 

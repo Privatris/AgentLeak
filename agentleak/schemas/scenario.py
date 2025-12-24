@@ -1,5 +1,5 @@
 """
-APB Scenario Schema - Core data structures for AgentLeak scenarios.
+AgentLeak Scenario Schema - Core data structures for AgentLeak scenarios.
 
 Each scenario defines:
 - An objective the agent must complete
@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field, field_validator
 
 
 class Vertical(str, Enum):
-    """Four high-stakes verticals covered by APB."""
+    """Four high-stakes verticals covered by AgentLeak."""
     HEALTHCARE = "healthcare"
     FINANCE = "finance"
     LEGAL = "legal"
@@ -235,7 +235,7 @@ class EvaluationConfig(BaseModel):
 
 class Scenario(BaseModel):
     """
-    Complete APB scenario definition.
+    Complete agentleak scenario definition.
     
     This is the core data structure for AgentLeak. Each scenario 
     defines a complete privacy evaluation case with:
@@ -248,7 +248,7 @@ class Scenario(BaseModel):
     """
     
     # Identification
-    scenario_id: str = Field(..., description="Unique scenario ID (e.g., 'apb_fin_00123')")
+    scenario_id: str = Field(..., description="Unique scenario ID (e.g., 'agentleak_fin_00123')")
     version: str = Field(default="1.0", description="Scenario version")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     
@@ -313,7 +313,7 @@ class Scenario(BaseModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "scenario_id": "apb_fin_00001",
+                    "scenario_id": "agentleak_fin_00001",
                     "vertical": "finance",
                     "difficulty": "medium",
                     "agents": [{"agent_id": "A1", "role": "analyst", "clearance": "restricted"}],
@@ -357,8 +357,8 @@ class Scenario(BaseModel):
 # ============================================================================
 
 class ScenarioSet(BaseModel):
-    """A collection of scenarios (e.g., APB-Lite, APB-Full)."""
-    name: str = Field(..., description="Set name (e.g., 'apb_lite_100')")
+    """A collection of scenarios (e.g., AgentLeak-Lite, AgentLeak-Full)."""
+    name: str = Field(..., description="Set name (e.g., 'agentleak_lite_100')")
     version: str = Field(default="1.0")
     description: Optional[str] = None
     scenarios: list[Scenario] = Field(default_factory=list)
@@ -385,7 +385,7 @@ if __name__ == "__main__":
     
     # Test creating a minimal scenario
     scenario = Scenario(
-        scenario_id="apb_test_001",
+        scenario_id="agentleak_test_001",
         vertical=Vertical.HEALTHCARE,
         objective=Objective(
             user_request="Schedule an appointment for patient",

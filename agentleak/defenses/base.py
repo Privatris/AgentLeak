@@ -1,5 +1,5 @@
 """
-APB Base Defense - Abstract base class for all defenses.
+AgentLeak Base Defense - Abstract base class for all defenses.
 """
 
 from __future__ import annotations

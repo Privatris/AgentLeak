@@ -1,7 +1,7 @@
 """
-APB Benchmark Runner - Complete end-to-end benchmark execution.
+AgentLeak Benchmark Runner - Complete end-to-end benchmark execution.
 
-This module orchestrates the full APB benchmark:
+This module orchestrates the full AgentLeak benchmark:
 1. Generate scenarios (1000 across 4 verticals)
 2. Run scenarios through agent adapter
 3. Apply attacks (optional)
@@ -106,7 +106,7 @@ class BenchmarkRun:
 
 class BenchmarkRunner:
     """
-    Main benchmark runner for APB.
+    Main benchmark runner for agentleak.
     
     Orchestrates full benchmark execution with configurable:
     - Scenario generation
@@ -356,7 +356,7 @@ class BenchmarkRunner:
         
         lines = [
             "=" * 60,
-            "APB Benchmark Results",
+            "agentleak Benchmark Results",
             "=" * 60,
             "",
             f"Configuration:",
@@ -381,12 +381,12 @@ class BenchmarkRunner:
         return "\n".join(lines)
 
 
-def generate_apb_1000(
-    output_dir: str = "apb_data",
+def generate_agentleak_1000(
+    output_dir: str = "agentleak_data",
     seed: int = 42,
 ) -> list[Scenario]:
     """
-    Generate the full APB-1000 scenario set.
+    Generate the full AgentLeak-1000 scenario set.
     
     Creates 1000 scenarios balanced across 4 verticals:
     - 250 Healthcare
@@ -414,7 +414,7 @@ def generate_apb_1000(
     
     # Save to JSONL
     os.makedirs(output_dir, exist_ok=True)
-    output_file = os.path.join(output_dir, "apb_1000.jsonl")
+    output_file = os.path.join(output_dir, "agentleak_1000.jsonl")
     
     with open(output_file, "w") as f:
         for scenario in scenarios:
@@ -430,7 +430,7 @@ def generate_apb_1000(
         "generated_at": datetime.utcnow().isoformat(),
     }
     
-    with open(os.path.join(output_dir, "apb_1000_summary.json"), "w") as f:
+    with open(os.path.join(output_dir, "agentleak_1000_summary.json"), "w") as f:
         json.dump(summary, f, indent=2)
     
     return scenarios

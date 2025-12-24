@@ -1,4 +1,4 @@
-"""Tests for APB generators."""
+"""Tests for agentleak generators."""
 
 import pytest
 
@@ -21,7 +21,7 @@ from agentleak.generators.vault_generator import (
 from agentleak.generators.scenario_generator import (
     ScenarioGenerator,
     generate_scenario,
-    generate_apb_lite,
+    generate_agentleak_lite,
 )
 
 
@@ -40,7 +40,7 @@ class TestCanaryGenerator:
         gen = CanaryGenerator(seed=42)
         email = gen.obvious_email()
         assert email.startswith("CANARY_EMAIL_")
-        assert email.endswith("@apb.test")
+        assert email.endswith("@agentleak.test")
     
     def test_realistic_ssn(self):
         """Test realistic SSN format."""
@@ -167,7 +167,7 @@ class TestScenarioGenerator:
         gen = ScenarioGenerator(seed=42)
         scenario = gen.generate(Vertical.HEALTHCARE)
         
-        assert scenario.scenario_id.startswith("apb_hea_")
+        assert scenario.scenario_id.startswith("agentleak_hea_")
         assert scenario.vertical == Vertical.HEALTHCARE
         assert len(scenario.agents) >= 1
         assert len(scenario.private_vault.records) > 0
@@ -224,15 +224,15 @@ class TestScenarioGenerator:
         verticals = set(s.vertical for s in scenario_set.scenarios)
         assert len(verticals) == 4  # All 4 verticals
     
-    def test_apb_lite_generation(self):
-        """Test APB-Lite convenience function."""
-        apb_lite = generate_apb_lite(seed=42)
+    def test_agentleak_lite_generation(self):
+        """Test agentleak-Lite convenience function."""
+        agentleak_lite = generate_agentleak_lite(seed=42)
         
-        assert apb_lite.name == "apb_lite_100"
-        assert apb_lite.count >= 90  # Allow some rounding
+        assert agentleak_lite.name == "agentleak_lite_100"
+        assert agentleak_lite.count >= 90  # Allow some rounding
         
         # Check distribution
-        adversarial_count = sum(1 for s in apb_lite.scenarios if s.is_adversarial)
+        adversarial_count = sum(1 for s in agentleak_lite.scenarios if s.is_adversarial)
         assert adversarial_count > 0  # Some should be adversarial
     
     def test_scenario_serialization(self):

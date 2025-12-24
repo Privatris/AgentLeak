@@ -1,5 +1,5 @@
 """
-APB Multi-Level Probing Evaluation - QA-based privacy norm assessment.
+AgentLeak Multi-Level Probing Evaluation - QA-based privacy norm assessment.
 
 Implements the three-level probing evaluation from PrivacyLens:
 1. Seed-level: Abstract privacy norm understanding

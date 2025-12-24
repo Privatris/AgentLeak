@@ -1,5 +1,5 @@
 """
-APB Core Metrics - Base metric calculations.
+AgentLeak Core Metrics - Base metric calculations.
 
 This module provides the core metric calculations for privacy evaluation:
 - ELR: Exact Leakage Rate

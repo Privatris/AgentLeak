@@ -1,5 +1,5 @@
 """
-APB Detection Pipeline - Orchestrates 3-stage leakage detection.
+AgentLeak Detection Pipeline - Orchestrates 3-stage leakage detection.
 
 The pipeline runs all three detection stages and aggregates results
 into a unified DetectionResult per scenario.
@@ -403,7 +403,7 @@ if __name__ == "__main__":
     from ..schemas import Vertical
     
     print("=" * 60)
-    print("APB Detection Pipeline Demo")
+    print("AgentLeak Detection Pipeline Demo")
     print("=" * 60)
     
     # Generate a scenario

@@ -1,5 +1,5 @@
 """
-APB AutoGPT Adapter - Integration with AutoGPT autonomous agent framework.
+AgentLeak AutoGPT Adapter - Integration with AutoGPT autonomous agent framework.
 
 AutoGPT is an autonomous agent that:
 - Breaks down goals into tasks
@@ -126,7 +126,7 @@ class AutoGPTAdapter(BaseAdapter):
             
             # This is simplified - real AutoGPT setup is more complex
             self._agent = Agent(
-                ai_name="APB-Agent",
+                ai_name="AgentLeak-Agent",
                 memory=LocalCache(),
                 ai_config=config,
             )
@@ -307,7 +307,7 @@ if __name__ == "__main__":
     from ...schemas.scenario import Vertical
     
     print("=" * 60)
-    print("APB AutoGPT Adapter Demo")
+    print("AgentLeak AutoGPT Adapter Demo")
     print("=" * 60)
     
     gen = ScenarioGenerator(seed=42)

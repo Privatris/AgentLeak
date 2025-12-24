@@ -1,5 +1,5 @@
 """
-APB LangChain Adapter - Integration with LangChain framework.
+agentleak LangChain Adapter - Integration with LangChain framework.
 
 LangChain is a popular framework for building LLM applications with:
 - Agents with tool use
@@ -59,11 +59,11 @@ class LangChainAdapter(BaseAdapter):
     """
     Adapter for LangChain agents.
     
-    Implements APB's four-method interface:
+    Implements agentleak's four-method interface:
     - hook_messages(): Via LangChain callbacks
     - wrap_tools(): Via tool decorators
     - intercept_memory(): Via memory callbacks
-    - export_trace(): Serialize to APB JSONL
+    - export_trace(): Serialize to agentleak JSONL
     """
     
     def __init__(self, config: Optional[LangChainConfig] = None):
@@ -321,7 +321,7 @@ You have access to confidential records and tools to help users.
             from langchain_core.callbacks import BaseCallbackHandler
             
             # Custom callback for tracing
-            class APBCallback(BaseCallbackHandler):
+            class agentleakCallback(BaseCallbackHandler):
                 def __init__(self, adapter: 'LangChainAdapter'):
                     self.adapter = adapter
                 
@@ -345,7 +345,7 @@ You have access to confidential records and tools to help users.
             # Run with callback
             result = self._agent.invoke(
                 {"input": scenario.objective.user_request},
-                config={"callbacks": [APBCallback(self)]}
+                config={"callbacks": [agentleakCallback(self)]}
             )
             
             return result.get("output", str(result))
@@ -400,7 +400,7 @@ if __name__ == "__main__":
     from ...schemas.scenario import Vertical
     
     print("=" * 60)
-    print("APB LangChain Adapter Demo")
+    print("AgentLeak LangChain Adapter Demo")
     print("=" * 60)
     
     # Generate a sample scenario

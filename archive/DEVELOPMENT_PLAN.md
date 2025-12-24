@@ -1,6 +1,6 @@
-# AgentPrivacyBench (APB) - Plan de Développement Itératif
+# AgentPrivacyBench (agentleak) - Plan de Développement Itératif
 
-> **Objectif** : Construire le benchmark APB de manière incrémentale, en validant chaque composant avant de passer au suivant.
+> **Objectif** : Construire le benchmark agentleak de manière incrémentale, en validant chaque composant avant de passer au suivant.
 
 ## 🎯 Target State (Paper)
 
@@ -22,7 +22,7 @@ Objectif: Setup projet, CI/CD, structure de base
 ```
 
 #### Tâches :
-- [ ] **0.1** Créer structure de projet Python (`apb/`)
+- [ ] **0.1** Créer structure de projet Python (`agentleak/`)
 - [ ] **0.2** Setup environnement (pyproject.toml, requirements.txt)
 - [ ] **0.3** Créer schémas Pydantic pour les scénarios
 - [ ] **0.4** Tests unitaires de base
@@ -31,14 +31,14 @@ Objectif: Setup projet, CI/CD, structure de base
 #### Validation :
 ```bash
 pytest tests/ -v  # Tous les tests passent
-python -c "from apb import Scenario; print('OK')"
+python -c "from agentleak import Scenario; print('OK')"
 ```
 
 ---
 
 ### **Phase 1 : Génération de Scénarios (Semaines 2-3)**
 ```
-Objectif: Générer 100 scénarios de validation (APB-Lite)
+Objectif: Générer 100 scénarios de validation (agentleak-Lite)
 ```
 
 #### Tâches :
@@ -50,13 +50,13 @@ Objectif: Générer 100 scénarios de validation (APB-Lite)
 - [ ] **1.6** Validation humaine de 20 scénarios
 
 #### Livrables :
-- `apb/generators/scenario_generator.py`
-- `apb/data/scenarios/apb_lite_100.jsonl`
-- `apb/schemas/scenario.py`
+- `agentleak/generators/scenario_generator.py`
+- `agentleak/data/scenarios/agentleak_lite_100.jsonl`
+- `agentleak/schemas/scenario.py`
 
 #### Validation :
 ```bash
-python -m apb.generators.scenario_generator --count 25 --vertical healthcare
+python -m agentleak.generators.scenario_generator --count 25 --vertical healthcare
 # Vérifier que les scénarios sont cohérents
 ```
 
@@ -77,16 +77,16 @@ Objectif: Implémenter les 15 classes d'attaques
 - [ ] **2.7** Tests unitaires pour chaque classe d'attaque
 
 #### Livrables :
-- `apb/attacks/base.py`
-- `apb/attacks/family1_prompt.py`
-- `apb/attacks/family2_tool.py`
-- `apb/attacks/family3_memory.py`
-- `apb/attacks/family4_multiagent.py`
-- `apb/attacks/payloads/` (templates YAML)
+- `agentleak/attacks/base.py`
+- `agentleak/attacks/family1_prompt.py`
+- `agentleak/attacks/family2_tool.py`
+- `agentleak/attacks/family3_memory.py`
+- `agentleak/attacks/family4_multiagent.py`
+- `agentleak/attacks/payloads/` (templates YAML)
 
 #### Validation :
 ```bash
-python -m apb.attacks.test_all  # 15 classes fonctionnelles
+python -m agentleak.attacks.test_all  # 15 classes fonctionnelles
 ```
 
 ---
@@ -105,16 +105,16 @@ Objectif: Créer le harness framework-agnostic avec trace JSONL
 - [ ] **3.6** Runner de scénarios avec logging
 
 #### Livrables :
-- `apb/harness/trace.py`
-- `apb/harness/adapter_base.py`
-- `apb/harness/adapters/langchain_adapter.py`
-- `apb/harness/adapters/openai_adapter.py`
-- `apb/harness/tools/` (mock tools)
-- `apb/harness/runner.py`
+- `agentleak/harness/trace.py`
+- `agentleak/harness/adapter_base.py`
+- `agentleak/harness/adapters/langchain_adapter.py`
+- `agentleak/harness/adapters/openai_adapter.py`
+- `agentleak/harness/tools/` (mock tools)
+- `agentleak/harness/runner.py`
 
 #### Validation :
 ```bash
-python -m apb.harness.runner --scenario apb_fin_001 --framework langchain
+python -m agentleak.harness.runner --scenario agentleak_fin_001 --framework langchain
 # Vérifier trace JSONL générée correctement
 ```
 
@@ -134,14 +134,14 @@ Objectif: Implémenter détection de leakage 3-stages
 - [ ] **4.6** Support per-channel detection (C1-C7)
 
 #### Livrables :
-- `apb/detection/canary_matcher.py`
-- `apb/detection/field_auditor.py`
-- `apb/detection/semantic_detector.py`
-- `apb/detection/pipeline.py`
+- `agentleak/detection/canary_matcher.py`
+- `agentleak/detection/field_auditor.py`
+- `agentleak/detection/semantic_detector.py`
+- `agentleak/detection/pipeline.py`
 
 #### Validation :
 ```bash
-python -m apb.detection.pipeline --trace trace.jsonl --scenario apb_fin_001
+python -m agentleak.detection.pipeline --trace trace.jsonl --scenario agentleak_fin_001
 # Output: {"leaked": true, "channels": ["C3", "C5"], "fields": ["ssn"]}
 ```
 
@@ -161,14 +161,14 @@ Objectif: Implémenter ELR, WLS, CLR, ASR, Pareto AUC
 - [ ] **5.6** Calculer Pareto AUC et dominance rate
 
 #### Livrables :
-- `apb/metrics/leakage.py`
-- `apb/metrics/utility.py`
-- `apb/metrics/pareto.py`
-- `apb/metrics/report.py`
+- `agentleak/metrics/leakage.py`
+- `agentleak/metrics/utility.py`
+- `agentleak/metrics/pareto.py`
+- `agentleak/metrics/report.py`
 
 #### Validation :
 ```bash
-python -m apb.metrics.report --results results.jsonl
+python -m agentleak.metrics.report --results results.jsonl
 # Output: ELR=0.68, WLS=2.31, TSR=0.87, Pareto_AUC=0.45
 ```
 
@@ -186,9 +186,9 @@ Objectif: Intégrer LCF et baselines de défense
 - [ ] **6.4** Benchmark comparatif des défenses
 
 #### Livrables :
-- `apb/defenses/output_filter.py`
-- `apb/defenses/policy_prompt.py`
-- `apb/defenses/lcf_wrapper.py`
+- `agentleak/defenses/output_filter.py`
+- `agentleak/defenses/policy_prompt.py`
+- `agentleak/defenses/lcf_wrapper.py`
 
 ---
 
@@ -210,7 +210,7 @@ Objectif: Passer de 100 à 1000 scénarios, créer leaderboard
 
 ```
 paper4/
-├── apb/                          # Package principal
+├── agentleak/                          # Package principal
 │   ├── __init__.py
 │   ├── schemas/
 │   │   ├── scenario.py           # Pydantic models
@@ -254,13 +254,13 @@ paper4/
 │   │   ├── policy_prompt.py
 │   │   └── lcf_wrapper.py
 │   └── cli/
-│       ├── generate.py           # apb generate
-│       ├── run.py                # apb run
-│       └── evaluate.py           # apb evaluate
+│       ├── generate.py           # agentleak generate
+│       ├── run.py                # agentleak run
+│       └── evaluate.py           # agentleak evaluate
 ├── data/
 │   ├── scenarios/
-│   │   ├── apb_lite_100.jsonl    # 100 scénarios pour dev
-│   │   └── apb_full_1000.jsonl   # 1000 scénarios complets
+│   │   ├── agentleak_lite_100.jsonl    # 100 scénarios pour dev
+│   │   └── agentleak_full_1000.jsonl   # 1000 scénarios complets
 │   ├── payloads/                 # Attack payloads
 │   └── calibration/              # Threshold calibration data
 ├── tests/
@@ -289,20 +289,20 @@ paper4/
 
 ```bash
 cd paper4
-mkdir -p apb/{schemas,generators,attacks,harness/adapters,harness/tools,detection,metrics,defenses,cli}
+mkdir -p agentleak/{schemas,generators,attacks,harness/adapters,harness/tools,detection,metrics,defenses,cli}
 mkdir -p data/{scenarios,payloads,calibration}
 mkdir -p tests notebooks docs
-touch apb/__init__.py
+touch agentleak/__init__.py
 ```
 
 ### Étape 2 : Créer les schémas Pydantic
 
-Commencer par `apb/schemas/scenario.py` - le cœur du benchmark.
+Commencer par `agentleak/schemas/scenario.py` - le cœur du benchmark.
 
 ### Étape 3 : Premier test
 
 ```bash
-python -c "from apb.schemas.scenario import Scenario; print('Structure OK')"
+python -c "from agentleak.schemas.scenario import Scenario; print('Structure OK')"
 ```
 
 ---

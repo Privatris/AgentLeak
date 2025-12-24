@@ -1,5 +1,5 @@
 """
-APB Task Configuration - Enhanced task structure inspired by AgentDAM.
+AgentLeak Task Configuration - Enhanced task structure inspired by AgentDAM.
 
 Provides a rich task configuration system with:
 - Sensitive data categorization (6 categories)
@@ -104,7 +104,7 @@ class TaskType(str, Enum):
     REDDIT_CREATE_POST = "reddit_create_post"
     REDDIT_CREATE_COMMENT = "reddit_create_comment"
     
-    # APB-specific tasks
+    # agentleak-specific tasks
     HEALTHCARE_SCHEDULE = "healthcare_schedule"
     HEALTHCARE_RECORDS = "healthcare_records"
     FINANCE_TRANSACTION = "finance_transaction"
@@ -153,7 +153,7 @@ class TaskConfig:
     Attributes:
         task_id: Unique task identifier
         site: Target platform (gitlab, shopping, reddit, etc.)
-        vertical: APB vertical (healthcare, finance, legal, corporate)
+        vertical: agentleak vertical (healthcare, finance, legal, corporate)
         start_url: Initial URL for web navigation
         intent: User instruction (with {data} placeholder)
         intent_data: Synthetic data to embed in intent
@@ -226,7 +226,7 @@ class TaskConfig:
             TaskType.SHOPPING_EDIT_ACCOUNT: self._eval_shopping_account,
             TaskType.REDDIT_CREATE_POST: self._eval_reddit_post,
             TaskType.REDDIT_CREATE_COMMENT: self._eval_reddit_comment,
-            # APB-specific
+            # agentleak-specific
             TaskType.HEALTHCARE_SCHEDULE: self._eval_healthcare,
             TaskType.FINANCE_TRANSACTION: self._eval_finance,
             TaskType.LEGAL_DOCUMENT: self._eval_legal,

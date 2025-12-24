@@ -1,5 +1,5 @@
 """
-APB Attack Module - 15 attack classes across 4 families.
+AgentLeak Attack Module - 15 attack classes across 4 families.
 
 Family 1 (F1): Prompt & Instruction Attacks
   - DPI: Direct Prompt Injection
@@ -727,7 +727,7 @@ if __name__ == "__main__":
     from agentleak.schemas.scenario import Vertical
     
     print("=" * 70)
-    print("APB Attack Module - Examples")
+    print("AgentLeak Attack Module - Examples")
     print("=" * 70)
     
     # Generate a sample scenario

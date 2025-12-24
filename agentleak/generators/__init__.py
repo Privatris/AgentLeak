@@ -1,4 +1,4 @@
-"""APB Generators - Scenario and data generation."""
+"""AgentLeak Generators - Scenario and data generation."""
 
 from agentleak.generators.canary_generator import (
     CanaryGenerator,
@@ -13,8 +13,8 @@ from agentleak.generators.vault_generator import (
 from agentleak.generators.scenario_generator import (
     ScenarioGenerator,
     generate_scenario,
-    generate_apb_lite,
-    generate_apb_full,
+    generate_agentleak_lite,
+    generate_agentleak_full,
 )
 from agentleak.generators.task_config import (
     TaskConfig,
@@ -69,8 +69,8 @@ __all__ = [
     # Scenario
     "ScenarioGenerator",
     "generate_scenario",
-    "generate_apb_lite",
-    "generate_apb_full",
+    "generate_agentleak_lite",
+    "generate_agentleak_full",
     # TaskConfig (AgentDAM-style)
     "TaskConfig",
     "TaskType",

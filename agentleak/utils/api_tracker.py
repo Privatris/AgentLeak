@@ -1,5 +1,5 @@
 """
-APB API Usage Tracker - Thread-safe token usage monitoring.
+AgentLeak API Usage Tracker - Thread-safe token usage monitoring.
 
 Provides utilities for tracking API usage across the codebase:
 1. APIUsageTracker: Singleton class for token counting
@@ -275,7 +275,7 @@ class LLMCache:
     
     def __init__(self, cache_dir: Optional[str] = None):
         if cache_dir is None:
-            cache_dir = os.path.join(Path.home(), ".apb_cache")
+            cache_dir = os.path.join(Path.home(), ".agentleak_cache")
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()

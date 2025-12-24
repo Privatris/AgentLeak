@@ -1,5 +1,5 @@
 """
-APB CrewAI Adapter - Integration with CrewAI multi-agent framework.
+agentleak CrewAI Adapter - Integration with CrewAI multi-agent framework.
 
 CrewAI enables building multi-agent systems with:
 - Role-based agents (researcher, writer, etc.)
@@ -276,7 +276,7 @@ if __name__ == "__main__":
     from ...schemas.scenario import Vertical
     
     print("=" * 60)
-    print("APB CrewAI Adapter Demo")
+    print("AgentLeak CrewAI Adapter Demo")
     print("=" * 60)
     
     # Generate a multi-agent scenario

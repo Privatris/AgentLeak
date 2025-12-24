@@ -1,4 +1,4 @@
-# APB Framework Audit Report
+# agentleak Framework Audit Report
 
 **Date**: 2024-12-24  
 **Auditor**: Copilot  
@@ -10,7 +10,7 @@ L'audit a révélé plusieurs **écarts entre le paper et l'implémentation** (h
 
 ## 1. Hallucinations Détectées
 
-### 1.1 Dataset APB-1000 (CORRIGÉ ✅)
+### 1.1 Dataset agentleak-1000 (CORRIGÉ ✅)
 
 | Claim du Paper | Avant Audit | Après Correction |
 |----------------|-------------|------------------|
@@ -79,7 +79,7 @@ elr = min(1.0, len(unique_leaks) / max(1, total_private_fields))
 
 ### 3.2 Dataset Régénéré
 
-Le fichier `apb_data/apb_1000.jsonl` a été régénéré avec la bonne distribution.
+Le fichier `agentleak_data/agentleak_1000.jsonl` a été régénéré avec la bonne distribution.
 
 ## 4. Test de Preuve
 
@@ -115,12 +115,12 @@ RESULTS: 23/23 tests passed
 |---------|--------|
 | `scripts/regenerate_dataset.py` | Créé |
 | `test_proof.py` | Créé |
-| `apb_data/apb_1000.jsonl` | Régénéré |
-| `apb/detection/pipeline.py` | Bug fix (ELR) |
+| `agentleak_data/agentleak_1000.jsonl` | Régénéré |
+| `agentleak/detection/pipeline.py` | Bug fix (ELR) |
 
 ## Conclusion
 
-Le framework APB est **fonctionnel et validé** avec 212 tests unitaires + 23 tests de preuve.
+Le framework agentleak est **fonctionnel et validé** avec 212 tests unitaires + 23 tests de preuve.
 Les hallucinations identifiées concernent principalement les **claims de portabilité** (adapters) et les **résultats numériques** (qui n'ont pas été générés par le code).
 
 Le code sous-jacent est solide et prêt pour un benchmark réel.

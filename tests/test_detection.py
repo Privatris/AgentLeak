@@ -1,5 +1,5 @@
 """
-Tests for APB Detection Pipeline.
+Tests for agentleak Detection Pipeline.
 
 Tests:
 - CanaryMatcher (Stage 1)

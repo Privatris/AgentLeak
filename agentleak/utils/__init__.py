@@ -1,5 +1,5 @@
 """
-APB Utilities - Helper functions and utilities.
+AgentLeak Utilities - Helper functions and utilities.
 
 Provides:
 - APIUsageTracker: Thread-safe token usage monitoring

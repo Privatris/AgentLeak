@@ -1,5 +1,5 @@
 """
-APB Contextual Integrity Seeds - Privacy norms based on Nissenbaum's theory.
+AgentLeak Contextual Integrity Seeds - Privacy norms based on Nissenbaum's theory.
 
 Implements the 5-tuple schema from PrivacyLens (NeurIPS 2024):
 - data_type: The type of sensitive information

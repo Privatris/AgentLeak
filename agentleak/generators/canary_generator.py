@@ -1,5 +1,5 @@
 """
-APB Canary Generator - Creates 3-tier canary tokens.
+AgentLeak Canary Generator - Creates 3-tier canary tokens.
 
 Tier 1 (Obvious): CANARY_SSN_7F3Q style markers
 Tier 2 (Realistic): Syntactically valid fake IDs
@@ -43,9 +43,9 @@ class CanaryGenerator:
         return f"CANARY_SSN_{self._random_suffix()}"
     
     def obvious_email(self) -> str:
-        """CANARY_EMAIL_XXXXXXXX@apb.test"""
+        """CANARY_EMAIL_XXXXXXXX@agentleak.test"""
         suffix = self._random_suffix()
-        return f"CANARY_EMAIL_{suffix}@apb.test"
+        return f"CANARY_EMAIL_{suffix}@agentleak.test"
     
     def obvious_phone(self) -> str:
         """CANARY_PHONE_XXXXXXXX"""
@@ -81,7 +81,7 @@ class CanaryGenerator:
         first = fake.first_name().lower()
         last = fake.last_name().lower()
         num = random.randint(1, 99)
-        domains = ["apbtest.com", "priv-eval.org", "synth-data.net"]
+        domains = ["agentleak-test.com", "priv-eval.org", "synth-data.net"]
         return f"{first}.{last}{num}@{random.choice(domains)}"
     
     def realistic_phone(self) -> str:
@@ -292,7 +292,7 @@ if __name__ == "__main__":
     gen = CanaryGenerator(seed=42)
     
     print("=" * 60)
-    print("APB Canary Generator - Examples")
+    print("AgentLeak Canary Generator - Examples")
     print("=" * 60)
     
     print("\n🏷️  TIER 1: Obvious Canaries")

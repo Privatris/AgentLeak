@@ -1,6 +1,6 @@
-# APB Harness - Execution infrastructure
+# AgentLeak Harness - Execution infrastructure
 """
-Framework-agnostic harness for running agents on APB scenarios.
+Framework-agnostic harness for running agents on AgentLeak scenarios.
 
 Components:
 - BaseAdapter: Abstract interface for agent frameworks

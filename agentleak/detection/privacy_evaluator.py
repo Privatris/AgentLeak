@@ -1,5 +1,5 @@
 """
-APB Privacy Evaluator - LLM-as-a-Judge for privacy leakage detection.
+AgentLeak Privacy Evaluator - LLM-as-a-Judge for privacy leakage detection.
 
 Inspired by AgentDAM (facebookresearch/ai-agent-privacy):
 - Uses Chain-of-Thought (CoT) reasoning to detect privacy leaks

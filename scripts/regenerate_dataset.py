@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Regenerate APB-1000 dataset with proper distribution.
+Regenerate AgentLeak-1000 dataset with proper distribution.
 
 Paper claims:
 - 4 verticals: 250 each
@@ -20,7 +20,7 @@ from agentleak.schemas.scenario import Vertical, AdversaryLevel
 def main():
     gen = ScenarioGenerator(seed=2024)
     
-    os.makedirs('apb_data', exist_ok=True)
+    os.makedirs('agentleak_data', exist_ok=True)
     
     scenarios = []
     for v in Vertical:
@@ -45,7 +45,7 @@ def main():
             scenarios.append(s)
     
     # Sauvegarder
-    with open('apb_data/apb_1000_v2.jsonl', 'w') as f:
+    with open('agentleak_data/agentleak_1000_v2.jsonl', 'w') as f:
         for s in scenarios:
             f.write(s.model_dump_json() + '\n')
     

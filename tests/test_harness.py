@@ -1,5 +1,5 @@
 """
-Tests for APB Harness components.
+Tests for agentleak Harness components.
 
 Tests:
 - BaseAdapter and DryRunAdapter

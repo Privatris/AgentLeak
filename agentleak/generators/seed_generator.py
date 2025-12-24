@@ -1,5 +1,5 @@
 """
-APB Seed Data Generator - Generate synthetic private data from seed plots.
+AgentLeak Seed Data Generator - Generate synthetic private data from seed plots.
 
 Inspired by AgentDAM's seed_to_data.py methodology:
 1. Human annotators create seed plots with sensitive_data markers

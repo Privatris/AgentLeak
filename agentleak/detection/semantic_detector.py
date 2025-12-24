@@ -1,5 +1,5 @@
 """
-APB Semantic Detector - Stage 3: Embedding-based detection for semantic canaries.
+AgentLeak Semantic Detector - Stage 3: Embedding-based detection for semantic canaries.
 
 Tier 3 canaries are natural language facts embedded in records:
 - "diagnosed with HIV in 2019"
@@ -349,7 +349,7 @@ class SemanticDetector:
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("APB Semantic Detector Demo")
+    print("AgentLeak Semantic Detector Demo")
     print("=" * 60)
     
     # Create detector with mock embeddings

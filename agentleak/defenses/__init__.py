@@ -1,8 +1,9 @@
 """
-APB Defenses Module - Privacy defenses for agentic systems.
+AgentLeak Defenses Module - Privacy defenses for agentic systems.
 
 Implements:
 - LCF: Learned Content Filter (primary defense)
+- LEACE: Linear Erasure of Attribute by Concept Erasure
 - OutputSanitizer: Rule-based output filtering
 - MemoryGuard: Memory access control
 - Mitigation: AgentDAM-style privacy prompts and CoT
@@ -13,6 +14,13 @@ from .lcf import (
     LCFConfig,
     LCFTrainer,
     FilterDecision,
+)
+
+from .leace import (
+    LEACEProjection,
+    LEACEFilter,
+    compute_leace_projection,
+    train_leace_from_examples,
 )
 
 from .sanitizer import (
@@ -46,6 +54,11 @@ __all__ = [
     "LCFConfig",
     "LCFTrainer",
     "FilterDecision",
+    # LEACE
+    "LEACEProjection",
+    "LEACEFilter",
+    "compute_leace_projection",
+    "train_leace_from_examples",
     # Sanitizer
     "OutputSanitizer",
     "SanitizerConfig",

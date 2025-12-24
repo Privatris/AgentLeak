@@ -10,10 +10,10 @@ This document provides a detailed mapping between the claims, tables, and figure
 
 | Paper Section | Code Files |
 |---------------|------------|
-| §4.1 Scenario Template | `apb/schemas/scenario.py` |
-| §4.2 Verticals and Task Families | `apb/generators/scenario_generator.py` |
-| §4.3 Controlled Realism | `apb/generators/canary_generator.py` |
-| §4.4 Scenario Distribution | `apb/generators/distribution.py` |
+| §4.1 Scenario Template | `agentleak/schemas/scenario.py` |
+| §4.2 Verticals and Task Families | `agentleak/generators/scenario_generator.py` |
+| §4.3 Controlled Realism | `agentleak/generators/canary_generator.py` |
+| §4.4 Scenario Distribution | `agentleak/generators/distribution.py` |
 
 **Key Classes:**
 - `Scenario` - Main scenario data structure
@@ -23,8 +23,8 @@ This document provides a detailed mapping between the claims, tables, and figure
 
 ```python
 # Generate 100 healthcare scenarios
-from apb.generators import ScenarioGenerator
-from apb.schemas.scenario import Vertical
+from agentleak.generators import ScenarioGenerator
+from agentleak.schemas.scenario import Vertical
 
 gen = ScenarioGenerator(seed=42)
 scenarios = gen.generate_batch(100, vertical=Vertical.HEALTHCARE)
@@ -36,9 +36,9 @@ scenarios = gen.generate_batch(100, vertical=Vertical.HEALTHCARE)
 
 | Paper Section | Code Files |
 |---------------|------------|
-| §5 Attack Taxonomy | `apb/attacks/attack_module.py` |
-| Table 2: Attack Classes | `apb/attacks/attack_module.py::ATTACK_REGISTRY` |
-| §5.1 Attack Implementation | `apb/attacks/payloads/` |
+| §5 Attack Taxonomy | `agentleak/attacks/attack_module.py` |
+| Table 2: Attack Classes | `agentleak/attacks/attack_module.py::ATTACK_REGISTRY` |
+| §5.1 Attack Implementation | `agentleak/attacks/payloads/` |
 
 **Attack Families (Table 2):**
 
@@ -51,7 +51,7 @@ scenarios = gen.generate_batch(100, vertical=Vertical.HEALTHCARE)
 
 ```python
 # Get all attacks for a family
-from apb.attacks import AttackModule, AttackFamily
+from agentleak.attacks import AttackModule, AttackFamily
 
 attacks = AttackModule.get_attacks_by_family(AttackFamily.TOOL)
 ```
@@ -62,10 +62,10 @@ attacks = AttackModule.get_attacks_by_family(AttackFamily.TOOL)
 
 | Paper Section | Code Files |
 |---------------|------------|
-| §6 Evaluation Harness | `apb/harness/base_adapter.py` |
-| §6.1 Unified Trace Format | `apb/schemas/trace.py` |
-| §6.2 Framework Adapters | `apb/harness/adapters/` |
-| Table 3: Adapters | `apb/harness/adapters/__init__.py` |
+| §6 Evaluation Harness | `agentleak/harness/base_adapter.py` |
+| §6.1 Unified Trace Format | `agentleak/schemas/trace.py` |
+| §6.2 Framework Adapters | `agentleak/harness/adapters/` |
+| Table 3: Adapters | `agentleak/harness/adapters/__init__.py` |
 
 **Supported Frameworks:**
 
@@ -79,7 +79,7 @@ attacks = AttackModule.get_attacks_by_family(AttackFamily.TOOL)
 
 ```python
 # Use LangChain adapter
-from apb.harness.adapters import LangChainAdapter, LangChainConfig
+from agentleak.harness.adapters import LangChainAdapter, LangChainConfig
 
 config = LangChainConfig(model_name="gpt-4")
 adapter = LangChainAdapter(config)
@@ -92,23 +92,23 @@ result = adapter.execute(scenario)
 
 | Paper Section | Code Files |
 |---------------|------------|
-| §7.1 Utility Metrics | `apb/metrics/utility_metrics.py` |
-| §7.2 Leakage Metrics | `apb/metrics/leakage_metrics.py` |
-| §7.3 Detection Pipeline | `apb/detection/pipeline.py` |
-| §7.4 Detection Calibration | `apb/detection/calibration.py` |
-| §7.5 Pareto Frontier | `apb/metrics/pareto.py` |
+| §7.1 Utility Metrics | `agentleak/metrics/utility_metrics.py` |
+| §7.2 Leakage Metrics | `agentleak/metrics/leakage_metrics.py` |
+| §7.3 Detection Pipeline | `agentleak/detection/pipeline.py` |
+| §7.4 Detection Calibration | `agentleak/detection/calibration.py` |
+| §7.5 Pareto Frontier | `agentleak/metrics/pareto.py` |
 
 **Metrics Implementation (Equations 1-3):**
 
 | Equation | Function | File |
 |----------|----------|------|
-| Eq. 1: ELR | `compute_elr()` | `apb/metrics/leakage_metrics.py` |
-| Eq. 2: WLS | `compute_wls()` | `apb/metrics/leakage_metrics.py` |
-| Eq. 3: CLR | `compute_clr()` | `apb/metrics/leakage_metrics.py` |
+| Eq. 1: ELR | `compute_elr()` | `agentleak/metrics/leakage_metrics.py` |
+| Eq. 2: WLS | `compute_wls()` | `agentleak/metrics/leakage_metrics.py` |
+| Eq. 3: CLR | `compute_clr()` | `agentleak/metrics/leakage_metrics.py` |
 
 ```python
 # Compute metrics
-from apb.metrics import compute_elr, compute_wls, compute_clr
+from agentleak.metrics import compute_elr, compute_wls, compute_clr
 
 elr = compute_elr(scenarios, traces)
 wls = compute_wls(scenarios, traces, severity_weights)
@@ -121,13 +121,13 @@ clr = compute_clr(scenarios, traces, channel=Channel.TOOL_INPUT)
 
 | Paper Section | Code Files |
 |---------------|------------|
-| §8.3 LCF Description | `apb/defenses/lcf_defense.py` |
-| LEACE Projection | `apb/defenses/leace.py` |
-| Variance Budget | `apb/defenses/budget_tracker.py` |
+| §8.3 LCF Description | `agentleak/defenses/lcf_defense.py` |
+| LEACE Projection | `agentleak/defenses/leace.py` |
+| Variance Budget | `agentleak/defenses/budget_tracker.py` |
 
 ```python
 # Apply LCF defense
-from apb.defenses import LCFDefense
+from agentleak.defenses import LCFDefense
 
 lcf = LCFDefense(lambda_strength=0.5)
 protected_embedding = lcf.apply(embedding, sensitive_attributes)
@@ -213,7 +213,7 @@ python scripts/generate_figures.py --figure heatmap --output figures/heatmap.pdf
 
 ```python
 # Generate tiered canaries
-from apb.generators import CanaryGenerator, CanaryTier
+from agentleak.generators import CanaryGenerator, CanaryTier
 
 gen = CanaryGenerator()
 obvious = gen.generate(CanaryTier.OBVIOUS, field_type="ssn")
@@ -227,14 +227,14 @@ semantic = gen.generate(CanaryTier.SEMANTIC, field_type="diagnosis")
 
 We integrated best practices from PrivacyLens (NeurIPS 2024):
 
-| PrivacyLens Concept | APB Implementation |
+| PrivacyLens Concept | agentleak Implementation |
 |---------------------|-------------------|
-| Contextual Integrity Seeds | `apb/generators/contextual_integrity.py` |
-| Seed→Vignette Generation | `apb/generators/vignette_generator.py` |
-| SurgeryKit Refinement | `apb/generators/vignette_generator.py::SurgeryKitModule` |
-| Multi-Level Probing | `apb/detection/probing_evaluation.py` |
-| Two-Stage Leakage Detection | `apb/detection/leakage_detector.py` |
-| API Usage Tracking | `apb/utils/api_tracker.py` |
+| Contextual Integrity Seeds | `agentleak/generators/contextual_integrity.py` |
+| Seed→Vignette Generation | `agentleak/generators/vignette_generator.py` |
+| SurgeryKit Refinement | `agentleak/generators/vignette_generator.py::SurgeryKitModule` |
+| Multi-Level Probing | `agentleak/detection/probing_evaluation.py` |
+| Two-Stage Leakage Detection | `agentleak/detection/leakage_detector.py` |
+| API Usage Tracking | `agentleak/utils/api_tracker.py` |
 
 ---
 
@@ -247,8 +247,8 @@ pip install -e .
 # 2. Run tests to verify setup
 pytest tests/ -v
 
-# 3. Generate APB-Lite dataset
-python -m apb.cli generate --preset lite
+# 3. Generate agentleak-Lite dataset
+python -m agentleak.cli generate --preset lite
 
 # 4. Run benchmark (simulation mode)
 python scripts/run_benchmark.py --quick

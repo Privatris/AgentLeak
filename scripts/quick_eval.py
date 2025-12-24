@@ -51,7 +51,7 @@ def run_simulation(n_scenarios: int, defense: Optional[str] = None, verbose: boo
     """
     start_time = time.time()
     
-    # Import APB components
+    # Import AgentLeak components
     from agentleak.generators import ScenarioGenerator
     from agentleak.schemas.scenario import Vertical
     
