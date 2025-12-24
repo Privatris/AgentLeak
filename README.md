@@ -333,7 +333,7 @@ wls = compute_wls(scenarios, traces)
 ```bibtex
 @misc{elyagoubi2025agentleak,
   title={AgentLeak: A Full-Stack Benchmark for Privacy Leakage Detection
-         in Tool-Using and Multi-Agent LLM Systems},
+         in Multi-Agent LLM Systems},
   author={El Yagoubi, Faouzi and Al Mallah, Ranwa},
   year={2025},
   institution={Polytechnique Montréal},
@@ -356,7 +356,7 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 
 ---
 
-## 📄 License
+## License
 
 MIT License - See [LICENSE](LICENSE) for details.
 
