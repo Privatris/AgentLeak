@@ -2,7 +2,6 @@
 
 **A Full-Stack Benchmark for Privacy Leakage Detection in Tool-Using and Multi-Agent LLM Systems**
 
-[![NeurIPS 2025](https://img.shields.io/badge/NeurIPS%202025-Datasets%20%26%20Benchmarks-red)]()
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)]()
 [![Tests Passing](https://img.shields.io/badge/tests-255%20passing-brightgreen)]()
 [![License MIT](https://img.shields.io/badge/license-MIT-green)]()
