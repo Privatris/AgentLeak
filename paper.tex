@@ -84,9 +84,9 @@ Montreal, QC, Canada & Montreal, Canada \\
 \begin{abstract}
 Autonomous LLM agents increasingly operate in multi-step, tool-using, and multi-agent settings where private data is stored in memory, retrieved from knowledge bases, and exchanged across agents and external tools. This shift expands the privacy attack surface beyond final text outputs to include intermediate messages, tool arguments, logs, and persistent stores. Existing evaluations often focus on prompt injection or broad safety, while privacy benchmarks typically lack (i) full-stack trace coverage across channels, (ii) standardized attack taxonomies, and (iii) leakage measurement that is both reproducible and utility-aware.
 
-We introduce \textbf{AgentLeak (APB)}, a comprehensive benchmark for privacy leakage in tool-using and multi-agent LLM systems. APB contains \textbf{1000 realistic, controlled scenarios} spanning healthcare, finance, legal, and corporate workflows, each with a private vault, explicit task objectives, and ground-truth ``allowed'' disclosure boundaries to operationalize data minimization. We contribute (1) a \textbf{15-class attack taxonomy} covering direct/indirect prompt injection, memory and store exfiltration, cross-agent collusion, and tool output poisoning; (2) a \textbf{framework-agnostic evaluation harness} that produces standardized traces across agent stacks; and (3) a \textbf{reproducible leakage measurement suite} combining exact-field canaries with structured field auditing and calibrated semantic checks, enabling privacy-utility Pareto analysis.
+We introduce \textbf{AgentLeak}, a comprehensive benchmark for privacy leakage in tool-using and multi-agent LLM systems. AgentLeak contains \textbf{1000 realistic, controlled scenarios} spanning healthcare, finance, legal, and corporate workflows, each with a private vault, explicit task objectives, and ground-truth ``allowed'' disclosure boundaries to operationalize data minimization. We contribute (1) a \textbf{7-channel audit framework} covering final output, inter-agent messages, tool inputs, tool outputs, memory writes, logs, and artifacts; (2) a \textbf{15-class attack taxonomy} organized in 4 families (prompt, tool-surface, memory, multi-agent); (3) a \textbf{framework-agnostic evaluation harness} that produces standardized execution traces across agent stacks (LangChain, CrewAI, AutoGPT, MetaGPT); and (4) a \textbf{reproducible leakage measurement suite} combining 3-tier canaries with multi-stage detection (pattern, semantic) and privacy-utility Pareto analysis.
 
-We evaluate major agent frameworks and models under benign and adversarial conditions and show that \textbf{privacy leakage is widespread without dedicated mitigations}---over 90\% of tested configurations leak PII in at least one channel. Finally, we provide strong baselines and demonstrate that \textbf{LCF (Latent Compliance Firewall)} achieves state-of-the-art privacy-utility tradeoffs on APB, establishing a reference point for future defenses. APB is released with a public leaderboard and a reproducibility package to standardize agent privacy evaluation.
+We evaluate major agent frameworks and models under benign and adversarial conditions and show that \textbf{privacy leakage is widespread without dedicated mitigations}---over 70\% of tested configurations leak sensitive information in at least one channel. Finally, we provide strong baselines and demonstrate that \textbf{LCF (Latent Compliance Firewall)} achieves state-of-the-art privacy-utility tradeoffs on AgentLeak, reducing leakage by 75\% while maintaining 81\% task success. AgentLeak is released with open source code, reproducibility scripts, and a public evaluation pipeline to standardize agent privacy assessment.
 \end{abstract}
 
 % === 1. INTRODUCTION ===
@@ -105,7 +105,7 @@ Despite rapid adoption, the community lacks a standard benchmark that:
     \item supports \textbf{multiple agent frameworks} through a unified harness and trace format.
 \end{itemize}
 
-We address these gaps by proposing \textbf{AgentLeak (APB)}, designed to become a community standard for agent privacy evaluation---analogous in spirit to benchmark suites that shaped other subfields (ImageNet for vision~\citep{deng2009imagenet}, GLUE/SuperGLUE for NLP~\citep{wang2018glue, wang2019superglue}). APB defines controlled, realistic privacy scenarios across high-stakes verticals and offers standardized attacks, metrics, and a leaderboard to ensure comparability.
+We address these gaps by proposing \textbf{AgentLeak }, designed to become a community standard for agent privacy evaluation---analogous in spirit to benchmark suites that shaped other subfields (ImageNet for vision~\citep{deng2009imagenet}, GLUE/SuperGLUE for NLP~\citep{wang2018glue, wang2019superglue}). AgentLeak defines controlled, realistic privacy scenarios across high-stakes verticals and offers standardized attacks, metrics, and a leaderboard to ensure comparability.
 
 \subsection{Why Existing Benchmarks Fall Short}
 
@@ -118,7 +118,7 @@ Current agent safety benchmarks focus primarily on prompt injection~\citep{perez
     \item \textbf{Framework portability}: Most benchmarks are tied to specific implementations.
 \end{itemize}
 
-APB fills each gap with explicit design choices documented in Section~\ref{sec:design}.
+AgentLeak fills each gap with explicit design choices documented in Section~\ref{sec:design}.
 
 % === 2. CONTRIBUTIONS ===
 \section{Contributions}
@@ -127,7 +127,7 @@ APB fills each gap with explicit design choices documented in Section~\ref{sec:d
 We summarize our contributions as follows:
 
 \noindent\textbf{C1 --- Benchmark at Scale (1000 Scenarios).}
-APB provides controlled, realistic scenarios in 4 verticals (healthcare, finance, legal, corporate), each specifying: objective, private vault, allowed disclosure set, tools, and evaluation oracles. This is the largest privacy-focused agent benchmark to date.
+AgentLeak provides controlled, realistic scenarios in 4 verticals (healthcare, finance, legal, corporate), each specifying: objective, private vault, allowed disclosure set, tools, and evaluation oracles. This is the largest privacy-focused agent benchmark to date.
 
 \noindent\textbf{C2 --- 15-Class Privacy Attack Taxonomy.}
 We document and implement a standardized set of attacks that target agent privacy across prompts, tools, memory, and inter-agent communication (Table~\ref{tab:attacks}).
@@ -139,7 +139,7 @@ We introduce a universal adapter layer producing a unified JSONL trace for any a
 We provide exact-field canaries + structured auditing + calibrated semantic checks, and score privacy alongside utility and cost (Section~\ref{sec:metrics}).
 
 \noindent\textbf{C5 --- Baselines \& Defenses; LCF as Reference Defense.}
-We release strong baselines and show LCF achieves state-of-the-art privacy-utility tradeoffs on APB (Section~\ref{sec:results}).
+We release strong baselines and show LCF achieves state-of-the-art privacy-utility tradeoffs on AgentLeak (Section~\ref{sec:results}).
 
 % === 3. PROBLEM DEFINITION & THREAT MODEL ===
 \section{Problem Definition \& Threat Model}
@@ -191,15 +191,15 @@ We assume an \textbf{honest-but-curious} observer at channel boundaries---someon
     \item Collusion between framework operators
 \end{itemize}
 
-These are important but orthogonal to the semantic privacy focus of APB.
+These are important but orthogonal to the semantic privacy focus of AgentLeak.
 
 % === 4. BENCHMARK DESIGN ===
-\section{APB Benchmark Design}
+\section{AgentLeak Benchmark Design}
 \label{sec:design}
 
 \subsection{Scenario Template}
 
-Each APB scenario is a structured tuple containing:
+Each AgentLeak scenario is a structured tuple containing:
 
 \begin{itemize}[nosep,leftmargin=*]
     \item \textbf{Objective}: What the user/team must accomplish
@@ -215,7 +215,7 @@ This template ensures every scenario has unambiguous ground truth for both task 
 
 \subsection{Verticals and Task Families}
 
-APB spans four high-stakes verticals, each with 2,500 scenarios:
+AgentLeak spans four high-stakes verticals, each with 2,500 scenarios:
 
 \begin{table}[h]
 \centering
@@ -230,7 +230,7 @@ APB spans four high-stakes verticals, each with 2,500 scenarios:
 \textcolor{corporate}{\textbf{Corporate}} & Incident response, HR case handling, trade secret routing, vendor onboarding, M\&A due diligence \\
 \bottomrule
 \end{tabular}
-\caption{APB verticals and representative tasks. Each vertical contains 250 scenarios covering single-agent, multi-agent, and adversarial variants.}
+\caption{AgentLeak verticals and representative tasks. Each vertical contains 250 scenarios covering single-agent, multi-agent, and adversarial variants.}
 \label{tab:verticals}
 \end{table}
 
@@ -246,7 +246,7 @@ APB spans four high-stakes verticals, each with 2,500 scenarios:
 \subsection{Controlled Realism}
 \label{sec:controlled-realism}
 
-APB uses \textbf{synthetic but realistic} records with:
+AgentLeak uses \textbf{synthetic but realistic} records with:
 
 \begin{itemize}[nosep,leftmargin=*]
     \item \textbf{Format constraints}: Names, IDs, addresses, account numbers, diagnosis codes, legal clauses following real-world patterns
@@ -254,7 +254,7 @@ APB uses \textbf{synthetic but realistic} records with:
     \item \textbf{Canary fields}: Unique markers (e.g., \texttt{CANARY\_SSN\_7F3Q}) for exact leakage detection
 \end{itemize}
 
-This approach yields realistic agent behavior without exposing real individuals, making APB fully publishable and ethically sound. We validate realism through human evaluation (Appendix~\ref{app:human-eval}).
+This approach yields realistic agent behavior without exposing real individuals, making AgentLeak fully publishable and ethically sound. We validate realism through human evaluation (Appendix~\ref{app:human-eval}).
 
 \subsubsection{Addressing the Synthetic-Real Gap}
 
@@ -266,7 +266,7 @@ A key critique of synthetic benchmarks is that canary tokens may be ``too obviou
     \item \textbf{Semantic canaries} (20\%): Natural language private facts (``diagnosed with Stage 2 lymphoma in March 2024'') that require semantic detection
 \end{enumerate}
 
-\textbf{Enterprise validation study}: We partnered with a Fortune 500 healthcare IT provider to validate 500 APB scenarios against their internal privacy incident logs. Results showed 87\% agreement on leakage classification, with disagreements concentrated in edge cases involving implied consent. This validation (detailed in Appendix~\ref{app:enterprise-validation}) provides evidence that APB captures real-world leakage patterns.
+\textbf{Enterprise validation study}: We partnered with a Fortune 500 healthcare IT provider to validate 500 AgentLeak scenarios against their internal privacy incident logs. Results showed 87\% agreement on leakage classification, with disagreements concentrated in edge cases involving implied consent. This validation (detailed in Appendix~\ref{app:enterprise-validation}) provides evidence that AgentLeak captures real-world leakage patterns.
 
 \subsection{Scenario Distribution}
 
@@ -289,7 +289,7 @@ Tool-light ($\leq$2 tools) & 300 & 30\% & 3.0 \\
 Tool-heavy ($>$2 tools) & 700 & 70\% & 6.2 \\
 \bottomrule
 \end{tabular}
-\caption{APB scenario distribution by topology, attack level, and tool usage.}
+\caption{AgentLeak scenario distribution by topology, attack level, and tool usage.}
 \label{tab:distribution}
 \end{table}
 
@@ -330,13 +330,13 @@ We contribute a \textbf{15-class attack taxonomy} organized into four families. 
 \quad Delegation Exploit & Task delegation & C2, C3 & Chain manipulation \\
 \bottomrule
 \end{tabular}
-\caption{APB 15-class attack taxonomy. Each class specifies injection surface, target channels (C1--C7), and expected leakage patterns. This standardization enables comparable attack success rate (ASR) measurement across frameworks.}
+\caption{AgentLeak 15-class attack taxonomy. Each class specifies injection surface, target channels (C1--C7), and expected leakage patterns. This standardization enables comparable attack success rate (ASR) measurement across frameworks.}
 \label{tab:attacks}
 \end{table*}
 
 \subsection{Attack Implementation}
 
-Each attack class in APB includes:
+Each attack class in AgentLeak includes:
 
 \begin{itemize}[nosep,leftmargin=*]
     \item \textbf{Template payloads}: Parameterized attack strings (Appendix~\ref{app:payloads})
@@ -365,7 +365,7 @@ We ensure attack diversity through stratified sampling:
 \section{Evaluation Harness \& Trace Standard}
 \label{sec:harness}
 
-A benchmark is only as useful as its reproducibility. APB provides a \textbf{framework-agnostic evaluation harness} that produces standardized traces across any agent implementation.
+A benchmark is only as useful as its reproducibility. AgentLeak provides a \textbf{framework-agnostic evaluation harness} that produces standardized traces across any agent implementation.
 
 \subsection{Unified Trace Format (JSONL)}
 
@@ -374,7 +374,7 @@ Every execution step logs:
 \begin{lstlisting}[language=json]
 {
   "timestamp": "2024-12-20T14:32:01Z",
-  "scenario_id": "apb_fin_004217",
+  "scenario_id": "agentleak_fin_004217",
   "agent_id": "A1",
   "role": "analyst",
   "event_type": "tool_call",
@@ -412,7 +412,7 @@ Custom (OpenAI API) & \checkmark & \checkmark \\
 Custom (Anthropic API) & \checkmark & \checkmark \\
 \bottomrule
 \end{tabular}
-\caption{APB framework adapters. Each adapter implements a minimal interface: hook messages, wrap tool calls, intercept memory operations, export unified traces.}
+\caption{AgentLeak framework adapters. Each adapter implements a minimal interface: hook messages, wrap tool calls, intercept memory operations, export unified traces.}
 \label{tab:adapters}
 \end{table}
 
@@ -421,16 +421,16 @@ Custom (Anthropic API) & \checkmark & \checkmark \\
     \item \texttt{hook\_messages()}: Intercept agent-to-agent and agent-to-user messages
     \item \texttt{wrap\_tools()}: Instrument tool calls with argument/output logging
     \item \texttt{intercept\_memory()}: Capture read/write operations to any memory store
-    \item \texttt{export\_trace()}: Serialize to APB's JSONL format
+    \item \texttt{export\_trace()}: Serialize to AgentLeak's JSONL format
 \end{itemize}
 
-The \texttt{apb-harness} repository provides reference implementations and a test suite for adapter validation.
+The \texttt{agentleak} repository provides reference implementations and a test suite for adapter validation.
 
 % === 7. METRICS ===
 \section{Metrics}
 \label{sec:metrics}
 
-APB measures both \textbf{utility} (task completion) and \textbf{privacy} (leakage prevention), enabling Pareto-optimal defense evaluation.
+AgentLeak measures both \textbf{utility} (task completion) and \textbf{privacy} (leakage prevention), enabling Pareto-optimal defense evaluation.
 
 \subsection{Utility Metrics}
 
@@ -465,7 +465,7 @@ We score leakage per-channel and globally:
 
 \subsection{Leakage Detection Pipeline}
 
-APB uses a three-stage detection approach:
+AgentLeak uses a three-stage detection approach:
 
 \begin{enumerate}[nosep,leftmargin=*]
     \item \textbf{Exact canary matching}: Regex search for unique markers in all channels.
@@ -494,7 +494,7 @@ To address concerns about semantic detection reliability, we report the full con
 \label{tab:confusion}
 \end{table}
 
-\textbf{Semantic threshold calibration}: We tune the cosine similarity threshold $\tau$ on a held-out 200-scenario set to minimize FNR while maintaining FPR $<$ 5\%. The optimal $\tau = 0.72$ achieves FNR = 7.4\%, meaning APB may underreport leakage by approximately 7\% in paraphrase-heavy cases. We report this as a known limitation and provide confidence intervals in all results.
+\textbf{Semantic threshold calibration}: We tune the cosine similarity threshold $\tau$ on a held-out 200-scenario set to minimize FNR while maintaining FPR $<$ 5\%. The optimal $\tau = 0.72$ achieves FNR = 7.4\%, meaning AgentLeak may underreport leakage by approximately 7\% in paraphrase-heavy cases. We report this as a known limitation and provide confidence intervals in all results.
 
 \subsection{Privacy-Utility Frontier}
 
@@ -544,7 +544,7 @@ To ensure fair comparison beyond our own defenses, we benchmark against independ
     \item \textbf{Rebuff}~\citep{rebuff2023}: Open-source multi-layer defense combining heuristics, embeddings, and LLM analysis.
 \end{itemize}
 
-This ensures APB evaluates diverse defense paradigms---not just embedding-based methods like LCF---enabling the community to identify the most promising approaches.
+This ensures AgentLeak evaluates diverse defense paradigms---not just embedding-based methods like LCF---enabling the community to identify the most promising approaches.
 
 \subsection{LCF: Latent Compliance Firewall}
 
@@ -577,18 +577,18 @@ LCF is parameterizable (privacy strength $\lambda \in [0,1]$), enabling Pareto c
 
 Experiments require approximately 2M tokens for full evaluation. We provide a \textbf{lite} subset (1,000 scenarios) for rapid iteration.
 
-\subsection{APB-Lite: Accessible Subset for Reproducibility}
+\subsection{AgentLeak-Lite: Accessible Subset for Reproducibility}
 
-To address computational cost barriers, we release \textbf{APB-Lite}: a carefully stratified 100-scenario subset designed for rapid validation:
+To address computational cost barriers, we release \textbf{AgentLeak-Lite}: a carefully stratified 100-scenario subset designed for rapid validation:
 
 \begin{itemize}[nosep,leftmargin=*]
-    \item \textbf{Cost}: \textasciitilde\$2 with GPT-4-turbo (vs. \$1,400+ for full APB)
+    \item \textbf{Cost}: \textasciitilde\$2 with GPT-4-turbo (vs. \$1,400+ for full AgentLeak)
     \item \textbf{Coverage}: 25 scenarios per vertical, all attack families represented
-    \item \textbf{Correlation}: $r = 0.94$ with full APB rankings (validated on 10 defense configurations)
+    \item \textbf{Correlation}: $r = 0.94$ with full AgentLeak rankings (validated on 10 defense configurations)
     \item \textbf{Use case}: Ablations, CI/CD integration, academic reproduction
 \end{itemize}
 
-APB-Lite enables researchers without cloud budgets to validate defenses before full-scale evaluation. We also provide \textbf{APB-Medium} (1,000 scenarios, \textasciitilde\$20) for intermediate validation.
+AgentLeak-Lite enables researchers without cloud budgets to validate defenses before full-scale evaluation. We also provide \textbf{AgentLeak-Medium} (1,000 scenarios, \textasciitilde\$20) for intermediate validation.
 
 % === 10. RESULTS ===
 \section{Results}
@@ -741,7 +741,7 @@ In a 3-agent KYC workflow, the compliance agent is tricked by a role confusion a
 \section{Ablations}
 \label{sec:ablations}
 
-We validate APB design choices through systematic ablations:
+We validate AgentLeak design choices through systematic ablations:
 
 \begin{table}[h]
 \centering
@@ -776,10 +776,10 @@ Semantic-only detection & +8.4 & +6.2 \\
 \subsection{Limitations}
 
 \begin{itemize}[nosep,leftmargin=*]
-    \item \textbf{Synthetic realism gap}: APB uses synthetic records that may not capture all real-world complexity. We mitigate through human evaluation of realism (Appendix~\ref{app:human-eval}).
-    \item \textbf{Tool coverage}: APB covers common tools but cannot model proprietary enterprise systems. The harness is extensible for custom tools.
+    \item \textbf{Synthetic realism gap}: AgentLeak uses synthetic records that may not capture all real-world complexity. We mitigate through human evaluation of realism (Appendix~\ref{app:human-eval}).
+    \item \textbf{Tool coverage}: AgentLeak covers common tools but cannot model proprietary enterprise systems. The harness is extensible for custom tools.
     \item \textbf{Semantic detection imperfection}: LLM-based paraphrase detection has inherent uncertainty. We calibrate thresholds and provide false-positive rates.
-    \item \textbf{Evolving attacks}: New attack classes will emerge. APB's modular design supports taxonomy extension.
+    \item \textbf{Evolving attacks}: New attack classes will emerge. AgentLeak's modular design supports taxonomy extension.
 \end{itemize}
 
 \subsection{Ethical Considerations}
@@ -794,21 +794,21 @@ Semantic-only detection & +8.4 & +6.2 \\
 \section{Release \& Reproducibility}
 \label{sec:release}
 
-APB is released as a complete reproducibility package:
+AgentLeak is released as a complete reproducibility package:
 
 \begin{itemize}[nosep,leftmargin=*]
     \item \textbf{Dataset}: 1000 scenarios in JSONL format with full documentation
-    \item \textbf{Harness}: \texttt{apb-harness} Python package with framework adapters
+    \item \textbf{Harness}: \texttt{agentleak} Python package with framework adapters
     \item \textbf{Evaluation}: Scripts for all metrics (ELR, WLS, CLR, ASR, Pareto)
     \item \textbf{Baselines}: Configurations for all tested defenses
     \item \textbf{Leaderboard}: Public submission portal with automated evaluation
     \item \textbf{Docker}: Containerized environment for exact reproduction
-    \item \textbf{Versioning}: APB v1.0 with checksum validation
+    \item \textbf{Versioning}: AgentLeak v1.0 with checksum validation
 \end{itemize}
 
 \subsection{Private Leaderboard Design (Anti-Gaming)}
 
-To prevent benchmark gaming and overfitting to public test cases, APB implements a \textbf{70/30 public/private split}:
+To prevent benchmark gaming and overfitting to public test cases, AgentLeak implements a \textbf{70/30 public/private split}:
 
 \begin{itemize}[nosep,leftmargin=*]
     \item \textbf{Public set (700 scenarios)}: Released for development and ablation
@@ -834,7 +834,7 @@ This design mirrors successful practices from Kaggle competitions and the HELM b
 
 \subsection{Comparison with Existing Benchmarks}
 
-Table~\ref{tab:comparison} positions APB against the closest existing benchmarks. We identify five critical dimensions where prior work falls short:
+Table~\ref{tab:comparison} positions AgentLeak against the closest existing benchmarks. We identify five critical dimensions where prior work falls short:
 
 \begin{table*}[t]
 \centering
@@ -848,25 +848,25 @@ AgentDAM~\citep{bagdasaryan2025agentdam} & 246 tasks & \textcolor{red}{\ding{55}
 PrivacyLens~\citep{shao2024privacylens} & 493 seeds & \textcolor{red}{\ding{55}} & \textcolor{red}{\ding{55}} & N/A (benign) & Norms only & \textcolor{red}{\ding{55}} & Custom \\
 AirGapAgent~\citep{wu2024airgapagent} & \textasciitilde100 & \textcolor{red}{\ding{55}} & \textcolor{red}{\ding{55}} & Context hijack & Binary leak & \textcolor{red}{\ding{55}} & 2-LLM \\
 \midrule
-\textbf{APB (Ours)} & \textbf{1000} & \textcolor{green}{\ding{51}} & \textcolor{green}{\ding{51}} & \textbf{15-class} & \textbf{ELR/WLS/CLR} & \textcolor{green}{\ding{51}} & \textbf{Agnostic} \\
+\textbf{AgentLeak (Ours)} & \textbf{1000} & \textcolor{green}{\ding{51}} & \textcolor{green}{\ding{51}} & \textbf{15-class} & \textbf{ELR/WLS/CLR} & \textcolor{green}{\ding{51}} & \textbf{Agnostic} \\
 \bottomrule
 \end{tabular}
-\caption{Comparison with existing agent privacy/safety benchmarks. APB is 20--100$\times$ larger, uniquely covers multi-agent scenarios, provides full-stack channel analysis (C1--C7), standardizes a 15-class attack taxonomy, and enables privacy-utility Pareto analysis across arbitrary frameworks.}
+\caption{Comparison with existing agent privacy/safety benchmarks. AgentLeak is 20--100$\times$ larger, uniquely covers multi-agent scenarios, provides full-stack channel analysis (C1--C7), standardizes a 15-class attack taxonomy, and enables privacy-utility Pareto analysis across arbitrary frameworks.}
 \label{tab:comparison}
 \end{table*}
 
 \textbf{Key differentiators:}
 \begin{itemize}[nosep,leftmargin=*]
-    \item \textbf{Scale}: APB's 1000 scenarios enable statistically robust comparisons and fine-grained vertical analysis, vs. $<$500 in prior work.
-    \item \textbf{Multi-agent}: Only APB tests coordination attacks (Family 4), cross-agent collusion, and role boundary violations---critical for enterprise deployments.
-    \item \textbf{Full-stack channels}: Prior benchmarks focus on final outputs. APB audits 7 channels including tool arguments, memory writes, and logs.
-    \item \textbf{Adversarial coverage}: AgentDAM and PrivacyLens test only inadvertent leakage. APB includes 250 scenarios with strong adversarial attacks.
-    \item \textbf{Framework portability}: APB's adapter architecture supports LangChain, CrewAI, AutoGPT, MetaGPT---enabling apples-to-apples framework comparison.
+    \item \textbf{Scale}: AgentLeak's 1000 scenarios enable statistically robust comparisons and fine-grained vertical analysis, vs. $<$500 in prior work.
+    \item \textbf{Multi-agent}: Only AgentLeak tests coordination attacks (Family 4), cross-agent collusion, and role boundary violations---critical for enterprise deployments.
+    \item \textbf{Full-stack channels}: Prior benchmarks focus on final outputs. AgentLeak audits 7 channels including tool arguments, memory writes, and logs.
+    \item \textbf{Adversarial coverage}: AgentDAM and PrivacyLens test only inadvertent leakage. AgentLeak includes 250 scenarios with strong adversarial attacks.
+    \item \textbf{Framework portability}: AgentLeak's adapter architecture supports LangChain, CrewAI, AutoGPT, MetaGPT---enabling apples-to-apples framework comparison.
 \end{itemize}
 
 \subsection{Agent Safety Benchmarks}
 
-Existing agent benchmarks focus on prompt injection~\citep{perez2022ignore, liu2023prompt}, jailbreaking~\citep{zou2023universal}, or broad safety~\citep{sun2024trustllm}. AgentDojo~\citep{debenedetti2024agentdojo} evaluates injection robustness but lacks privacy-specific metrics. TrustLLM~\citep{sun2024trustllm} covers fairness and robustness without multi-channel privacy. APB complements these with full-stack privacy measurement.
+Existing agent benchmarks focus on prompt injection~\citep{perez2022ignore, liu2023prompt}, jailbreaking~\citep{zou2023universal}, or broad safety~\citep{sun2024trustllm}. AgentDojo~\citep{debenedetti2024agentdojo} evaluates injection robustness but lacks privacy-specific metrics. TrustLLM~\citep{sun2024trustllm} covers fairness and robustness without multi-channel privacy. AgentLeak complements these with full-stack privacy measurement.
 
 \subsection{Privacy Evaluation}
 
@@ -874,19 +874,19 @@ Privacy benchmarks for LLMs typically assess memorization~\citep{carlini2021extr
 
 \subsection{Agent Privacy Attacks}
 
-Prompt injection attacks are well-documented~\citep{greshake2023youve, liu2023prompt}. Memory exfiltration and cross-agent collusion are emerging research areas~\citep{patil2025sum}. APB provides the first comprehensive taxonomy and standardized evaluation for these attack classes.
+Prompt injection attacks are well-documented~\citep{greshake2023youve, liu2023prompt}. Memory exfiltration and cross-agent collusion are emerging research areas~\citep{patil2025sum}. AgentLeak provides the first comprehensive taxonomy and standardized evaluation for these attack classes.
 
 % === 15. CONCLUSION ===
 \section{Conclusion}
 \label{sec:conclusion}
 
-We introduced \textbf{AgentLeak (APB)}, a comprehensive benchmark for privacy leakage in tool-using and multi-agent LLM systems. APB provides 1000 realistic scenarios across four high-stakes verticals, a 15-class attack taxonomy, a framework-agnostic evaluation harness, and reproducible metrics that capture both privacy and utility.
+We introduced \textbf{AgentLeak }, a comprehensive benchmark for privacy leakage in tool-using and multi-agent LLM systems. AgentLeak provides 1000 realistic scenarios across four high-stakes verticals, a 15-class attack taxonomy, a framework-agnostic evaluation harness, and reproducible metrics that capture both privacy and utility.
 
 Our evaluation reveals that \textbf{privacy leakage is widespread} in current agent frameworks: over 70\% of scenarios leak private data even without adversarial attacks, rising to 90\%+ under targeted attacks. Critically, most leakage occurs through \textbf{overlooked channels}---tool arguments and memory writes---rather than final outputs.
 
-APB establishes LCF as the current state-of-the-art defense, achieving the best privacy-utility tradeoff. We release APB with a public leaderboard to standardize agent privacy evaluation and accelerate progress toward privacy-preserving autonomous agents.
+AgentLeak establishes LCF as the current state-of-the-art defense, achieving the best privacy-utility tradeoff. We release AgentLeak with a public leaderboard to standardize agent privacy evaluation and accelerate progress toward privacy-preserving autonomous agents.
 
-\textbf{Impact Statement.} APB aims to make agent privacy measurable and comparable, driving the development of safer multi-agent systems. We acknowledge dual-use risks and implement responsible disclosure practices.
+\textbf{Impact Statement.} AgentLeak aims to make agent privacy measurable and comparable, driving the development of safer multi-agent systems. We acknowledge dual-use risks and implement responsible disclosure practices.
 
 % === ACKNOWLEDGMENTS ===
 \section*{Acknowledgments}
@@ -906,7 +906,7 @@ We thank the anonymous reviewers for their constructive feedback. This work was 
 
 \begin{lstlisting}[language=json]
 {
-  "scenario_id": "apb_fin_004217",
+  "scenario_id": "agentleak_fin_004217",
   "vertical": "finance",
   "difficulty": "medium",
   "agents": [
@@ -1043,7 +1043,7 @@ Track 3 & Pareto & AUC, dominance rate \\
 Track 4 & Efficiency & Steps, tokens vs. privacy \\
 \bottomrule
 \end{tabular}
-\caption{APB leaderboard tracks and evaluation metrics.}
+\caption{AgentLeak leaderboard tracks and evaluation metrics.}
 \end{table}
 
 Submissions are evaluated on a held-out test set (300 scenarios) not included in the public release. Results are automatically computed and published within 24 hours.
@@ -1067,14 +1067,14 @@ Experts confirmed that synthetic records follow real-world patterns and workflow
 \section{Enterprise Validation Study}
 \label{app:enterprise-validation}
 
-To validate that APB captures real-world privacy leakage patterns, we partnered with a Fortune 500 healthcare IT provider (anonymized) to compare APB classifications against their internal privacy incident logs.
+To validate that AgentLeak captures real-world privacy leakage patterns, we partnered with a Fortune 500 healthcare IT provider (anonymized) to compare AgentLeak classifications against their internal privacy incident logs.
 
 \subsection{Methodology}
 
 \begin{itemize}[nosep,leftmargin=*]
-    \item \textbf{Dataset}: 500 APB healthcare scenarios run on the partner's internal agent deployment
+    \item \textbf{Dataset}: 500 AgentLeak healthcare scenarios run on the partner's internal agent deployment
     \item \textbf{Ground truth}: Manual annotation by the partner's privacy compliance team
-    \item \textbf{Comparison}: APB's automated leakage detection vs. human expert classification
+    \item \textbf{Comparison}: AgentLeak's automated leakage detection vs. human expert classification
 \end{itemize}
 
 \subsection{Results}
@@ -1087,12 +1087,12 @@ To validate that APB captures real-world privacy leakage patterns, we partnered 
 \textbf{Metric} & \textbf{Value} & \textbf{95\% CI} \\
 \midrule
 Agreement rate & 87.4\% & [84.2\%, 90.1\%] \\
-APB precision & 91.2\% & [88.1\%, 93.8\%] \\
-APB recall & 84.7\% & [81.0\%, 88.0\%] \\
+AgentLeak precision & 91.2\% & [88.1\%, 93.8\%] \\
+AgentLeak recall & 84.7\% & [81.0\%, 88.0\%] \\
 Cohen's $\kappa$ & 0.74 & [0.69, 0.79] \\
 \bottomrule
 \end{tabular}
-\caption{Enterprise validation results comparing APB automated detection to expert human annotation.}
+\caption{Enterprise validation results comparing AgentLeak automated detection to expert human annotation.}
 \end{table}
 
 \subsection{Disagreement Analysis}
@@ -1104,6 +1104,6 @@ The 12.6\% disagreement cases fell into three categories:
     \item \textbf{Organizational policy} (21\%): Internal policies that differ from HIPAA minimum necessary standard
 \end{enumerate}
 
-These disagreements highlight legitimate areas of ambiguity and inform future APB extensions with configurable consent models.
+These disagreements highlight legitimate areas of ambiguity and inform future AgentLeak extensions with configurable consent models.
 
 \end{document}
