@@ -1,4 +1,4 @@
-# 🔐 AgentLeak
+# AgentLeak
 
 **A Full-Stack Benchmark for Privacy Leakage Detection in Tool-Using and Multi-Agent LLM Systems**
 
