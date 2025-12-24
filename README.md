@@ -23,7 +23,7 @@
 
 ---
 
-## 🎯 The Problem
+## The Problem
 
 Modern LLM agents operate in complex multi-step workflows with:
 - **Tool usage** - APIs, databases, file systems
@@ -52,7 +52,7 @@ Result: Privacy breach across 3 channels despite clean final output
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -88,21 +88,21 @@ python scripts/quick_eval.py --n 100 --output results.json
 ### Example Output
 
 ```
-🔐 AgentLeak Quick Evaluation
+AgentLeak Quick Evaluation
 ============================================================
-📊 AgentLeak Evaluation Results
+AgentLeak Evaluation Results
 ============================================================
 
-⚙️  Mode: SIMULATION
-📁 Scenarios: 10
-⏱️  Runtime: 0.43s
+  Mode: SIMULATION
+  Scenarios: 10
+  Runtime: 0.43s
 
-📈 Metrics:
+  Metrics:
   TSR (Task Success Rate):     85.3%
   ELR (Exact Leakage Rate):    71.1%
   WLS (Weighted Leakage Score): 2.62
 
-📡 Per-Channel Leakage:
+  Per-Channel Leakage:
   C1 Final Output       35.8% ███████
   C2 Inter-Agent        27.3% █████
   C3 Tool Input         50.5% ██████████
@@ -117,7 +117,7 @@ python scripts/quick_eval.py --n 100 --output results.json
 
 ---
 
-## 📊 Research Results
+##  Research Results
 
 ### Baseline Leakage is Widespread
 
@@ -141,7 +141,7 @@ python scripts/quick_eval.py --n 100 --output results.json
 
 ---
 
-## 🏗️ Repository Structure
+##  Repository Structure
 
 ```
 AgentLeak/
@@ -215,7 +215,7 @@ AgentLeak/
 
 ---
 
-## 🔬 Key Concepts
+##  Key Concepts
 
 ### 7 Leakage Channels (C1-C7)
 
@@ -314,7 +314,7 @@ wls = compute_wls(scenarios, traces)
 
 ---
 
-## 🆚 AgentLeak vs. Existing Work
+##  AgentLeak vs. Existing Work
 
 | Feature | AgentLeak | PrivacyLens | TrustLLM | AgentHarm |
 |---------|-----------|-------------|----------|-----------|
@@ -330,7 +330,7 @@ wls = compute_wls(scenarios, traces)
 
 ---
 
-## 📝 Citation
+##  Citation
 
 ```bibtex
 @inproceedings{elyagoubi2025agentleak,
@@ -345,7 +345,7 @@ wls = compute_wls(scenarios, traces)
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
@@ -366,14 +366,6 @@ Developed at **Polytechnique Montréal**
 
 ---
 
-## 👥 Contact & References
-
-- **Faouzi EL YAGOUBI**: faouzi.elyagoubi@polymtl.ca
-- **Ranwa AL MALLAH**: ranwa.al-mallah@polymtl.ca
-- **Repository**: https://github.com/Privatris/AgentLeak
-- **Paper**: [NeurIPS 2025 Datasets & Benchmarks](https://neurips.cc)
-
----
 
 ## 🙏 Acknowledgments
 
