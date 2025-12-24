@@ -206,8 +206,8 @@ AgentLeak/
 │   └── ARCHITECTURE.md            # System architecture
 │
 ├── 📊 data/                       # Scenario data (JSONL format)
-│   ├── scenarios_lite.jsonl       # APB-Lite: 100 scenarios (~$2)
-│   └── scenarios_medium.jsonl     # APB-Medium: 1000 scenarios (~$20)
+│   ├── scenarios_lite.jsonl       # AgentLeak-Lite: 100 scenarios (~$2)
+│   └── scenarios_medium.jsonl     # AgentLeak-Medium: 1000 scenarios (~$20)
 │
 └── 📄 references.bib              # Bibliography
 
