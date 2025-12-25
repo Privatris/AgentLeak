@@ -29,6 +29,9 @@ We evaluated **6 production LLMs** across **100 scenarios** each (**600 total AP
 - 📊 87% of leaks are **semantic** (not verbatim copying)
 - 💰 Total evaluation cost: **$0.58**
 
+**📖 Read the full paper:** [AgentLeak Paper](https://github.com/Privatris/AgentLeak)
+**🏆 Public Leaderboard:** [Coming soon]
+
 ---
 
 ## System Architecture
