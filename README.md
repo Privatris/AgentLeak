@@ -11,7 +11,7 @@
 ## System Architecture
 
 <p align="center">
-  <img src="figures/Fig_System_Architecture_AgentLeak_Complete.drawio.pdf" alt="AgentLeak System Architecture" width="800"/>
+  <img src="figures/Fig_System_Architecture_AgentLeak_Complete.drawio.png" alt="AgentLeak System Architecture" width="800"/>
 </p>
 
 AgentLeak audits **seven leakage channels** (C1–C7) across the entire agent execution stack: final outputs, inter-agent messages, tool arguments, tool responses, memory writes, logs, and artifacts.
@@ -19,7 +19,7 @@ AgentLeak audits **seven leakage channels** (C1–C7) across the entire agent ex
 ## Attack Taxonomy
 
 <p align="center">
-  <img src="figures/Fig_Attack_Taxonomy_Improved.drawio.pdf" alt="15-Class Attack Taxonomy" width="700"/>
+  <img src="figures/Fig_Attack_Taxonomy_Improved.drawio.png" alt="15-Class Attack Taxonomy" width="700"/>
 </p>
 
 Our **15-class attack taxonomy** is organized into four families: prompt attacks (F1), tool-surface attacks (F2), memory/persistence attacks (F3), and multi-agent coordination attacks (F4).
@@ -27,7 +27,7 @@ Our **15-class attack taxonomy** is organized into four families: prompt attacks
 ## Framework-Agnostic Harness
 
 <p align="center">
-  <img src="figures/Fig_Framework_Agnostic_Harness.drawio.pdf" alt="Framework-Agnostic Harness" width="700"/>
+  <img src="figures/Fig_Framework_Agnostic_Harness.drawio.png" alt="Framework-Agnostic Harness" width="700"/>
 </p>
 
 The evaluation harness provides adapters for LangChain, CrewAI, AutoGPT, and MetaGPT, emitting a unified JSONL trace format for consistent benchmarking.

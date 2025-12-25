@@ -1,6 +1,6 @@
 # 📊 Paper ↔ Code Mapping
 
-This document provides a detailed mapping between the claims, tables, and figures in our NeurIPS 2025 paper and the corresponding code implementations.
+This document provides a detailed mapping between the claims, tables, and figures in our paper and the corresponding code implementations.
 
 ---
 
