@@ -9,7 +9,7 @@
 
 ---
 
-## � Research Paper
+## Research Paper
 
 **[👉 AgentLeak_Full_Paper.pdf](./paper.pdf)** — Read the complete research paper with methodology, results, and theoretical analysis.
 
@@ -23,7 +23,7 @@ The paper presents:
 
 ---
 
-## �🔬 Latest Empirical Results (December 2025)
+## Latest Empirical Results (December 2025)
 
 We evaluated **6 production LLMs** across **100 scenarios** each (**600 total API calls**):
 
@@ -44,11 +44,10 @@ We evaluated **6 production LLMs** across **100 scenarios** each (**600 total AP
 - 💰 Total evaluation cost: **$0.58**
 
 **📖 Read the full paper:** [AgentLeak Paper](https://github.com/Privatris/AgentLeak)
-**🏆 Public Leaderboard:** [Coming soon]
 
 ---
 
-## 🔬 Diagnostic & Validation Reports
+## Diagnostic & Validation Reports
 
 **All findings have been rigorously validated against reviewer concerns.**
 
@@ -92,7 +91,7 @@ The evaluation harness provides adapters for LangChain, CrewAI, AutoGPT, and Met
 
 ---
 
-## 🔄 Multi-Framework Evaluation (NEW)
+## Multi-Framework Evaluation (NEW)
 
 AgentLeak now supports **unified evaluation across all major multi-agent frameworks** with a generic plugin architecture:
 
@@ -410,7 +409,7 @@ AgentLeak/
 
 ---
 
-## 📈 How to Use AgentLeak
+##  How to Use AgentLeak
 
 ### For Research
 
@@ -473,7 +472,7 @@ wls = compute_wls(scenarios, traces)
 @misc{elyagoubi2025agentleak,
   title={AgentLeak: A Full-Stack Benchmark for Privacy Leakage Detection
          in Multi-Agent LLM Systems},
-  author={El Yagoubi, Faouzi and Al Mallah, Ranwa},
+  author={El Yagoubi, Faouzi and Al Mallah, Ranwa, Abdi, Arslene},
   year={2025},
   institution={Polytechnique Montréal},
   url={https://github.com/Privatris/AgentLeak}
@@ -504,7 +503,7 @@ Developed at **Polytechnique Montréal**
 ---
 
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 AgentLeak integrates best practices from:
 - **PrivacyLens** (NeurIPS 2024): Contextual Integrity framework
