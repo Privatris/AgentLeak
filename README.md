@@ -5,6 +5,29 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)]()
 [![Tests Passing](https://img.shields.io/badge/tests-255%20passing-brightgreen)]()
 [![License MIT](https://img.shields.io/badge/license-MIT-green)]()
+[![Empirical Eval](https://img.shields.io/badge/Empirical_Eval-600_API_calls-orange)]()
+
+---
+
+## 🔬 Latest Empirical Results (December 2025)
+
+We evaluated **6 production LLMs** across **100 scenarios** each (**600 total API calls**):
+
+| Model | ELR ↓ | WLS ↓ | Leaks | Cost |
+|-------|-------|-------|-------|------|
+| **GPT-4o** | **37.0%** | 3.16 | 37 | $0.17 |
+| Claude-3.5-Sonnet | 40.4% | 2.71 | 40 | $0.34 |
+| GPT-4o-mini | 44.0% | 3.88 | 44 | $0.01 |
+| Claude-3-Haiku | 50.0% | 3.73 | 50 | $0.03 |
+| Qwen-2.5-72B | 56.0% | 10.43 | 56 | $0.02 |
+| Qwen-2.5-7B | 77.0% | 13.69 | 77 | $0.005 |
+
+**Key Findings:**
+- 🔴 **51% average leakage rate** despite explicit privacy instructions
+- 🟢 GPT-4o is the most privacy-preserving (37% ELR)
+- 🔴 Qwen-7B leaks in 77% of scenarios
+- 📊 87% of leaks are **semantic** (not verbatim copying)
+- 💰 Total evaluation cost: **$0.58**
 
 ---
 
@@ -42,6 +65,7 @@ It serves as a rigorous, adversarial testing ground for any agent framework (Lan
 
 ### Key Statistics
 - **1,000 realistic scenarios** across 4 verticals (healthcare, finance, legal, corporate)
+- **600 real API calls** evaluated on production LLMs (GPT-4o, Claude, Qwen)
 - **15-class attack taxonomy** organized in 4 families
 - **7 leakage channels** with standardized detection methods
 - **3-tier canary system** for robust leakage detection

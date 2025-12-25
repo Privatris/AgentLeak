@@ -1,12 +1,12 @@
 # AgentLeak Empirical Evaluation Results
 
 **Date:** December 25, 2025  
-**Total Scenarios:** 180 (30 per model)  
-**Total API Cost:** $0.17  
+**Total Scenarios:** 600 (100 per model × 6 models)  
+**Total API Cost:** $0.58  
 
 ## Summary
 
-We conducted real evaluations using production LLM APIs via OpenRouter to validate the AgentLeak benchmark beyond simulation. This document summarizes the empirical findings.
+We conducted real evaluations using production LLM APIs via OpenRouter to validate the AgentLeak benchmark beyond simulation. This document summarizes the empirical findings from our large-scale evaluation.
 
 ## Models Evaluated
 
@@ -19,17 +19,17 @@ We conducted real evaluations using production LLM APIs via OpenRouter to valida
 | Qwen-2.5-7B | Qwen | qwen/qwen-2.5-7b-instruct | $0.07 in / $0.07 out |
 | Qwen-2.5-72B | Qwen | qwen/qwen-2.5-72b-instruct | $0.35 in / $0.40 out |
 
-## Main Results
+## Main Results (n=100 per model)
 
 | Model | TSR | ELR | WLS | Leaks | Cost |
 |-------|-----|-----|-----|-------|------|
-| **GPT-4o** | 100.0% | **23.3%** | 1.52 | 7 | $0.05 |
-| GPT-4o-mini | 100.0% | 30.0% | 2.32 | 9 | $0.003 |
-| Claude-3-Haiku | 100.0% | 40.0% | 3.06 | 12 | $0.009 |
-| **Claude-3.5-Sonnet** | 100.0% | **26.7%** | 2.23 | 8 | $0.10 |
-| Qwen-2.5-7B | 100.0% | 80.0% | 11.96 | 24 | $0.002 |
-| Qwen-2.5-72B | 100.0% | 40.0% | 7.76 | 12 | $0.007 |
-| **Average** | 100.0% | **40.0%** | 4.81 | 12 | $0.17 |
+| **GPT-4o** | 100.0% | **37.0%** | 3.16 | 37 | $0.17 |
+| Claude-3.5-Sonnet | 99.0% | **40.4%** | 2.71 | 40 | $0.34 |
+| GPT-4o-mini | 100.0% | 44.0% | 3.88 | 44 | $0.01 |
+| Claude-3-Haiku | 100.0% | 50.0% | 3.73 | 50 | $0.03 |
+| Qwen-2.5-72B | 100.0% | 56.0% | 10.43 | 56 | $0.02 |
+| Qwen-2.5-7B | 100.0% | 77.0% | 13.69 | 77 | $0.005 |
+| **Average** | 99.8% | **50.7%** | 6.27 | 51 | $0.58 |
 
 ### Key Metrics
 
@@ -41,40 +41,41 @@ We conducted real evaluations using production LLM APIs via OpenRouter to valida
 
 | Model | T1 (Canary) | T2 (Pattern) | T3 (Semantic) | Total |
 |-------|-------------|--------------|---------------|-------|
-| GPT-4o | 1 | 0 | 12 | 13 |
-| GPT-4o-mini | 1 | 3 | 17 | 21 |
-| Claude-3-Haiku | 4 | 1 | 25 | 30 |
-| Claude-3.5-Sonnet | 1 | 1 | 19 | 21 |
-| Qwen-2.5-7B | 5 | 8 | 95 | 108 |
-| Qwen-2.5-72B | 2 | 7 | 58 | 67 |
+| GPT-4o | 2 | 6 | 90 | 98 |
+| GPT-4o-mini | 3 | 8 | 109 | 120 |
+| Claude-3-Haiku | 10 | 3 | 104 | 117 |
+| Claude-3.5-Sonnet | 4 | 2 | 76 | 82 |
+| Qwen-2.5-7B | 29 | 28 | 362 | 419 |
+| Qwen-2.5-72B | 11 | 22 | 283 | 316 |
+| **Total** | 59 | 69 | 1024 | 1152 |
 
-**Key Finding:** 87% of leaks are semantic (T3)—models disclose confidential information while being helpful, not through verbatim copying.
+**Key Finding:** 89% of leaks are semantic (T3)—models disclose confidential information while being helpful, not through verbatim copying.
 
-## Leakage by Vertical
+## Leakage by Vertical Domain (n=25 per vertical × 6 models = 150 per vertical)
 
 | Vertical | Scenarios | Mean ELR | Most Secure | Least Secure |
 |----------|-----------|----------|-------------|--------------|
-| Healthcare | 42 | **14.3%** | GPT-4o | Qwen-7B |
-| Finance | 42 | 33.3% | GPT-4o | Qwen-7B |
-| Legal | 42 | 45.2% | GPT-4o-mini | Qwen-7B |
-| Corporate | 54 | **61.1%** | GPT-4o | Qwen-7B |
+| Healthcare | 150 | **21.3%** | GPT-4o | Qwen-7B |
+| Finance | 150 | 42.7% | Claude-3.5-Sonnet | Qwen-7B |
+| Legal | 150 | 62.7% | GPT-4o | Qwen-7B |
+| Corporate | 150 | **77.3%** | GPT-4o | Qwen-7B |
 
-**Key Finding:** Healthcare shows lowest leakage (likely due to HIPAA-focused training). Corporate scenarios need more attention.
+**Key Finding:** Healthcare shows lowest leakage (21.3%, likely due to HIPAA-focused training). Corporate scenarios have highest leakage (77.3%), indicating a significant gap in privacy training for business contexts.
 
 ## Qualitative Analysis
 
 ### Types of Leakage Observed
 
-1. **Canary Token Leakage (14 instances)**
+1. **Canary Token Leakage (59 instances)**
    - Models include obvious markers like `CANARY_CASE_OROLRTJP` verbatim
    - Indicates complete failure to filter confidential identifiers
 
-2. **Pattern Leakage (20 instances)**
+2. **Pattern Leakage (69 instances)**
    - SSN: `939-79-6410`
    - Routing numbers: `040134811`
    - Email addresses exposed despite instructions
 
-3. **Semantic Leakage (226 instances)**
+3. **Semantic Leakage (1024 instances)**
    - Revealing diagnoses ("carries the BRCA1 gene mutation")
    - Disclosing opposing party names in legal cases
    - Sharing internal notes marked as confidential
@@ -90,10 +91,11 @@ We conducted real evaluations using production LLM APIs via OpenRouter to valida
 
 ## Key Insights
 
-1. **All models leak:** Even frontier models (GPT-4o, Claude-3.5-Sonnet) leaked in 23-27% of scenarios
-2. **Model size matters:** Qwen-7B leaked in 80% vs. Qwen-72B's 40%
-3. **Domain-specific training helps:** Healthcare models are safer than corporate
+1. **All models leak:** Even frontier models (GPT-4o, Claude-3.5-Sonnet) leaked in 37-40% of scenarios
+2. **Model size matters:** Qwen-7B leaked in 77% vs. Qwen-72B's 56%
+3. **Domain-specific training helps:** Healthcare (21.3% ELR) is safer than corporate (77.3% ELR)
 4. **Privacy instructions are insufficient:** Explicit "do not share" instructions don't prevent leakage
+5. **Cost-effectiveness:** Complete evaluation cost <$1 for 600 API calls
 
 ## Reproducibility
 
