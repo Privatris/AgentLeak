@@ -14,9 +14,10 @@
 **[👉 AgentLeak_Full_Paper.pdf](./paper.pdf)** — Read the complete research paper with methodology, results, and theoretical analysis.
 
 The paper presents:
-- Full taxonomy of 15 attack classes across 4 families
+- Full taxonomy of **19 attack classes** across **5 families** (including F5 Chain-of-Thought)
 - Detailed methodology for 7-channel privacy auditing
 - Empirical evaluation on 6 production LLMs (600 API calls)
+- **Multi-framework support**: CrewAI, LangGraph, AutoGen, MetaGPT
 - Statistical analysis and vulnerability breakdown
 - Recommendations for defense mechanisms
 
@@ -79,7 +80,7 @@ AgentLeak audits **seven leakage channels** (C1–C7) across the entire agent ex
   <img src="figures/Fig_Attack_Taxonomy_Improved.drawio.png" alt="15-Class Attack Taxonomy" width="700"/>
 </p>
 
-Our **15-class attack taxonomy** is organized into four families: prompt attacks (F1), tool-surface attacks (F2), memory/persistence attacks (F3), and multi-agent coordination attacks (F4).
+Our **19-class attack taxonomy** is organized into five families: prompt attacks (F1), tool-surface attacks (F2), memory/persistence attacks (F3), multi-agent coordination attacks (F4), and **reasoning/chain-of-thought attacks (F5)**.
 
 ## Framework-Agnostic Harness
 
@@ -88,6 +89,51 @@ Our **15-class attack taxonomy** is organized into four families: prompt attacks
 </p>
 
 The evaluation harness provides adapters for LangChain, CrewAI, AutoGPT, and MetaGPT, emitting a unified JSONL trace format for consistent benchmarking.
+
+---
+
+## 🔄 Multi-Framework Evaluation (NEW)
+
+AgentLeak now supports **unified evaluation across all major multi-agent frameworks** with a generic plugin architecture:
+
+| Framework | Status | Install | C2 Inter-Agent Capture |
+|-----------|--------|---------|------------------------|
+| **CrewAI** | ✅ Supported | `pip install crewai` | ✅ Full |
+| **LangGraph** | ✅ Supported | `pip install langgraph` | ✅ Full |
+| **AutoGen** | ✅ Supported | `pip install autogen-agentchat` | ✅ Full |
+| **MetaGPT** | ✅ Supported | `pip install metagpt` | ✅ Full |
+
+### Quick Multi-Framework Test
+
+```bash
+# Check framework availability
+python scripts/run_unified_evaluation.py --check-frameworks
+
+# Run simulated evaluation (no API key needed)
+python scripts/run_unified_evaluation.py --mode simulated --n-scenarios 50
+
+# Run real evaluation with specific frameworks
+python scripts/run_unified_evaluation.py --mode real --frameworks crewai,langgraph
+```
+
+### Multi-Framework Results (Simulated, N=50)
+
+| Framework | C1 Leaks | C2 Leaks | Leak Rate |
+|-----------|----------|----------|-----------|
+| CrewAI | 15 | 15 | 30.0% |
+| AutoGen | 18 | 18 | 36.0% |
+| MetaGPT | 29 | 29 | 58.0% |
+| LangGraph | 12 | 12 | 24.0% |
+
+### F5 Chain-of-Thought Attack Testing
+
+```bash
+# View CoT attack examples
+python scripts/run_cot_attack_evaluation.py --examples
+
+# Run CoT attacks on specific model
+python scripts/run_cot_attack_evaluation.py --model gpt-4o-mini --n-scenarios 20
+```
 
 ---
 
@@ -100,11 +146,12 @@ It serves as a rigorous, adversarial testing ground for any agent framework (Lan
 ### Key Statistics
 - **1,000 realistic scenarios** across 4 verticals (healthcare, finance, legal, corporate)
 - **600 real API calls** evaluated on production LLMs (GPT-4o, Claude, Qwen)
-- **15-class attack taxonomy** organized in 4 families
+- **19-class attack taxonomy** organized in 5 families (including F5 Chain-of-Thought)
 - **7 leakage channels** with standardized detection methods
+- **4 multi-agent frameworks**: CrewAI, LangGraph, AutoGen, MetaGPT
 - **3-tier canary system** for robust leakage detection
 - **255 comprehensive tests** covering all components
-- **Framework-agnostic harness** for LangChain, CrewAI, AutoGPT, MetaGPT
+- **Framework-agnostic harness** with generic adapter architecture
 
 ---
 
@@ -338,6 +385,12 @@ AgentLeak/
 - Cross-Agent Collusion
 - Role Boundary Violation
 - Delegation Exploit
+
+**F5: Reasoning & Chain-of-Thought** (4 attacks) — *NEW*
+- Logic Puzzle Jailbreak (GPT-5 style)
+- Chain-of-Thought Forging (fake `<think>` tags)
+- Special Token Injection (DeepSeek R1 exploits)
+- Reasoning Hijack (Socratic escalation)
 
 ### 3-Tier Canary System
 

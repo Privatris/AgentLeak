@@ -66,11 +66,12 @@ class Channel(str, Enum):
 
 
 class AttackFamily(str, Enum):
-    """Four attack families."""
+    """Five attack families."""
     F1_PROMPT = "prompt_instruction"
     F2_TOOL = "tool_surface"
     F3_MEMORY = "memory_persistence"
     F4_MULTIAGENT = "multiagent_coordination"
+    F5_REASONING = "reasoning_cot"  # Chain-of-Thought attacks (NEW)
 
 
 class AttackClass(str, Enum):
@@ -94,6 +95,11 @@ class AttackClass(str, Enum):
     CROSS_AGENT = "cross_agent_collusion"
     ROLE_BOUNDARY = "role_boundary_violation"
     DELEGATION_EXPLOIT = "delegation_exploit"
+    # Family 5: Reasoning/Chain-of-Thought (NEW - inspired by BackdoorLLM CoTA)
+    LOGIC_PUZZLE_JAILBREAK = "logic_puzzle_jailbreak"  # GPT-5 style logic grid bypass
+    COT_FORGING = "cot_forging"  # Inject fake <think> reasoning
+    SPECIAL_TOKEN_INJECTION = "special_token_injection"  # DeepSeek R1 style
+    REASONING_HIJACK = "reasoning_hijack"  # Hijack reasoning to leak data
 
 
 # ============================================================================
