@@ -9,7 +9,20 @@
 
 ---
 
-## 🔬 Latest Empirical Results (December 2025)
+## � Research Paper
+
+**[👉 AgentLeak_Full_Paper.pdf](./paper.pdf)** — Read the complete research paper with methodology, results, and theoretical analysis.
+
+The paper presents:
+- Full taxonomy of 15 attack classes across 4 families
+- Detailed methodology for 7-channel privacy auditing
+- Empirical evaluation on 6 production LLMs (600 API calls)
+- Statistical analysis and vulnerability breakdown
+- Recommendations for defense mechanisms
+
+---
+
+## �🔬 Latest Empirical Results (December 2025)
 
 We evaluated **6 production LLMs** across **100 scenarios** each (**600 total API calls**):
 
