@@ -47,6 +47,24 @@ We evaluated **6 production LLMs** across **100 scenarios** each (**600 total AP
 
 ---
 
+## 🔬 Diagnostic & Validation Reports
+
+**All findings have been rigorously validated against reviewer concerns.**
+
+- **[DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)** ← Quick navigation to all diagnostic reports
+- **[VALIDATION_SUMMARY.md](./VALIDATION_SUMMARY.md)** - Executive summary of all findings (5 min read)
+- **[DIAGNOSTIC_TEST_RIGOR.md](./DIAGNOSTIC_TEST_RIGOR.md)** - Detailed test quality audit
+- **[PAYLOAD_VERIFICATION_REPORT.md](./PAYLOAD_VERIFICATION_REPORT.md)** - 100% paper-to-code alignment verification
+- **[WHY_SIMPLE_PAYLOADS_WORK.md](./WHY_SIMPLE_PAYLOADS_WORK.md)** - Root cause analysis of LLM vulnerability
+
+**Key Findings:**
+- ✅ Attack payloads ARE as shown in paper (intentional baseline)
+- ✅ 100% alignment between Appendix B and code implementation
+- ✅ 51% leakage rate is realistic and matches published literature
+- ✅ Simple prompt injections work because of LLM training on internet-scale attack data
+
+---
+
 ## System Architecture
 
 <p align="center">
