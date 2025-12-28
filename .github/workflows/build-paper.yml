@@ -1,0 +1,45 @@
+name: Build Paper PDF
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'paper/**.tex'
+      - 'paper/**.bib'
+      - 'paper/**.png'
+      - 'paper/**.jpg'
+  workflow_dispatch:
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: paper.tex
+          working_directory: paper/
+          latexmk_use_xelatex: false
+          latexmk_shell_escape: true
+          extra_system_packages: "pygments-routers-lexers"
+
+      - name: Check if PDF was generated
+        run: |
+          if [ -f paper/paper.pdf ]; then
+            echo "PDF generated successfully."
+          else
+            echo "PDF generation failed."
+            exit 1
+          fi
+
+      - name: Commit and Push PDF
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Docs: auto-generate paper PDF [skip ci]"
+          file_pattern: 'paper/*.pdf'
