@@ -9,36 +9,37 @@ from pathlib import Path
 from collections import defaultdict
 from datetime import datetime
 
+
 def load_results(results_dir: str) -> tuple[dict, list]:
     """Load the most recent evaluation results."""
     results_path = Path(results_dir)
-    
+
     # Find most recent summary
     summaries = list(results_path.glob("real_eval_summary_*.json"))
     if not summaries:
         raise FileNotFoundError("No summary files found")
-    
+
     latest_summary = max(summaries, key=lambda p: p.stat().st_mtime)
-    
+
     with open(latest_summary) as f:
         summary = json.load(f)
-    
+
     # Find matching results
     results_file = latest_summary.name.replace("summary", "results").replace(".json", ".jsonl")
     results_path = results_path / results_file
-    
+
     results = []
     if results_path.exists():
         with open(results_path) as f:
             for line in f:
                 results.append(json.loads(line))
-    
+
     return summary, results
 
 
 def generate_latex_main_table(summary: dict) -> str:
     """Generate Table: Main results across models."""
-    
+
     latex = r"""
 \begin{table}[h]
 \centering
@@ -48,11 +49,13 @@ def generate_latex_main_table(summary: dict) -> str:
 \toprule
 \textbf{Model} & \textbf{Family} & \textbf{TSR (\%%)} & \textbf{ELR (\%%)} & \textbf{WLS} & \textbf{Leaks} & \textbf{Cost (\$)} \\
 \midrule
-""" % summary.get("n_scenarios_per_model", 30)
-    
+""" % summary.get(
+        "n_scenarios_per_model", 30
+    )
+
     model_families = {
         "gpt-4o": "OpenAI",
-        "gpt-4o-mini": "OpenAI", 
+        "gpt-4o-mini": "OpenAI",
         "gpt-4-turbo": "OpenAI",
         "gpt-3.5-turbo": "OpenAI",
         "claude-3-opus": "Anthropic",
@@ -65,7 +68,7 @@ def generate_latex_main_table(summary: dict) -> str:
         "llama-3-70b": "Meta",
         "mixtral-8x22b": "Mistral",
     }
-    
+
     for model, data in summary.get("models", {}).items():
         family = model_families.get(model, "Other")
         tsr = data.get("TSR", 0)
@@ -73,9 +76,11 @@ def generate_latex_main_table(summary: dict) -> str:
         wls = data.get("WLS_mean", 0)
         leaks = data.get("n_with_leaks", 0)
         cost = data.get("total_cost_usd", 0)
-        
-        latex += f"{model} & {family} & {tsr:.1f} & {elr:.1f} & {wls:.2f} & {leaks} & {cost:.4f} \\\\\n"
-    
+
+        latex += (
+            f"{model} & {family} & {tsr:.1f} & {elr:.1f} & {wls:.2f} & {leaks} & {cost:.4f} \\\\\n"
+        )
+
     latex += r"""
 \bottomrule
 \end{tabular}
@@ -86,7 +91,7 @@ def generate_latex_main_table(summary: dict) -> str:
 
 def generate_latex_leak_type_table(summary: dict) -> str:
     """Generate Table: Leakage by detection tier."""
-    
+
     latex = r"""
 \begin{table}[h]
 \centering
@@ -97,16 +102,16 @@ def generate_latex_leak_type_table(summary: dict) -> str:
 \textbf{Model} & \textbf{T1 (Canary)} & \textbf{T2 (Pattern)} & \textbf{T3 (Semantic)} & \textbf{Total} & \textbf{ELR (\%)} \\
 \midrule
 """
-    
+
     for model, data in summary.get("models", {}).items():
         t1 = data.get("canary_leaks", 0)
         t2 = data.get("pattern_leaks", 0)
         t3 = data.get("semantic_leaks", 0)
         total = t1 + t2 + t3
         elr = data.get("ELR", 0)
-        
+
         latex += f"{model} & {t1} & {t2} & {t3} & {total} & {elr:.1f} \\\\\n"
-    
+
     latex += r"""
 \bottomrule
 \end{tabular}
@@ -117,10 +122,10 @@ def generate_latex_leak_type_table(summary: dict) -> str:
 
 def generate_per_vertical_table(results: list) -> str:
     """Generate Table: Results by vertical."""
-    
+
     # Aggregate by vertical and model
     vertical_stats = defaultdict(lambda: defaultdict(lambda: {"total": 0, "leaks": 0, "wls": 0}))
-    
+
     for r in results:
         v = r.get("vertical", "unknown")
         m = r.get("model", "unknown")
@@ -128,7 +133,7 @@ def generate_per_vertical_table(results: list) -> str:
         if r.get("elr", 0) > 0:
             vertical_stats[v][m]["leaks"] += 1
         vertical_stats[v][m]["wls"] += r.get("wls", 0)
-    
+
     latex = r"""
 \begin{table}[h]
 \centering
@@ -139,24 +144,25 @@ def generate_per_vertical_table(results: list) -> str:
 \textbf{Vertical} & \textbf{Scenarios} & \textbf{Mean ELR (\%)} & \textbf{Mean WLS} & \textbf{Most Secure} & \textbf{Least Secure} \\
 \midrule
 """
-    
+
     for vertical in sorted(vertical_stats.keys()):
         models = vertical_stats[vertical]
         total_scenarios = sum(m["total"] for m in models.values())
         total_leaks = sum(m["leaks"] for m in models.values())
         total_wls = sum(m["wls"] for m in models.values())
-        
+
         mean_elr = (total_leaks / total_scenarios * 100) if total_scenarios > 0 else 0
         mean_wls = total_wls / total_scenarios if total_scenarios > 0 else 0
-        
+
         # Find most/least secure models for this vertical
-        elr_by_model = {m: (s["leaks"]/s["total"]*100 if s["total"] > 0 else 0) 
-                        for m, s in models.items()}
+        elr_by_model = {
+            m: (s["leaks"] / s["total"] * 100 if s["total"] > 0 else 0) for m, s in models.items()
+        }
         most_secure = min(elr_by_model, key=elr_by_model.get)
         least_secure = max(elr_by_model, key=elr_by_model.get)
-        
+
         latex += f"{vertical.capitalize()} & {total_scenarios} & {mean_elr:.1f} & {mean_wls:.2f} & {most_secure} & {least_secure} \\\\\n"
-    
+
     latex += r"""
 \bottomrule
 \end{tabular}
@@ -167,27 +173,29 @@ def generate_per_vertical_table(results: list) -> str:
 
 def generate_qualitative_analysis(results: list) -> str:
     """Generate qualitative analysis section."""
-    
+
     # Collect example leaks
     leak_examples = []
     for r in results:
         if r.get("leaks_detected"):
             for leak in r["leaks_detected"]:
-                leak_examples.append({
-                    "scenario": r.get("scenario_id"),
-                    "model": r.get("model"),
-                    "vertical": r.get("vertical"),
-                    "type": leak.get("type"),
-                    "field": leak.get("field"),
-                    "value": leak.get("value", "")[:50],
-                    "output_preview": r.get("output", "")[:200],
-                })
-    
+                leak_examples.append(
+                    {
+                        "scenario": r.get("scenario_id"),
+                        "model": r.get("model"),
+                        "vertical": r.get("vertical"),
+                        "type": leak.get("type"),
+                        "field": leak.get("field"),
+                        "value": leak.get("value", "")[:50],
+                        "output_preview": r.get("output", "")[:200],
+                    }
+                )
+
     # Categorize leaks
     canary_leaks = [l for l in leak_examples if l["type"] == "canary"]
     pattern_leaks = [l for l in leak_examples if l["type"] == "pattern"]
     semantic_leaks = [l for l in leak_examples if l["type"] == "semantic"]
-    
+
     analysis = f"""
 \\subsection{{Qualitative Analysis}}
 
@@ -218,28 +226,28 @@ internal notes) while attempting to be helpful.
 
 def main():
     results_dir = "benchmark_results/real_eval"
-    
+
     print("Loading results...")
     summary, results = load_results(results_dir)
-    
+
     print(f"Loaded {len(results)} scenario results")
     print(f"Models: {list(summary.get('models', {}).keys())}")
-    
+
     # Generate tables
     print("\n=== LATEX TABLES ===\n")
-    
+
     print("% Table: Main Results")
     print(generate_latex_main_table(summary))
-    
+
     print("\n% Table: Leakage by Tier")
     print(generate_latex_leak_type_table(summary))
-    
+
     print("\n% Table: Per Vertical")
     print(generate_per_vertical_table(results))
-    
+
     print("\n% Qualitative Analysis")
     print(generate_qualitative_analysis(results))
-    
+
     # Save to file
     output_path = Path(results_dir) / "latex_tables.tex"
     with open(output_path, "w") as f:
@@ -252,15 +260,15 @@ def main():
         f.write(generate_per_vertical_table(results))
         f.write("\n")
         f.write(generate_qualitative_analysis(results))
-    
+
     print(f"\nSaved to: {output_path}")
-    
+
     # Print summary stats
     print("\n=== SUMMARY STATISTICS ===")
     total_scenarios = sum(m.get("n_scenarios", 0) for m in summary.get("models", {}).values())
     total_leaks = sum(m.get("n_with_leaks", 0) for m in summary.get("models", {}).values())
     total_cost = sum(m.get("total_cost_usd", 0) for m in summary.get("models", {}).values())
-    
+
     print(f"Total scenarios run: {total_scenarios}")
     print(f"Total scenarios with leaks: {total_leaks}")
     print(f"Overall ELR: {total_leaks/total_scenarios*100:.1f}%")
@@ -269,5 +277,6 @@ def main():
 
 if __name__ == "__main__":
     import os
+
     os.chdir(Path(__file__).parent.parent)
     main()
