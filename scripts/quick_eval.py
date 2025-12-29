@@ -173,7 +173,25 @@ def run_real(n_scenarios: int, defense: Optional[str] = None, verbose: bool = Fa
     successes = 0
     leaks = 0
     total_wls = 0.0
-    channel_counts = {f"C{i}": 0 for i in range(1, 8)}
+    channel_counts = {
+        "C1_final_output": 0,
+        "C2_inter_agent": 0,
+        "C3_tool_input": 0,
+        "C4_tool_output": 0,
+        "C5_memory": 0,
+        "C6_logs": 0,
+        "C7_artifacts": 0,
+    }
+
+    channel_map = {
+        "final_output": "C1_final_output",
+        "inter_agent": "C2_inter_agent",
+        "tool_input": "C3_tool_input",
+        "tool_output": "C4_tool_output",
+        "memory_write": "C5_memory",
+        "log": "C6_logs",
+        "artifact": "C7_artifacts",
+    }
 
     for i, scenario in enumerate(scenarios):
         if verbose:
@@ -214,7 +232,7 @@ def run_real(n_scenarios: int, defense: Optional[str] = None, verbose: bool = Fa
                 total_wls += detection.weighted_leakage_score
 
                 for leak in detection.field_leaks:
-                    channel_key = f"C{leak.channel.value}"
+                    channel_key = channel_map.get(leak.channel.value)
                     if channel_key in channel_counts:
                         channel_counts[channel_key] += 1
 
