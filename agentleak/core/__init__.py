@@ -15,7 +15,7 @@ from .scenarios import Scenario, PrivateVault, AllowedSet
 __all__ = [
     "Channel",
     "ChannelManager",
-    "AttackClass", 
+    "AttackClass",
     "AttackFamily",
     "AttackPayload",
     "Scenario",

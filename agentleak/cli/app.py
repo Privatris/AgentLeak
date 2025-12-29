@@ -32,16 +32,16 @@ from config import Config, load_config
 class AgentLeakCLI:
     """
     Main CLI application for AgentLeak.
-    
+
     Usage:
         cli = AgentLeakCLI()
         cli.run()
-    
+
     Or with configuration:
         cli = AgentLeakCLI(config_path="config.yaml")
         cli.run()
     """
-    
+
     def __init__(
         self,
         config_path: str = None,
@@ -49,7 +49,7 @@ class AgentLeakCLI:
     ):
         self.console = Console()
         self.display = Display(self.console)
-        
+
         # Load configuration
         if config:
             self.config = config
@@ -57,11 +57,11 @@ class AgentLeakCLI:
             self.config = load_config(config_path)
         else:
             self.config = Config()
-        
+
         # State
         self._running = True
         self._last_results: Optional[TestProgress] = None
-    
+
     def _build_main_menu(self) -> Menu:
         """Build the main menu."""
         menu = Menu(
@@ -69,7 +69,7 @@ class AgentLeakCLI:
             "Privacy Benchmark for LLM Agents",
             console=self.console,
         )
-        
+
         menu.add_item("1", "🚀 Quick Test", "Run a quick 10-scenario test", self.quick_test)
         menu.add_item("2", "📊 Full Benchmark", "Run the complete benchmark", self.full_benchmark)
         menu.add_item("3", "⚙️  Configure", "Configure test parameters", self.configure)
@@ -80,69 +80,69 @@ class AgentLeakCLI:
         menu.add_separator()
         menu.add_item("h", "❓ Help", "Show help information", self.show_help)
         menu.add_item("q", "🚪 Quit", "Exit AgentLeak", self.quit)
-        
+
         return menu
-    
+
     def run(self) -> None:
         """Run the CLI application."""
         self._running = True
-        
+
         while self._running:
             try:
                 self.console.clear()
                 self.display.print_logo("full")
-                
+
                 menu = self._build_main_menu()
                 menu.show()
-                
+
             except KeyboardInterrupt:
                 if Confirm.ask("\nReally quit?", console=self.console):
                     break
             except Exception as e:
                 self.display.print_error(f"An error occurred: {e}")
                 self.console.input("[dim]Press Enter to continue...[/dim]")
-    
+
     def quick_test(self) -> None:
         """Run a quick 10-scenario test."""
         self.console.clear()
         self.display.print_header("🚀 Quick Test", "Running 10 scenarios")
         self.console.print()
-        
+
         # Get model
         self.console.print("[bold]Select Model:[/bold]")
         selector = ModelSelector(self.console)
         model = selector.select_single()
-        
+
         self.console.print()
         self.console.print(f"[cyan]Using model: {model}[/cyan]")
         self.console.print()
-        
+
         if not Confirm.ask("Start test?", console=self.console):
             return
-        
+
         # Run test
         self._run_benchmark(
             n_scenarios=10,
             model=model,
             mode="dashboard",
         )
-        
+
         self.console.input("\n[dim]Press Enter to continue...[/dim]")
-    
+
     def full_benchmark(self) -> None:
         """Run the full benchmark."""
         self.console.clear()
         self.display.print_header("📊 Full Benchmark", "Complete benchmark run")
         self.console.print()
-        
+
         # Configuration wizard
         wizard = ConfigWizard(self.console)
         config = wizard.run()
-        
+
         self.console.print()
         if not Confirm.ask("Start benchmark with these settings?", console=self.console):
             return
-        
+
         # Run benchmark
         self._run_benchmark(
             n_scenarios=config.get("n_scenarios", 100),
@@ -153,9 +153,9 @@ class AgentLeakCLI:
             defense=config.get("defense"),
             mode="dashboard",
         )
-        
+
         self.console.input("\n[dim]Press Enter to continue...[/dim]")
-    
+
     def _run_benchmark(
         self,
         n_scenarios: int,
@@ -169,36 +169,36 @@ class AgentLeakCLI:
         """Run the benchmark with given parameters."""
         import time
         import random
-        
+
         # Import core modules
         from core.scenarios import ScenarioGenerator, Vertical
         from core.attacks import AttackManager, AttackClass
         from core.channels import Channel
-        
+
         # Initialize
         generator = ScenarioGenerator(seed=self.config.benchmark.seed)
         attack_manager = AttackManager(seed=self.config.benchmark.seed)
-        
+
         # Generate scenarios
         verticals_enum = None
         if verticals:
             verticals_enum = [Vertical(v) for v in verticals]
-        
+
         scenarios = generator.generate_batch(
             n=n_scenarios,
             verticals=verticals_enum,
             attack_probability=attack_probability if enable_attacks else 0,
         )
-        
+
         # Run with progress
         with ProgressManager(total=n_scenarios, mode=mode, console=self.console) as pm:
             for scenario in scenarios:
                 pm.set_current(scenario.scenario_id)
-                
+
                 # Simulate test execution
                 # TODO: Replace with actual LLM execution
                 start_time = time.time()
-                
+
                 # Simulated results (replace with real execution)
                 task_success = random.random() > 0.1
                 leaked = random.random() < 0.3
@@ -208,45 +208,47 @@ class AgentLeakCLI:
                         [c.short_name for c in Channel],
                         k=random.randint(1, 3),
                     )
-                
+
                 duration = time.time() - start_time + random.uniform(0.1, 0.5)
-                
+
                 result = TestResult(
                     scenario_id=scenario.scenario_id,
                     vertical=scenario.vertical.value,
-                    attack_class=scenario.attack.attack_class.value if scenario.is_adversarial else None,
+                    attack_class=(
+                        scenario.attack.attack_class.value if scenario.is_adversarial else None
+                    ),
                     task_success=task_success,
                     leaked=leaked,
                     leak_channels=leak_channels,
                     duration=duration,
                 )
-                
+
                 pm.update(result)
-                
+
                 # Small delay for visual effect
                 time.sleep(0.05)
-            
+
             self._last_results = pm.get_progress()
-        
+
         # Show summary
         self.console.print()
         self._show_results_summary(self._last_results)
-        
+
         return self._last_results
-    
+
     def _show_results_summary(self, progress: TestProgress) -> None:
         """Show a summary of test results."""
         self.display.print_section("Results Summary")
-        
+
         metrics = {
             "Task Success Rate (TSR)": progress.success_rate,
             "Exact Leak Rate (ELR)": progress.leak_rate,
             "Total Completed": progress.completed,
             "Total Leaked": progress.leaked,
         }
-        
+
         self.display.print_metrics_summary(metrics)
-        
+
         # Channel breakdown
         channel_counts = {}
         for r in progress.results:
@@ -255,28 +257,30 @@ class AgentLeakCLI:
                     channel_counts[ch] = {"name": ch, "event_count": 0, "leak_count": 0}
                 channel_counts[ch]["event_count"] += 1
                 channel_counts[ch]["leak_count"] += 1
-        
+
         if channel_counts:
             self.console.print()
             self.display.print_channel_summary(channel_counts)
-    
+
     def configure(self) -> None:
         """Open configuration menu."""
         self.console.clear()
         self.display.print_header("⚙️ Configuration", "Modify test parameters")
         self.console.print()
-        
+
         # Show current config
-        self.display.print_config_summary({
-            "Model": self.config.model.name,
-            "Scenarios": self.config.benchmark.n_scenarios,
-            "Verticals": ", ".join(self.config.benchmark.verticals),
-            "Attacks": "Enabled" if self.config.benchmark.enable_attacks else "Disabled",
-            "Defense": self.config.defense.defense_type or "None",
-        })
-        
+        self.display.print_config_summary(
+            {
+                "Model": self.config.model.name,
+                "Scenarios": self.config.benchmark.n_scenarios,
+                "Verticals": ", ".join(self.config.benchmark.verticals),
+                "Attacks": "Enabled" if self.config.benchmark.enable_attacks else "Disabled",
+                "Defense": self.config.defense.defense_type or "None",
+            }
+        )
+
         self.console.print()
-        
+
         # Config menu
         menu = Menu("Configuration Options", console=self.console)
         menu.add_item("1", "Change Model", action=self._config_model)
@@ -289,16 +293,16 @@ class AgentLeakCLI:
         menu.add_item("l", "Load Configuration", action=self._load_config)
         menu.add_separator()
         menu.add_item("b", "Back", action=lambda: None)
-        
+
         menu.show()
-    
+
     def _config_model(self) -> None:
         """Configure model selection."""
         selector = ModelSelector(self.console)
         model = selector.select_single()
         self.config.model.name = model
         self.display.print_success(f"Model set to: {model}")
-    
+
     def _config_scenarios(self) -> None:
         """Configure scenarios count."""
         n = IntPrompt.ask(
@@ -308,7 +312,7 @@ class AgentLeakCLI:
         )
         self.config.benchmark.n_scenarios = n
         self.display.print_success(f"Scenarios set to: {n}")
-    
+
     def _config_verticals(self) -> None:
         """Configure verticals."""
         self.console.print("Available verticals: healthcare, finance, legal, corporate")
@@ -319,7 +323,7 @@ class AgentLeakCLI:
         )
         self.config.benchmark.verticals = [v.strip() for v in verticals.split(",")]
         self.display.print_success(f"Verticals set to: {self.config.benchmark.verticals}")
-    
+
     def _config_attacks(self) -> None:
         """Configure attack settings."""
         enabled = Confirm.ask(
@@ -328,7 +332,7 @@ class AgentLeakCLI:
             console=self.console,
         )
         self.config.benchmark.enable_attacks = enabled
-        
+
         if enabled:
             prob = IntPrompt.ask(
                 "Attack probability (%)",
@@ -336,23 +340,23 @@ class AgentLeakCLI:
                 console=self.console,
             )
             self.config.benchmark.attack_probability = prob / 100.0
-        
+
         self.display.print_success("Attack settings updated")
-    
+
     def _config_defense(self) -> None:
         """Configure defense settings."""
         defenses = ["none", "sanitizer", "filter"]
         self.console.print("Available defenses: " + ", ".join(defenses))
-        
+
         defense = Prompt.ask(
             "Select defense",
             default=self.config.defense.defense_type or "none",
             console=self.console,
         )
-        
+
         self.config.defense.defense_type = None if defense == "none" else defense
         self.display.print_success(f"Defense set to: {defense}")
-    
+
     def _save_config(self) -> None:
         """Save current configuration."""
         path = Prompt.ask(
@@ -362,7 +366,7 @@ class AgentLeakCLI:
         )
         self.config.save(path)
         self.display.print_success(f"Configuration saved to: {path}")
-    
+
     def _load_config(self) -> None:
         """Load configuration from file."""
         path = Prompt.ask(
@@ -375,24 +379,24 @@ class AgentLeakCLI:
             self.display.print_success(f"Configuration loaded from: {path}")
         else:
             self.display.print_error(f"File not found: {path}")
-    
+
     def view_results(self) -> None:
         """View results from last run."""
         self.console.clear()
         self.display.print_header("📈 Results Viewer")
         self.console.print()
-        
+
         if not self._last_results:
             self.display.print_warning("No results available. Run a test first.")
             self.console.input("\n[dim]Press Enter to continue...[/dim]")
             return
-        
+
         self._show_results_summary(self._last_results)
-        
+
         # Recent results table
         self.console.print()
         self.display.print_section("Recent Test Results")
-        
+
         results_dicts = [
             {
                 "ID": r.scenario_id[:15],
@@ -404,38 +408,38 @@ class AgentLeakCLI:
             }
             for r in self._last_results.results[-20:]
         ]
-        
+
         self.display.print_results_table(results_dicts, "Recent Results")
-        
+
         self.console.input("\n[dim]Press Enter to continue...[/dim]")
-    
+
     def compare_models(self) -> None:
         """Compare multiple models."""
         self.console.clear()
         self.display.print_header("🔄 Model Comparison", "Compare privacy across models")
         self.console.print()
-        
+
         # Select models
         selector = ModelSelector(self.console)
         models = selector.select_multiple()
-        
+
         if len(models) < 2:
             self.display.print_warning("Please select at least 2 models for comparison.")
             self.console.input("\n[dim]Press Enter to continue...[/dim]")
             return
-        
+
         self.console.print()
         self.console.print(f"[cyan]Selected models: {', '.join(models)}[/cyan]")
-        
+
         n_scenarios = IntPrompt.ask(
             "Scenarios per model",
             default=50,
             console=self.console,
         )
-        
+
         if not Confirm.ask("Start comparison?", console=self.console):
             return
-        
+
         # Run comparison
         results = {}
         for model in models:
@@ -449,7 +453,7 @@ class AgentLeakCLI:
                 "TSR": progress.success_rate,
                 "ELR": progress.leak_rate,
             }
-        
+
         # Show comparison
         self.console.print()
         self.display.print_comparison_table(
@@ -460,38 +464,37 @@ class AgentLeakCLI:
             },
             title="Model Comparison Results",
         )
-        
+
         self.console.input("\n[dim]Press Enter to continue...[/dim]")
-    
+
     def show_taxonomy(self) -> None:
         """Show the attack taxonomy."""
         self.console.clear()
         self.display.print_header("📋 Attack Taxonomy", "19 attack classes in 5 families")
         self.console.print()
-        
+
         from core.attacks import AttackFamily, AttackClass, AttackManager
-        
+
         taxonomy = AttackManager.get_taxonomy_summary()
-        
+
         for family_id, family_data in taxonomy.items():
             self.console.print(f"\n[bold cyan]{family_id}: {family_data['name']}[/bold cyan]")
-            
+
             for attack in family_data["attacks"]:
                 channels = ", ".join(attack["channels"])
                 self.console.print(
-                    f"  • {attack['name']} "
-                    f"[dim]({attack['level']}, {channels})[/dim]"
+                    f"  • {attack['name']} " f"[dim]({attack['level']}, {channels})[/dim]"
                 )
-        
+
         self.console.print()
         self.console.input("[dim]Press Enter to continue...[/dim]")
-    
+
     def show_help(self) -> None:
         """Show help information."""
         self.console.clear()
         self.display.print_header("❓ Help", "AgentLeak User Guide")
         self.console.print()
-        
+
         help_text = """
 [bold cyan]AgentLeak v1.0 - Privacy Benchmark for LLM Agents[/bold cyan]
 
@@ -532,10 +535,10 @@ classes organized in 5 families.
   AGENTLEAK_MODEL       - Default model to use
   AGENTLEAK_OUTPUT_DIR  - Output directory
         """
-        
+
         self.console.print(help_text)
         self.console.input("\n[dim]Press Enter to continue...[/dim]")
-    
+
     def quit(self) -> None:
         """Quit the application."""
         self._running = False
@@ -544,32 +547,32 @@ classes organized in 5 families.
 def main():
     """Main entry point."""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="AgentLeak - Privacy Benchmark for LLM Agents")
     parser.add_argument("--config", "-c", help="Path to configuration file")
     parser.add_argument("--profile", "-p", help="Configuration profile to use")
     parser.add_argument("--quick", action="store_true", help="Run quick test and exit")
     parser.add_argument("--model", "-m", help="Model to use")
     parser.add_argument("--scenarios", "-n", type=int, help="Number of scenarios")
-    
+
     args = parser.parse_args()
-    
+
     # Load config
     overrides = {}
     if args.model:
         overrides["model.name"] = args.model
     if args.scenarios:
         overrides["benchmark.n_scenarios"] = args.scenarios
-    
+
     config = load_config(
         path=args.config,
         profile=args.profile,
         overrides=overrides if overrides else None,
     )
-    
+
     # Create and run CLI
     cli = AgentLeakCLI(config=config)
-    
+
     if args.quick:
         cli.quick_test()
     else:

@@ -23,6 +23,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 # Try to import tiktoken for token counting
 try:
     import tiktoken
+
     HAS_TIKTOKEN = True
 except ImportError:
     HAS_TIKTOKEN = False
@@ -32,16 +33,18 @@ except ImportError:
 # API Usage Tracker (Singleton, Thread-Safe)
 # =============================================================================
 
+
 class APIUsageTracker:
     """
     A singleton class to track API usage across threads.
-    
+
     For usage tracking for cost monitoring
     and debugging during evaluation runs.
     """
+
     _instance = None
     _lock = threading.Lock()
-    
+
     def __new__(cls):
         if cls._instance is None:
             with cls._lock:
@@ -49,34 +52,29 @@ class APIUsageTracker:
                     cls._instance = super().__new__(cls)
                     cls._instance._initialize()
         return cls._instance
-    
+
     def _initialize(self):
         self._token_usage: Dict[str, Dict[str, int]] = {}
         self._call_count: Dict[str, int] = {}
         self._usage_lock = threading.Lock()
-    
+
     def get_token_usage(self) -> Dict[str, Dict[str, int]]:
         """Get current token usage by model."""
         with self._usage_lock:
             return dict(self._token_usage)
-    
+
     def get_call_count(self) -> Dict[str, int]:
         """Get API call count by model."""
         with self._usage_lock:
             return dict(self._call_count)
-    
+
     def reset(self):
         """Reset all usage counters."""
         with self._usage_lock:
             self._token_usage = {}
             self._call_count = {}
-    
-    def increment_token_usage(
-        self,
-        model: str,
-        prompt_tokens: int,
-        completion_tokens: int
-    ):
+
+    def increment_token_usage(self, model: str, prompt_tokens: int, completion_tokens: int):
         """Thread-safe increment of token usage."""
         with self._usage_lock:
             if model not in self._token_usage:
@@ -88,15 +86,15 @@ class APIUsageTracker:
             self._token_usage[model]["prompt_tokens"] += prompt_tokens
             self._token_usage[model]["completion_tokens"] += completion_tokens
             self._token_usage[model]["total_tokens"] += prompt_tokens + completion_tokens
-            
+
             if model not in self._call_count:
                 self._call_count[model] = 0
             self._call_count[model] += 1
-    
+
     def estimate_cost(self, pricing: Optional[Dict[str, Dict[str, float]]] = None) -> float:
         """
         Estimate total cost based on token usage.
-        
+
         Args:
             pricing: Dict mapping model to {"prompt": cost_per_1k, "completion": cost_per_1k}
         """
@@ -108,24 +106,23 @@ class APIUsageTracker:
                 "gpt-4-turbo": {"prompt": 0.01, "completion": 0.03},
                 "claude-3-5-sonnet-20241022": {"prompt": 0.003, "completion": 0.015},
             }
-        
+
         total_cost = 0.0
         with self._usage_lock:
             for model, usage in self._token_usage.items():
                 if model in pricing:
-                    cost = (
-                        (usage["prompt_tokens"] / 1000) * pricing[model]["prompt"] +
-                        (usage["completion_tokens"] / 1000) * pricing[model]["completion"]
-                    )
+                    cost = (usage["prompt_tokens"] / 1000) * pricing[model]["prompt"] + (
+                        usage["completion_tokens"] / 1000
+                    ) * pricing[model]["completion"]
                     total_cost += cost
-        
+
         return total_cost
-    
+
     def summary(self) -> str:
         """Get a formatted summary of API usage."""
         lines = ["API Usage Summary:"]
         lines.append("-" * 50)
-        
+
         with self._usage_lock:
             for model, usage in self._token_usage.items():
                 calls = self._call_count.get(model, 0)
@@ -134,10 +131,10 @@ class APIUsageTracker:
                 lines.append(f"  Prompt tokens: {usage['prompt_tokens']:,}")
                 lines.append(f"  Completion tokens: {usage['completion_tokens']:,}")
                 lines.append(f"  Total tokens: {usage['total_tokens']:,}")
-        
+
         lines.append("-" * 50)
         lines.append(f"Estimated cost: ${self.estimate_cost():.4f}")
-        
+
         return "\n".join(lines)
 
 
@@ -149,13 +146,15 @@ api_usage_tracker = APIUsageTracker()
 # Decorator for Automatic Usage Printing
 # =============================================================================
 
+
 def print_api_usage(func: Callable) -> Callable:
     """
     Decorator to print API usage after function execution.
-    
+
     Prints usage summary even if the function raises an exception,
     which is useful for debugging failed runs.
     """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
@@ -166,13 +165,14 @@ def print_api_usage(func: Callable) -> Callable:
             raise
         finally:
             print(f"\n{api_usage_tracker.summary()}")
-    
+
     return wrapper
 
 
 # =============================================================================
 # Retry Utilities with Exponential Backoff
 # =============================================================================
+
 
 def retry_with_backoff(
     max_retries: int = 5,
@@ -184,7 +184,7 @@ def retry_with_backoff(
 ):
     """
     Decorator for retrying functions with exponential backoff.
-    
+
     Args:
         max_retries: Maximum number of retry attempts
         initial_delay: Initial delay between retries in seconds
@@ -193,12 +193,13 @@ def retry_with_backoff(
         jitter: Add random jitter to prevent thundering herd
         exceptions: Tuple of exception types to catch and retry
     """
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             delay = initial_delay
             last_exception = None
-            
+
             for attempt in range(max_retries + 1):
                 try:
                     return func(*args, **kwargs)
@@ -207,17 +208,20 @@ def retry_with_backoff(
                     if attempt < max_retries:
                         actual_delay = delay
                         if jitter:
-                            actual_delay *= (0.5 + random.random())
+                            actual_delay *= 0.5 + random.random()
                         actual_delay = min(actual_delay, max_delay)
-                        
-                        print(f"Attempt {attempt + 1} failed: {e}. "
-                              f"Retrying in {actual_delay:.1f}s...")
+
+                        print(
+                            f"Attempt {attempt + 1} failed: {e}. "
+                            f"Retrying in {actual_delay:.1f}s..."
+                        )
                         time.sleep(actual_delay)
                         delay *= backoff_factor
-            
+
             raise last_exception
-        
+
         return wrapper
+
     return decorator
 
 
@@ -225,10 +229,11 @@ def retry_with_backoff(
 # Token Counting Utilities
 # =============================================================================
 
+
 def count_tokens(text: str, model: str = "gpt-4o") -> int:
     """
     Count the number of tokens in a text string.
-    
+
     Uses tiktoken for accurate counting, falls back to estimate if unavailable.
     """
     if HAS_TIKTOKEN:
@@ -241,15 +246,12 @@ def count_tokens(text: str, model: str = "gpt-4o") -> int:
             return len(encoding.encode(text))
         except Exception:
             pass
-    
+
     # Fallback: rough estimate (1 token ≈ 4 characters)
     return len(text) // 4
 
 
-def count_message_tokens(
-    messages: List[Dict[str, str]],
-    model: str = "gpt-4o"
-) -> int:
+def count_message_tokens(messages: List[Dict[str, str]], model: str = "gpt-4o") -> int:
     """Count tokens in a list of chat messages."""
     total = 0
     for msg in messages:
@@ -265,35 +267,36 @@ def count_message_tokens(
 # Simple Cache for LLM Calls
 # =============================================================================
 
+
 class LLMCache:
     """
     Simple file-based cache for LLM responses.
-    
+
     Caches responses based on the hash of the request to avoid
     redundant API calls during development and testing.
     """
-    
+
     def __init__(self, cache_dir: Optional[str] = None):
         if cache_dir is None:
             cache_dir = os.path.join(Path.home(), ".agentleak_cache")
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
-    
+
     def _get_cache_key(self, request: Dict[str, Any]) -> str:
         """Generate a cache key from the request."""
         # Create deterministic string representation
         request_str = json.dumps(request, sort_keys=True)
         return hashlib.sha256(request_str.encode()).hexdigest()[:16]
-    
+
     def _get_cache_path(self, key: str) -> Path:
         return self.cache_dir / f"{key}.json"
-    
+
     def get(self, request: Dict[str, Any]) -> Optional[str]:
         """Get cached response if available."""
         key = self._get_cache_key(request)
         cache_path = self._get_cache_path(key)
-        
+
         with self._lock:
             if cache_path.exists():
                 try:
@@ -303,19 +306,19 @@ class LLMCache:
                 except Exception:
                     return None
         return None
-    
+
     def set(self, request: Dict[str, Any], response: str):
         """Cache a response."""
         key = self._get_cache_key(request)
         cache_path = self._get_cache_path(key)
-        
+
         with self._lock:
             try:
                 with open(cache_path, "w") as f:
                     json.dump({"request": request, "response": response}, f)
             except Exception as e:
                 print(f"Cache write error: {e}")
-    
+
     def clear(self):
         """Clear all cached entries."""
         with self._lock:
@@ -333,36 +336,37 @@ def cached_llm_call(
 ) -> Callable:
     """
     Wrapper to add caching to an LLM call function.
-    
+
     Args:
         call_func: The original LLM call function
         use_cache: Whether to use caching
     """
+
     @functools.wraps(call_func)
     def wrapper(engine: str, messages: List[Dict], **kwargs):
         if not use_cache:
             return call_func(engine, messages, **kwargs)
-        
+
         # Build cache request
         cache_request = {
             "engine": engine,
             "messages": messages,
-            **{k: v for k, v in kwargs.items() if k != "api_key"}
+            **{k: v for k, v in kwargs.items() if k != "api_key"},
         }
-        
+
         # Check cache
         cached = llm_cache.get(cache_request)
         if cached is not None:
             return cached
-        
+
         # Make actual call
         response = call_func(engine, messages, **kwargs)
-        
+
         # Cache response
         llm_cache.set(cache_request, response)
-        
+
         return response
-    
+
     return wrapper
 
 
@@ -370,18 +374,20 @@ def cached_llm_call(
 # Progress Tracking
 # =============================================================================
 
+
 @dataclass
 class ProgressTracker:
     """Simple progress tracker for long-running operations."""
+
     total: int
     current: int = 0
     description: str = "Processing"
-    
+
     def update(self, n: int = 1):
         """Update progress by n steps."""
         self.current += n
         self._print_progress()
-    
+
     def _print_progress(self):
         pct = (self.current / self.total) * 100 if self.total > 0 else 0
         bar_len = 30
@@ -390,7 +396,7 @@ class ProgressTracker:
         print(f"\r{self.description}: [{bar}] {self.current}/{self.total} ({pct:.1f}%)", end="")
         if self.current >= self.total:
             print()  # Newline at completion
-    
+
     def finish(self):
         """Mark as complete."""
         self.current = self.total
@@ -400,6 +406,7 @@ class ProgressTracker:
 # =============================================================================
 # Data I/O Utilities
 # =============================================================================
+
 
 def load_json(filepath: str) -> Any:
     """Load data from JSON file."""

@@ -22,6 +22,7 @@ try:
         create_qwen_adapter,
         QWEN_MODELS,
     )
+
     _HAS_OPENROUTER = True
 except ImportError:
     _HAS_OPENROUTER = False

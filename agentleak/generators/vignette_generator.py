@@ -81,27 +81,29 @@ Output:
 # SurgeryKit - Iterative Output Refinement (for AgentLeak)
 # =============================================================================
 
+
 @dataclass
 class SurgeryKitUnitTest:
     """
     A unit test for validating and refining LLM outputs.
-    
+
     For surgery kit module, this enables
     programmatic validation and iterative refinement of outputs.
     """
+
     name: str
     description: str
     test_func: Callable[[str, str], Tuple[bool, List[str]]]
-    
+
     def run_test(self, instruction: str, output: str, **kwargs) -> Tuple[bool, List[str]]:
         """
         Run the test on the output.
-        
+
         Returns:
             Tuple of (pass/fail, list of fixing instructions)
         """
         return self.test_func(instruction, output, **kwargs)
-    
+
     def get_refinement_instruction(self, output: str, fixing_instruction: str) -> str:
         """Generate a refinement prompt."""
         return f"""Refine the given output to resolve the identified issue. 
@@ -119,11 +121,11 @@ Refined output:"""
 class SurgeryKitModule:
     """
     Iterative refinement module for LLM outputs.
-    
+
     This module runs a series of unit tests on LLM outputs and
     iteratively refines them until all tests pass or max attempts reached.
     """
-    
+
     def __init__(
         self,
         max_try: int = 3,
@@ -134,32 +136,28 @@ class SurgeryKitModule:
         self.refine_engine = refine_engine
         self.llm_call_func = llm_call_func
         self.trace: List[str] = []
-    
+
     def run(
-        self,
-        instruction: str,
-        original_output: str,
-        unit_tests: List[SurgeryKitUnitTest],
-        **kwargs
+        self, instruction: str, original_output: str, unit_tests: List[SurgeryKitUnitTest], **kwargs
     ) -> Tuple[str, int]:
         """
         Run refinement loop.
-        
+
         Returns:
             Tuple of (final_output, refinement_rounds)
             refinement_rounds = -1 if tests still fail after max attempts
         """
         self.trace = [original_output]
         current_output = original_output
-        
+
         for i in range(self.max_try):
             all_passed = True
-            
+
             for unit_test in unit_tests:
                 passed, fixing_instructions = unit_test.run_test(
                     instruction, current_output, **kwargs
                 )
-                
+
                 if not passed:
                     all_passed = False
                     for fix_instruction in fixing_instructions:
@@ -170,11 +168,11 @@ class SurgeryKitModule:
                             current_output = refined
                             self.trace.append(current_output)
                     break  # Re-run all tests after refinement
-            
+
             if all_passed:
                 print(f"All tests passed after {i} refinements.")
                 return current_output, i
-        
+
         # Final check
         all_passed = True
         for unit_test in unit_tests:
@@ -182,22 +180,19 @@ class SurgeryKitModule:
             if not passed:
                 all_passed = False
                 break
-        
+
         if all_passed:
             return current_output, self.max_try
         else:
             return current_output, -1
-    
+
     def _refine_output(
-        self,
-        unit_test: SurgeryKitUnitTest,
-        output: str,
-        fixing_instruction: str
+        self, unit_test: SurgeryKitUnitTest, output: str, fixing_instruction: str
     ) -> str:
         """Call LLM to refine the output."""
         if not self.llm_call_func:
             return output
-        
+
         prompt = unit_test.get_refinement_instruction(output, fixing_instruction)
         response = self.llm_call_func(
             engine=self.refine_engine,
@@ -212,18 +207,21 @@ class SurgeryKitModule:
 # Predefined Unit Tests for Vignette Generation
 # =============================================================================
 
-def check_no_explicit_sensitivity_words(instruction: str, output: str, **kwargs) -> Tuple[bool, List[str]]:
+
+def check_no_explicit_sensitivity_words(
+    instruction: str, output: str, **kwargs
+) -> Tuple[bool, List[str]]:
     """
     Check that the vignette doesn't use explicit sensitivity words.
-    
+
     The vignette should describe sensitive situations without
     explicitly labeling them as "sensitive" or "private".
     """
-    story_line = output.split('\n')[0] if output else ""
+    story_line = output.split("\n")[0] if output else ""
     forbidden_words = ["sensitive", "private", "privacy", "confidential", "secret"]
-    
+
     found_words = [w for w in forbidden_words if w in story_line.lower()]
-    
+
     if found_words:
         return False, [
             f"Remove words that explicitly state sensitivity ({', '.join(found_words)}) "
@@ -241,9 +239,9 @@ def check_has_all_fields(instruction: str, output: str, **kwargs) -> Tuple[bool,
         "[Data Sender]:",
         "[Data Recipient]:",
     ]
-    
+
     missing = [f for f in required_fields if f not in output]
-    
+
     if missing:
         return False, [
             f"Add the missing fields: {', '.join(missing)}. "
@@ -254,15 +252,15 @@ def check_has_all_fields(instruction: str, output: str, **kwargs) -> Tuple[bool,
 
 def check_vignette_length(instruction: str, output: str, **kwargs) -> Tuple[bool, List[str]]:
     """Check that the vignette has approximately 5 sentences."""
-    vignette_match = re.search(r'\[Vignette\]:\s*(.+?)(?=\[Sensitive Data\])', output, re.DOTALL)
-    
+    vignette_match = re.search(r"\[Vignette\]:\s*(.+?)(?=\[Sensitive Data\])", output, re.DOTALL)
+
     if not vignette_match:
         return False, ["Cannot find vignette content. Ensure [Vignette]: is present."]
-    
+
     vignette_text = vignette_match.group(1).strip()
-    sentences = re.split(r'[.!?]+', vignette_text)
+    sentences = re.split(r"[.!?]+", vignette_text)
     sentences = [s.strip() for s in sentences if s.strip()]
-    
+
     if len(sentences) < 4:
         return False, [
             f"The vignette has only {len(sentences)} sentences. "
@@ -295,17 +293,18 @@ VIGNETTE_LENGTH_TEST = SurgeryKitUnitTest(
 # Vignette Generator
 # =============================================================================
 
+
 class VignetteGenerator:
     """
     Generates expressive vignettes from privacy-sensitive seeds.
-    
+
     Uses template-based generation with optional SurgeryKit refinement
     to ensure high-quality outputs that:
     1. Don't use explicit sensitivity words
     2. Contain all required fields
     3. Have the proper narrative structure
     """
-    
+
     def __init__(
         self,
         llm_call_func: Optional[Callable] = None,
@@ -316,7 +315,7 @@ class VignetteGenerator:
         self.llm_call_func = llm_call_func
         self.engine = engine
         self.use_surgery_kit = use_surgery_kit
-        
+
         if use_surgery_kit and llm_call_func:
             self.surgery_kit = SurgeryKitModule(
                 max_try=surgery_kit_max_try,
@@ -325,7 +324,7 @@ class VignetteGenerator:
             )
         else:
             self.surgery_kit = None
-    
+
     def build_prompt(self, seed: PrivacySeed) -> str:
         """Build the seed-to-vignette prompt."""
         return SEED_TO_VIGNETTE_TEMPLATE.format(
@@ -335,18 +334,18 @@ class VignetteGenerator:
             data_recipient=seed.data_recipient,
             transmission_principle=seed.transmission_principle.value,
         )
-    
+
     def parse_output(self, output: str) -> Optional[Vignette]:
         """Parse LLM output into a Vignette object."""
         try:
-            lines = [line.strip() for line in output.split('\n') if line.strip()]
-            
+            lines = [line.strip() for line in output.split("\n") if line.strip()]
+
             vignette_story = None
             sensitive_data = None
             data_subject = None
             data_sender = None
             data_recipient = None
-            
+
             for line in lines:
                 if line.startswith("[Vignette]:"):
                     vignette_story = line.replace("[Vignette]:", "").strip()
@@ -358,7 +357,7 @@ class VignetteGenerator:
                     data_sender = line.replace("[Data Sender]:", "").strip()
                 elif line.startswith("[Data Recipient]:"):
                     data_recipient = line.replace("[Data Recipient]:", "").strip()
-            
+
             if all([vignette_story, sensitive_data, data_subject, data_sender, data_recipient]):
                 return Vignette(
                     story=vignette_story,
@@ -371,22 +370,22 @@ class VignetteGenerator:
         except Exception as e:
             print(f"Error parsing vignette output: {e}")
             return None
-    
+
     def generate(self, seed: PrivacySeed) -> Optional[Vignette]:
         """
         Generate a vignette from a privacy seed.
-        
+
         Args:
             seed: The privacy-sensitive seed to expand
-            
+
         Returns:
             A Vignette object if successful, None otherwise
         """
         if not self.llm_call_func:
             raise ValueError("LLM call function is required for generation")
-        
+
         prompt = self.build_prompt(seed)
-        
+
         # Initial generation
         response = self.llm_call_func(
             engine=self.engine,
@@ -394,11 +393,11 @@ class VignetteGenerator:
             max_tokens=500,
             temperature=0.0,
         )
-        
+
         output = response
         refine_round = 0
         original_output = output
-        
+
         # Apply surgery kit refinement if enabled
         if self.surgery_kit:
             output, refine_round = self.surgery_kit.run(
@@ -410,24 +409,26 @@ class VignetteGenerator:
                     VIGNETTE_LENGTH_TEST,
                 ],
             )
-        
+
         vignette = self.parse_output(output)
-        
+
         if vignette:
             vignette.refine_round = refine_round
             if refine_round > 0:
-                vignette.story_before_refinement = self.parse_output(original_output).story if self.parse_output(original_output) else None
-        
+                vignette.story_before_refinement = (
+                    self.parse_output(original_output).story
+                    if self.parse_output(original_output)
+                    else None
+                )
+
         return vignette
-    
+
     def generate_batch(
-        self,
-        seeds: List[PrivacySeed],
-        skip_on_error: bool = True
+        self, seeds: List[PrivacySeed], skip_on_error: bool = True
     ) -> List[Tuple[PrivacySeed, Optional[Vignette]]]:
         """Generate vignettes for a batch of seeds."""
         results = []
-        
+
         for seed in seeds:
             try:
                 vignette = self.generate(seed)
@@ -438,13 +439,14 @@ class VignetteGenerator:
                     results.append((seed, None))
                 else:
                     raise
-        
+
         return results
 
 
 # =============================================================================
 # Utility Functions
 # =============================================================================
+
 
 def create_contextualized_data_point(
     seed: PrivacySeed,
@@ -465,17 +467,14 @@ def load_data_points_from_json(filepath: str) -> List[ContextualizedDataPoint]:
     """Load a list of contextualized data points from JSON."""
     with open(filepath, "r") as f:
         data = json.load(f)
-    
+
     if isinstance(data, list):
         return [ContextualizedDataPoint.from_dict(d) for d in data]
     else:
         return [ContextualizedDataPoint.from_dict(data)]
 
 
-def save_data_points_to_json(
-    data_points: List[ContextualizedDataPoint],
-    filepath: str
-) -> None:
+def save_data_points_to_json(data_points: List[ContextualizedDataPoint], filepath: str) -> None:
     """Save a list of contextualized data points to JSON."""
     with open(filepath, "w") as f:
         json.dump([dp.to_dict() for dp in data_points], f, indent=2)
