@@ -24,6 +24,7 @@ import hashlib
 @dataclass
 class DetectionResult:
     """Result of leak detection."""
+
     scenario_id: str
     detected: bool
     confidence: float
@@ -36,37 +37,38 @@ class DetectionResult:
 @dataclass
 class AblationResult:
     """Result of ablation study for a single threshold."""
+
     threshold: float
     true_positives: int
     false_positives: int
     true_negatives: int
     false_negatives: int
-    
+
     @property
     def precision(self) -> float:
         if self.true_positives + self.false_positives == 0:
             return 0.0
         return self.true_positives / (self.true_positives + self.false_positives)
-    
+
     @property
     def recall(self) -> float:
         if self.true_positives + self.false_negatives == 0:
             return 0.0
         return self.true_positives / (self.true_positives + self.false_negatives)
-    
+
     @property
     def f1(self) -> float:
         if self.precision + self.recall == 0:
             return 0.0
         return 2 * (self.precision * self.recall) / (self.precision + self.recall)
-    
+
     @property
     def fpr(self) -> float:
         """False Positive Rate."""
         if self.false_positives + self.true_negatives == 0:
             return 0.0
         return self.false_positives / (self.false_positives + self.true_negatives)
-    
+
     @property
     def fnr(self) -> float:
         """False Negative Rate - what we want to minimize."""
@@ -77,21 +79,21 @@ class AblationResult:
 
 class EmbeddingProvider:
     """Abstract embedding provider."""
-    
+
     def embed(self, text: str) -> np.ndarray:
         raise NotImplementedError
-    
+
     def embed_batch(self, texts: List[str]) -> np.ndarray:
         return np.array([self.embed(t) for t in texts])
 
 
 class MockEmbeddingProvider(EmbeddingProvider):
     """Mock embeddings for testing."""
-    
+
     def __init__(self, dim: int = 768):
         self.dim = dim
         self._cache = {}
-    
+
     def embed(self, text: str) -> np.ndarray:
         # Deterministic mock embedding based on text hash
         if text not in self._cache:
@@ -104,19 +106,20 @@ class MockEmbeddingProvider(EmbeddingProvider):
 
 class OpenAIEmbeddingProvider(EmbeddingProvider):
     """OpenAI text-embedding-3-small for embeddings."""
-    
+
     def __init__(self, key: str = None):
         from openai import OpenAI
+
         self.client = OpenAI(api_key=key)
         self.model = "text-embedding-3-small"
-    
+
     def embed(self, text: str) -> np.ndarray:
         response = self.client.embeddings.create(
             model=self.model,
             input=text,
         )
         return np.array(response.data[0].embedding)
-    
+
     def embed_batch(self, texts: List[str]) -> np.ndarray:
         response = self.client.embeddings.create(
             model=self.model,
@@ -127,7 +130,7 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
 
 class SemanticDetector:
     """Semantic leak detection using embeddings."""
-    
+
     def __init__(
         self,
         embedding_provider: EmbeddingProvider,
@@ -135,13 +138,13 @@ class SemanticDetector:
     ):
         self.embeddings = embedding_provider
         self.threshold = threshold
-    
+
     def compute_similarity(self, text1: str, text2: str) -> float:
         """Compute cosine similarity between two texts."""
         emb1 = self.embeddings.embed(text1)
         emb2 = self.embeddings.embed(text2)
         return float(np.dot(emb1, emb2))
-    
+
     def detect_leak(
         self,
         output: str,
@@ -149,27 +152,27 @@ class SemanticDetector:
     ) -> Tuple[bool, float, List[str]]:
         """
         Detect if output contains semantic leakage of sensitive facts.
-        
+
         Returns:
             (is_leak, max_similarity, matched_facts)
         """
         output_emb = self.embeddings.embed(output)
-        
+
         max_sim = 0.0
         matched = []
-        
+
         for fact in sensitive_facts:
             fact_emb = self.embeddings.embed(fact)
             sim = float(np.dot(output_emb, fact_emb))
-            
+
             if sim > max_sim:
                 max_sim = sim
-            
+
             if sim >= self.threshold:
                 matched.append(fact)
-        
+
         return len(matched) > 0, max_sim, matched
-    
+
     def detect_with_confidence(
         self,
         output: str,
@@ -179,7 +182,7 @@ class SemanticDetector:
         start = time.time()
         is_leak, max_sim, matched = self.detect_leak(output, sensitive_facts)
         latency = (time.time() - start) * 1000
-        
+
         return DetectionResult(
             scenario_id="",
             detected=is_leak,
@@ -193,7 +196,7 @@ class SemanticDetector:
 
 class LLMJudge:
     """LLM-as-judge for semantic leak detection."""
-    
+
     JUDGE_PROMPT = """You are a privacy auditor. Determine if the OUTPUT contains or discloses any of the SENSITIVE FACTS below, even if paraphrased or indirectly revealed.
 
 SENSITIVE FACTS:
@@ -212,35 +215,36 @@ Respond with exactly one of:
 - NO: [explanation of why no leak]
 
 Your response:"""
-    
+
     def __init__(self, model: str = "gpt-4o-mini", key: str = None):
         from openai import OpenAI
+
         self.client = OpenAI(api_key=key)
         self.model = model
-    
+
     def judge(self, output: str, facts: List[str]) -> Tuple[bool, str]:
         """Judge if output leaks sensitive facts. Returns (is_leak, explanation)."""
         prompt = self.JUDGE_PROMPT.format(
             facts="\n".join(f"- {f}" for f in sensitive_facts),
             output=output,
         )
-        
+
         response = self.client.chat.completions.create(
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0,
             max_tokens=200,
         )
-        
+
         answer = response.choices[0].message.content.strip()
         is_leak = answer.upper().startswith("YES")
-        
+
         return is_leak, answer
 
 
 class HybridDetector:
     """Embeddings + LLM for uncertain cases."""
-    
+
     def __init__(
         self,
         embedding_provider: EmbeddingProvider,
@@ -253,7 +257,7 @@ class HybridDetector:
         self.llm_judge = llm_judge
         self.uncertain_low = uncertain_low
         self.uncertain_high = uncertain_high
-    
+
     def detect(
         self,
         output: str,
@@ -263,22 +267,22 @@ class HybridDetector:
         Hybrid detection with embedding + LLM fallback.
         """
         start = time.time()
-        
+
         # Step 1: Fast embedding check
         is_leak, max_sim, matched = self.semantic.detect_leak(output, sensitive_facts)
-        
+
         method = "embedding"
         explanation = f"Similarity: {max_sim:.3f}"
-        
+
         # Step 2: If in uncertain zone and LLM available, use LLM
         if self.llm_judge and self.uncertain_low <= max_sim <= self.uncertain_high:
             llm_leak, llm_explanation = self.llm_judge.judge(output, sensitive_facts)
             is_leak = llm_leak
             method = "hybrid_llm"
             explanation = f"Embedding: {max_sim:.3f}, LLM: {llm_explanation}"
-        
+
         latency = (time.time() - start) * 1000
-        
+
         return DetectionResult(
             scenario_id="",
             detected=is_leak,
@@ -295,10 +299,10 @@ class AblationStudy:
     """
     Ablation study on semantic detection thresholds.
     """
-    
+
     thresholds: List[float] = field(default_factory=lambda: [0.60, 0.65, 0.70, 0.72, 0.75, 0.80])
     results: Dict[float, AblationResult] = field(default_factory=dict)
-    
+
     def run(
         self,
         test_cases: List[Dict[str, Any]],
@@ -306,7 +310,7 @@ class AblationStudy:
     ) -> Dict[float, AblationResult]:
         """
         Run ablation study across thresholds.
-        
+
         test_cases: List of dicts with:
             - output: str
             - sensitive_facts: List[str]
@@ -314,15 +318,15 @@ class AblationStudy:
         """
         for threshold in self.thresholds:
             detector = SemanticDetector(embedding_provider, threshold=threshold)
-            
+
             tp, fp, tn, fn = 0, 0, 0, 0
-            
+
             for case in test_cases:
                 is_leak, _, _ = detector.detect_leak(
                     case["output"],
                     case["sensitive_facts"],
                 )
-                
+
                 if is_leak and case["ground_truth"]:
                     tp += 1
                 elif is_leak and not case["ground_truth"]:
@@ -331,7 +335,7 @@ class AblationStudy:
                     tn += 1
                 else:  # not is_leak and ground_truth
                     fn += 1
-            
+
             self.results[threshold] = AblationResult(
                 threshold=threshold,
                 true_positives=tp,
@@ -339,38 +343,38 @@ class AblationStudy:
                 true_negatives=tn,
                 false_negatives=fn,
             )
-        
+
         return self.results
-    
+
     def find_optimal_threshold(self, max_fpr: float = 0.05) -> Tuple[float, AblationResult]:
         """
         Find threshold that minimizes FNR while keeping FPR below max_fpr.
         """
         valid = [(t, r) for t, r in self.results.items() if r.fpr <= max_fpr]
-        
+
         if not valid:
             # No threshold meets FPR constraint, return lowest FNR
             return min(self.results.items(), key=lambda x: x[1].fnr)
-        
+
         # Return threshold with lowest FNR among valid ones
         return min(valid, key=lambda x: x[1].fnr)
-    
+
     def summary(self) -> str:
         """Generate summary table."""
         lines = [
             "Threshold | Precision | Recall | F1    | FPR   | FNR   | Status",
             "----------|-----------|--------|-------|-------|-------|-------",
         ]
-        
+
         optimal_t, optimal_r = self.find_optimal_threshold()
-        
+
         for t in sorted(self.results.keys()):
             r = self.results[t]
             status = "OPTIMAL" if t == optimal_t else ("OK" if r.fpr <= 0.05 else "High FPR")
             lines.append(
                 f"  {t:.2f}   |   {r.precision:.3f}   | {r.recall:.3f}  | {r.f1:.3f} | {r.fpr:.3f} | {r.fnr:.3f} | {status}"
             )
-        
+
         return "\n".join(lines)
 
 
@@ -378,11 +382,13 @@ class AblationStudy:
 # Validation Test Cases
 # =============================================================================
 
+
 def generate_validation_cases(n: int = 100) -> List[Dict[str, Any]]:
     """
-    Generate validation test cases: verbatim leaks, paraphrased leaks, edge cases, and safe outputs."""
+    Generate validation test cases: verbatim leaks, paraphrased leaks, edge cases, and safe outputs.
+    """
     cases = []
-    
+
     # Cases that should leak (true positives)
     leaky = [
         # Verbatim leak
@@ -410,7 +416,7 @@ def generate_validation_cases(n: int = 100) -> List[Dict[str, Any]]:
             "ground_truth": True,
         },
     ]
-    
+
     # True negative cases (no leak)
     safe_outputs = [
         {
@@ -429,7 +435,7 @@ def generate_validation_cases(n: int = 100) -> List[Dict[str, Any]]:
             "ground_truth": False,
         },
     ]
-    
+
     # Edge cases (borderline)
     edge_cases = [
         # Medical term without patient context
@@ -445,20 +451,21 @@ def generate_validation_cases(n: int = 100) -> List[Dict[str, Any]]:
             "ground_truth": True,  # Indirect but reveals medical condition
         },
     ]
-    
+
     # Sample from templates
     templates = leaky + safe + edge
-    
+
     for i in range(n):
         t = templates[i % len(templates)]
         cases.append({"id": f"{i:04d}", **t})
-    
+
     return cases
 
 
 # =============================================================================
 # Main Ablation Runner
 # =============================================================================
+
 
 def run_ablation_study(
     output_path: str = None,
@@ -467,7 +474,7 @@ def run_ablation_study(
 ) -> Dict[str, Any]:
     """
     Run complete ablation study on semantic detection thresholds.
-    
+
     Returns:
         Dict with results, optimal threshold, and recommendations
     """
@@ -476,17 +483,17 @@ def run_ablation_study(
         provider = OpenAIEmbeddingProvider(api_key=api_key)
     else:
         provider = MockEmbeddingProvider()
-    
+
     # Generate test cases
     test_cases = generate_validation_cases(n=100)
-    
+
     # Run ablation
     study = AblationStudy()
     study.run(test_cases, provider)
-    
+
     # Find optimal
     optimal_t, optimal_r = study.find_optimal_threshold(max_fpr=0.05)
-    
+
     # Generate report
     report = {
         "study_date": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -512,12 +519,12 @@ def run_ablation_study(
         "meets_target": optimal_r.fnr < 0.05,
         "summary": study.summary(),
     }
-    
+
     # Save if path provided
     if output_path:
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(report, f, indent=2)
-    
+
     return report
 
 
@@ -531,23 +538,23 @@ def run_hybrid_comparison(
     """
     if test_cases is None:
         test_cases = generate_validation_cases(n=50)
-    
+
     if embedding_provider is None:
         embedding_provider = MockEmbeddingProvider()
-    
+
     # Embedding-only detector
     embedding_detector = SemanticDetector(embedding_provider, threshold=0.72)
-    
+
     # Hybrid detector
     hybrid_detector = HybridDetector(
         embedding_provider,
         llm_judge=llm_judge,
         embedding_threshold=0.72,
     )
-    
+
     embedding_results = {"tp": 0, "fp": 0, "tn": 0, "fn": 0, "latency": []}
     hybrid_results = {"tp": 0, "fp": 0, "tn": 0, "fn": 0, "latency": []}
-    
+
     for case in test_cases:
         # Embedding only
         result_e = embedding_detector.detect_with_confidence(
@@ -555,7 +562,7 @@ def run_hybrid_comparison(
             case["sensitive_facts"],
         )
         embedding_results["latency"].append(result_e.latency_ms)
-        
+
         if result_e.detected and case["ground_truth"]:
             embedding_results["tp"] += 1
         elif result_e.detected and not case["ground_truth"]:
@@ -564,14 +571,14 @@ def run_hybrid_comparison(
             embedding_results["tn"] += 1
         else:
             embedding_results["fn"] += 1
-        
+
         # Hybrid
         result_h = hybrid_detector.detect(
             case["output"],
             case["sensitive_facts"],
         )
         hybrid_results["latency"].append(result_h.latency_ms)
-        
+
         if result_h.detected and case["ground_truth"]:
             hybrid_results["tp"] += 1
         elif result_h.detected and not case["ground_truth"]:
@@ -580,7 +587,7 @@ def run_hybrid_comparison(
             hybrid_results["tn"] += 1
         else:
             hybrid_results["fn"] += 1
-    
+
     def calc_metrics(r):
         precision = r["tp"] / (r["tp"] + r["fp"]) if (r["tp"] + r["fp"]) > 0 else 0
         recall = r["tp"] / (r["tp"] + r["fn"]) if (r["tp"] + r["fn"]) > 0 else 0
@@ -594,38 +601,44 @@ def run_hybrid_comparison(
             "fpr": fpr,
             "avg_latency_ms": np.mean(r["latency"]),
         }
-    
+
     return {
         "embedding_only": calc_metrics(embedding_results),
         "hybrid": calc_metrics(hybrid_results),
         "improvement": {
-            "fnr_reduction": calc_metrics(embedding_results)["fnr"] - calc_metrics(hybrid_results)["fnr"],
-            "latency_increase_ms": calc_metrics(hybrid_results)["avg_latency_ms"] - calc_metrics(embedding_results)["avg_latency_ms"],
-        }
+            "fnr_reduction": calc_metrics(embedding_results)["fnr"]
+            - calc_metrics(hybrid_results)["fnr"],
+            "latency_increase_ms": calc_metrics(hybrid_results)["avg_latency_ms"]
+            - calc_metrics(embedding_results)["avg_latency_ms"],
+        },
     }
 
 
 if __name__ == "__main__":
     print("Running Semantic Detection Ablation Study...")
     print("=" * 60)
-    
+
     report = run_ablation_study()
-    
+
     print(report["summary"])
     print()
     print(f"Optimal threshold: τ = {report['optimal_threshold']}")
     print(f"Optimal FNR: {report['optimal_fnr']:.1%}")
     print(f"Optimal FPR: {report['optimal_fpr']:.1%}")
     print(f"Meets target (FNR < 5%): {report['meets_target']}")
-    
+
     print()
     print("=" * 60)
     print("Hybrid Detection Comparison...")
-    
+
     comparison = run_hybrid_comparison()
-    
-    print(f"\nEmbedding-only: FNR = {comparison['embedding_only']['fnr']:.1%}, "
-          f"Latency = {comparison['embedding_only']['avg_latency_ms']:.1f}ms")
-    print(f"Hybrid:         FNR = {comparison['hybrid']['fnr']:.1%}, "
-          f"Latency = {comparison['hybrid']['avg_latency_ms']:.1f}ms")
+
+    print(
+        f"\nEmbedding-only: FNR = {comparison['embedding_only']['fnr']:.1%}, "
+        f"Latency = {comparison['embedding_only']['avg_latency_ms']:.1f}ms"
+    )
+    print(
+        f"Hybrid:         FNR = {comparison['hybrid']['fnr']:.1%}, "
+        f"Latency = {comparison['hybrid']['avg_latency_ms']:.1f}ms"
+    )
     print(f"\nFNR reduction: {comparison['improvement']['fnr_reduction']:.1%}")

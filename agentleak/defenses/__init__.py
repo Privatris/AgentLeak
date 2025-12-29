@@ -4,7 +4,7 @@ AgentLeak Defenses Module - Privacy defenses for agentic systems.
 Implements baseline defenses as described in the paper (Section 8):
 
 1. Output Filtering: PII scrubbers (regex + NER) on final outputs
-2. Input Sanitization: Filter sensitive data before agent execution  
+2. Input Sanitization: Filter sensitive data before agent execution
 3. System Prompt Hardening: Privacy-aware prompts with CoT reasoning
 4. Role Separation: Multi-agent clearance levels (handled in harness)
 5. Memory Minimization: Disable persistent memory (config option)
