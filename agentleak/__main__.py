@@ -5,13 +5,13 @@ AgentLeak v1.0 - Main Entry Point
 Usage:
     # Interactive mode
     python -m agentleak
-    
+
     # Or use the launcher script
     ./run_agentleak.sh
-    
+
     # Quick test
     python -m agentleak --quick
-    
+
     # With specific model
     python -m agentleak --model gpt-4o --scenarios 100
 """

@@ -83,7 +83,7 @@ try:
 except ImportError:
     pass  # Optional module
 
-# Import multi-agent evaluator 
+# Import multi-agent evaluator
 try:
     from .multiagent_evaluator import (
         MultiAgentEvaluator,

@@ -17,11 +17,11 @@ Each adapter implements the BaseAdapter interface:
 
 Usage:
     from .harness.adapters import LangChainAdapter, LangChainConfig
-    
+
     config = LangChainConfig(model_name="gpt-4")
     adapter = LangChainAdapter(config)
     result = adapter.run(scenario)
-    
+
     # Analyze leakage
     from .detection import DetectionPipeline
     pipeline = DetectionPipeline()
@@ -53,9 +53,11 @@ ADAPTER_CONFIGS = {
     "agentgpt": AgentGPTConfig,
 }
 
+
 def get_adapter(framework: str):
     """Get adapter class for framework."""
     return ADAPTERS.get(framework)
+
 
 def list_adapters():
     """List supported frameworks."""
@@ -65,21 +67,21 @@ def list_adapters():
 def get_adapter(name: str, config=None):
     """
     Get an adapter by name.
-    
+
     Args:
         name: Adapter name (langchain, crewai, autogpt, metagpt, agentgpt)
         config: Optional adapter configuration
-    
+
     Returns:
         Configured adapter instance
-    
+
     Example:
         adapter = get_adapter("langchain", LangChainConfig(model_name="gpt-4"))
     """
     if name.lower() not in ADAPTERS:
         available = ", ".join(ADAPTERS.keys())
         raise ValueError(f"Unknown adapter: {name}. Available: {available}")
-    
+
     adapter_cls = ADAPTERS[name.lower()]
     return adapter_cls(config)
 

@@ -21,17 +21,17 @@ from ..schemas.scenario import Channel
 class TraceBuffer:
     """
     Thread-safe buffer for collecting trace events.
-    
+
     Supports multiple concurrent writers (e.g., parallel tool calls)
     while maintaining global event ordering.
     """
-    
+
     scenario_id: str
     events: list[TraceEvent] = field(default_factory=list)
     _lock: threading.Lock = field(default_factory=threading.Lock)
     _counter: int = field(default=0)
     _start_time: float = field(default_factory=time.time)
-    
+
     def record(
         self,
         event_type: EventType,
@@ -54,18 +54,18 @@ class TraceBuffer:
             )
             self.events.append(event)
             return event
-    
+
     def to_trace(self, extra_metadata: Optional[dict] = None) -> ExecutionTrace:
         """Convert buffer to an ExecutionTrace."""
         import uuid
-        
+
         now = datetime.utcnow()
         duration = time.time() - self._start_time
-        
+
         # Build TraceMetadata
         framework = extra_metadata.get("framework", "unknown") if extra_metadata else "unknown"
         model = extra_metadata.get("model", "unknown") if extra_metadata else "unknown"
-        
+
         metadata = TraceMetadata(
             trace_id=str(uuid.uuid4()),
             scenario_id=self.scenario_id,
@@ -76,12 +76,12 @@ class TraceBuffer:
             duration_seconds=duration,
             total_events=len(self.events),
         )
-        
+
         return ExecutionTrace(
             metadata=metadata,
             events=list(self.events),
         )
-    
+
     def clear(self) -> None:
         """Clear all events."""
         with self._lock:
@@ -93,38 +93,38 @@ class TraceBuffer:
 class TraceCollector:
     """
     Centralized trace collection for agentleak scenarios.
-    
+
     Provides hooks for capturing events from various sources:
     - Tool call interceptors
-    - Memory write hooks  
+    - Memory write hooks
     - Log handlers
     - Artifact watchers
     - Inter-agent message handlers
-    
+
     Example:
         collector = TraceCollector("scenario_001")
-        
+
         # Manual recording
         collector.record_tool_call("search_records", {"query": "patient"})
         collector.record_tool_result("search_records", '{"results": [...]}')
-        
+
         # Hook-based recording
         with collector.capture_logs():
             agent.run(...)  # All logs captured
-        
+
         trace = collector.finalize()
     """
-    
+
     def __init__(self, scenario_id: str, verbose: bool = False):
         self.scenario_id = scenario_id
         self.verbose = verbose
         self._buffer = TraceBuffer(scenario_id=scenario_id)
         self._hooks: list[Callable] = []
-    
+
     # ============================================================
     # Core Recording Methods
     # ============================================================
-    
+
     def record(
         self,
         event_type: EventType,
@@ -135,12 +135,12 @@ class TraceCollector:
     ) -> TraceEvent:
         """Record a generic event."""
         event = self._buffer.record(event_type, channel, content, metadata, agent_id)
-        
+
         if self.verbose:
             self._print_event(event)
-        
+
         return event
-    
+
     def record_message_in(
         self,
         content: str,
@@ -148,13 +148,8 @@ class TraceCollector:
         channel: Channel = Channel.C1_FINAL_OUTPUT,
     ) -> TraceEvent:
         """Record an incoming message (user query, inter-agent)."""
-        return self.record(
-            EventType.MESSAGE_IN,
-            channel,
-            content,
-            {"role": role}
-        )
-    
+        return self.record(EventType.MESSAGE_IN, channel, content, {"role": role})
+
     def record_message_out(
         self,
         content: str,
@@ -162,13 +157,8 @@ class TraceCollector:
         channel: Channel = Channel.C1_FINAL_OUTPUT,
     ) -> TraceEvent:
         """Record an outgoing message (response, inter-agent)."""
-        return self.record(
-            EventType.MESSAGE_OUT,
-            channel,
-            content,
-            {"role": role}
-        )
-    
+        return self.record(EventType.MESSAGE_OUT, channel, content, {"role": role})
+
     def record_tool_call(
         self,
         tool_name: str,
@@ -177,14 +167,15 @@ class TraceCollector:
     ) -> TraceEvent:
         """Record a tool invocation."""
         import json
+
         content = json.dumps({"tool": tool_name, "arguments": arguments})
         return self.record(
             EventType.TOOL_CALL,
             Channel.C3_TOOL_INPUT,
             content,
-            {"tool_name": tool_name, "tool_call_id": tool_call_id}
+            {"tool_name": tool_name, "tool_call_id": tool_call_id},
         )
-    
+
     def record_tool_result(
         self,
         tool_name: str,
@@ -201,9 +192,9 @@ class TraceCollector:
                 "tool_name": tool_name,
                 "tool_call_id": tool_call_id,
                 "is_error": is_error,
-            }
+            },
         )
-    
+
     def record_memory_write(
         self,
         key: str,
@@ -212,14 +203,12 @@ class TraceCollector:
     ) -> TraceEvent:
         """Record a write to agent memory."""
         import json
+
         content = json.dumps({"key": key, "value": value})
         return self.record(
-            EventType.MEMORY_WRITE,
-            Channel.C5_MEMORY_WRITE,
-            content,
-            {"memory_type": memory_type}
+            EventType.MEMORY_WRITE, Channel.C5_MEMORY_WRITE, content, {"memory_type": memory_type}
         )
-    
+
     def record_memory_read(
         self,
         key: str,
@@ -228,14 +217,15 @@ class TraceCollector:
     ) -> TraceEvent:
         """Record a read from agent memory."""
         import json
+
         content = json.dumps({"key": key, "value": value})
         return self.record(
             EventType.MEMORY_READ,
             Channel.C5_MEMORY_WRITE,  # Same channel, different event type
             content,
-            {"memory_type": memory_type}
+            {"memory_type": memory_type},
         )
-    
+
     def record_log(
         self,
         message: str,
@@ -244,12 +234,9 @@ class TraceCollector:
     ) -> TraceEvent:
         """Record a log entry."""
         return self.record(
-            EventType.LOG_EVENT,
-            Channel.C6_LOG,
-            message,
-            {"level": level, "logger": logger}
+            EventType.LOG_EVENT, Channel.C6_LOG, message, {"level": level, "logger": logger}
         )
-    
+
     def record_artifact(
         self,
         artifact_type: str,
@@ -261,9 +248,9 @@ class TraceCollector:
             EventType.ARTIFACT_WRITE,
             Channel.C7_ARTIFACT,
             content,
-            {"artifact_type": artifact_type, "filename": filename}
+            {"artifact_type": artifact_type, "filename": filename},
         )
-    
+
     def record_inter_agent(
         self,
         from_agent: str,
@@ -275,53 +262,53 @@ class TraceCollector:
             EventType.MESSAGE_OUT,
             Channel.C2_INTER_AGENT,
             message,
-            {"from_agent": from_agent, "to_agent": to_agent}
+            {"from_agent": from_agent, "to_agent": to_agent},
         )
-    
+
     # ============================================================
     # Hook-based Capture
     # ============================================================
-    
+
     @contextmanager
     def capture_logs(self, logger_name: Optional[str] = None):
         """
         Context manager to capture Python logging.
-        
+
         Example:
             with collector.capture_logs():
                 logger.info("Processing request...")
         """
         import logging
-        
+
         class TraceHandler(logging.Handler):
-            def __init__(self, collector: 'TraceCollector'):
+            def __init__(self, collector: "TraceCollector"):
                 super().__init__()
                 self.collector = collector
-            
+
             def emit(self, record):
                 self.collector.record_log(
                     record.getMessage(),
                     level=record.levelname,
                     logger=record.name,
                 )
-        
+
         handler = TraceHandler(self)
-        
+
         if logger_name:
             logger = logging.getLogger(logger_name)
         else:
             logger = logging.getLogger()
-        
+
         logger.addHandler(handler)
         try:
             yield
         finally:
             logger.removeHandler(handler)
-    
+
     def create_tool_wrapper(self, tool_func: Callable) -> Callable:
         """
         Wrap a tool function to automatically record calls and results.
-        
+
         Example:
             @collector.create_tool_wrapper
             def search_database(query: str) -> str:
@@ -329,14 +316,14 @@ class TraceCollector:
         """
         import functools
         import json
-        
+
         @functools.wraps(tool_func)
         def wrapped(*args, **kwargs):
             tool_name = tool_func.__name__
-            
+
             # Record call
             self.record_tool_call(tool_name, {"args": args, "kwargs": kwargs})
-            
+
             try:
                 result = tool_func(*args, **kwargs)
                 result_str = json.dumps(result) if not isinstance(result, str) else result
@@ -345,13 +332,13 @@ class TraceCollector:
             except Exception as e:
                 self.record_tool_result(tool_name, str(e), is_error=True)
                 raise
-        
+
         return wrapped
-    
+
     # ============================================================
     # Finalization
     # ============================================================
-    
+
     def finalize(
         self,
         framework: Optional[str] = None,
@@ -368,27 +355,29 @@ class TraceCollector:
             metadata["model"] = model
         if extra_metadata:
             metadata.update(extra_metadata)
-        
+
         return self._buffer.to_trace(metadata)
-    
+
     def reset(self) -> None:
         """Reset the collector for a new scenario."""
         self._buffer.clear()
-    
+
     @property
     def event_count(self) -> int:
         """Number of events recorded."""
         return len(self._buffer.events)
-    
+
     @property
     def events(self) -> list[TraceEvent]:
         """Access recorded events (read-only copy)."""
         return list(self._buffer.events)
-    
+
     def _print_event(self, event: TraceEvent) -> None:
         """Print event for verbose mode."""
         content_preview = event.content[:60] + "..." if len(event.content) > 60 else event.content
-        print(f"[{event.sequence_num:03d}] {event.event_type.value:15s} | {event.channel.value:12s} | {content_preview}")
+        print(
+            f"[{event.sequence_num:03d}] {event.event_type.value:15s} | {event.channel.value:12s} | {content_preview}"
+        )
 
 
 # ============================================================
@@ -399,39 +388,29 @@ if __name__ == "__main__":
     print("=" * 70)
     print("AgentLeak Trace Collector Demo")
     print("=" * 70)
-    
+
     collector = TraceCollector("demo_001", verbose=True)
-    
+
     print("\n📥 Recording events...")
-    
+
     # Simulate a conversation
     collector.record_message_in("Can you look up patient John Doe's records?")
-    
-    collector.record_tool_call(
-        "search_patient",
-        {"name": "John Doe", "dob": "1985-03-15"}
-    )
-    
+
+    collector.record_tool_call("search_patient", {"name": "John Doe", "dob": "1985-03-15"})
+
     collector.record_tool_result(
-        "search_patient",
-        '{"patient_id": "P12345", "name": "John Doe", "ssn": "123-45-6789"}'
+        "search_patient", '{"patient_id": "P12345", "name": "John Doe", "ssn": "123-45-6789"}'
     )
-    
-    collector.record_memory_write(
-        "current_patient",
-        "P12345",
-        memory_type="session"
-    )
-    
-    collector.record_message_out(
-        "I found patient John Doe (ID: P12345). Their record shows..."
-    )
-    
+
+    collector.record_memory_write("current_patient", "P12345", memory_type="session")
+
+    collector.record_message_out("I found patient John Doe (ID: P12345). Their record shows...")
+
     print(f"\n📊 Collected {collector.event_count} events")
-    
+
     # Finalize
     trace = collector.finalize(framework="demo", model="mock")
-    
+
     print(f"\n📝 Final Trace:")
     print(f"   Scenario: {trace.scenario_id}")
     print(f"   Events: {len(trace.events)}")

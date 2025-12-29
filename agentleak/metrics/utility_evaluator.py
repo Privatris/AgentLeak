@@ -31,21 +31,23 @@ from ..schemas.trace import ExecutionTrace, TraceEvent
 # Evaluation Types
 # =============================================================================
 
+
 class EvalType(str, Enum):
     """Types of evaluation methods."""
-    STRING_MATCH = "string_match"       # Simple string matching
-    PROGRAM_HTML = "program_html"       # Check HTML content
-    URL_MATCH = "url_match"             # Check final URL
-    FUNCTION = "function"               # Custom function evaluation
-    LLM_JUDGE = "llm_judge"             # LLM-based evaluation
-    CONTENT_CHECK = "content_check"     # Check output contains items
-    PRIVACY_CHECK = "privacy_check"     # Privacy-aware evaluation
+
+    STRING_MATCH = "string_match"  # Simple string matching
+    PROGRAM_HTML = "program_html"  # Check HTML content
+    URL_MATCH = "url_match"  # Check final URL
+    FUNCTION = "function"  # Custom function evaluation
+    LLM_JUDGE = "llm_judge"  # LLM-based evaluation
+    CONTENT_CHECK = "content_check"  # Check output contains items
+    PRIVACY_CHECK = "privacy_check"  # Privacy-aware evaluation
 
 
 @dataclass
 class EvalConfig:
     """Configuration for task evaluation."""
-    
+
     eval_types: list[EvalType] = field(default_factory=lambda: [EvalType.STRING_MATCH])
     reference_answers: Optional[list[str]] = None
     reference_url: Optional[str] = None
@@ -53,15 +55,15 @@ class EvalConfig:
     must_include: Optional[list[str]] = None
     must_exclude: Optional[list[str]] = None
     custom_eval_fn: Optional[Callable] = None
-    
+
     @classmethod
     def from_dict(cls, data: dict) -> "EvalConfig":
         """Create from dictionary."""
         eval_types = [
-            EvalType(t) if isinstance(t, str) else t 
+            EvalType(t) if isinstance(t, str) else t
             for t in data.get("eval_types", ["string_match"])
         ]
-        
+
         return cls(
             eval_types=eval_types,
             reference_answers=data.get("reference_answers"),
@@ -75,13 +77,13 @@ class EvalConfig:
 @dataclass
 class EvalResult:
     """Result from task evaluation."""
-    
+
     success: bool
     score: float  # 0.0 to 1.0
     eval_type: EvalType
     explanation: str = ""
     details: dict = field(default_factory=dict)
-    
+
     def __bool__(self) -> bool:
         return self.success
 
@@ -90,11 +92,12 @@ class EvalResult:
 # Base Evaluator
 # =============================================================================
 
+
 class BaseEvaluator(ABC):
     """Abstract base class for evaluators."""
-    
+
     eval_type: EvalType
-    
+
     @abstractmethod
     def evaluate(
         self,
@@ -111,11 +114,12 @@ class BaseEvaluator(ABC):
 # String Match Evaluator
 # =============================================================================
 
+
 class StringMatchEvaluator(BaseEvaluator):
     """Evaluate by matching output against reference answers."""
-    
+
     eval_type = EvalType.STRING_MATCH
-    
+
     def __init__(
         self,
         case_sensitive: bool = False,
@@ -123,7 +127,7 @@ class StringMatchEvaluator(BaseEvaluator):
     ):
         self.case_sensitive = case_sensitive
         self.partial_match = partial_match
-    
+
     def evaluate(
         self,
         output: str,
@@ -139,12 +143,12 @@ class StringMatchEvaluator(BaseEvaluator):
                 eval_type=self.eval_type,
                 explanation="No reference answers provided",
             )
-        
+
         output_check = output if self.case_sensitive else output.lower()
-        
+
         for ref in config.reference_answers:
             ref_check = ref if self.case_sensitive else ref.lower()
-            
+
             if self.partial_match:
                 if ref_check in output_check:
                     return EvalResult(
@@ -161,7 +165,7 @@ class StringMatchEvaluator(BaseEvaluator):
                         eval_type=self.eval_type,
                         explanation="Exact match found",
                     )
-        
+
         return EvalResult(
             success=False,
             score=0.0,
@@ -174,11 +178,12 @@ class StringMatchEvaluator(BaseEvaluator):
 # Content Check Evaluator
 # =============================================================================
 
+
 class ContentCheckEvaluator(BaseEvaluator):
     """Evaluate by checking for required/forbidden content."""
-    
+
     eval_type = EvalType.CONTENT_CHECK
-    
+
     def evaluate(
         self,
         output: str,
@@ -188,32 +193,32 @@ class ContentCheckEvaluator(BaseEvaluator):
     ) -> EvalResult:
         """Check if output contains required items and excludes forbidden ones."""
         output_lower = output.lower()
-        
+
         # Check must_include
         missing_items = []
         if config.must_include:
             for item in config.must_include:
                 if item.lower() not in output_lower:
                     missing_items.append(item)
-        
+
         # Check must_exclude
         found_forbidden = []
         if config.must_exclude:
             for item in config.must_exclude:
                 if item.lower() in output_lower:
                     found_forbidden.append(item)
-        
+
         # Calculate score
         total_checks = len(config.must_include or []) + len(config.must_exclude or [])
         failed_checks = len(missing_items) + len(found_forbidden)
-        
+
         if total_checks == 0:
             score = 1.0
         else:
             score = (total_checks - failed_checks) / total_checks
-        
+
         success = len(missing_items) == 0 and len(found_forbidden) == 0
-        
+
         explanation = ""
         if missing_items:
             explanation += f"Missing: {missing_items}. "
@@ -221,7 +226,7 @@ class ContentCheckEvaluator(BaseEvaluator):
             explanation += f"Forbidden items found: {found_forbidden}. "
         if success:
             explanation = "All content checks passed"
-        
+
         return EvalResult(
             success=success,
             score=score,
@@ -230,7 +235,7 @@ class ContentCheckEvaluator(BaseEvaluator):
             details={
                 "missing_items": missing_items,
                 "forbidden_found": found_forbidden,
-            }
+            },
         )
 
 
@@ -238,25 +243,26 @@ class ContentCheckEvaluator(BaseEvaluator):
 # HTML Content Evaluator (WebArena-style)
 # =============================================================================
 
+
 class HTMLContentEvaluator(BaseEvaluator):
     """
     Evaluate by checking HTML content at specified URLs.
-    
+
     This is the WebArena-style evaluation that checks if specific
     content appears in web pages after agent execution.
     """
-    
+
     eval_type = EvalType.PROGRAM_HTML
-    
+
     def __init__(self, browser_page: Optional[Any] = None):
         """
         Initialize with optional browser page.
-        
+
         Args:
             browser_page: Playwright page object for web evaluation
         """
         self.page = browser_page
-    
+
     def evaluate(
         self,
         output: str,
@@ -266,7 +272,7 @@ class HTMLContentEvaluator(BaseEvaluator):
     ) -> EvalResult:
         """
         Evaluate using program_html configuration.
-        
+
         For full web evaluation, requires a browser page.
         Falls back to output checking if no browser available.
         """
@@ -277,16 +283,16 @@ class HTMLContentEvaluator(BaseEvaluator):
                 eval_type=self.eval_type,
                 explanation="No program_html configuration",
             )
-        
+
         all_passed = True
         details = []
-        
+
         for prog in config.program_html:
             url = prog.get("url", "")
             locator = prog.get("locator", "")
             required = prog.get("required_contents", {})
             must_include = required.get("must_include", [])
-            
+
             # If we have a browser page, use it
             if self.page:
                 try:
@@ -302,18 +308,22 @@ class HTMLContentEvaluator(BaseEvaluator):
                 for item in must_include:
                     if item and item not in output:
                         all_passed = False
-                        details.append({
-                            "item": item,
-                            "found": False,
-                            "url": url,
-                        })
+                        details.append(
+                            {
+                                "item": item,
+                                "found": False,
+                                "url": url,
+                            }
+                        )
                     else:
-                        details.append({
-                            "item": item,
-                            "found": True,
-                            "url": url,
-                        })
-        
+                        details.append(
+                            {
+                                "item": item,
+                                "found": True,
+                                "url": url,
+                            }
+                        )
+
         return EvalResult(
             success=all_passed,
             score=1.0 if all_passed else 0.0,
@@ -321,7 +331,7 @@ class HTMLContentEvaluator(BaseEvaluator):
             explanation="HTML content check " + ("passed" if all_passed else "failed"),
             details={"checks": details},
         )
-    
+
     def _check_page_content(
         self,
         url: str,
@@ -333,25 +343,25 @@ class HTMLContentEvaluator(BaseEvaluator):
             # Navigate to URL if not "last"
             if url != "last":
                 self.page.goto(url)
-            
+
             # Get content using locator
             if locator:
                 content = self.page.evaluate(locator)
             else:
                 content = self.page.content()
-            
+
             # Check for required items
             missing = []
             for item in must_include:
                 if item and item not in content:
                     missing.append(item)
-            
+
             return {
                 "success": len(missing) == 0,
                 "missing": missing,
                 "url": url,
             }
-            
+
         except Exception as e:
             return {
                 "success": False,
@@ -364,11 +374,12 @@ class HTMLContentEvaluator(BaseEvaluator):
 # URL Match Evaluator
 # =============================================================================
 
+
 class URLMatchEvaluator(BaseEvaluator):
     """Evaluate by checking the final URL."""
-    
+
     eval_type = EvalType.URL_MATCH
-    
+
     def evaluate(
         self,
         output: str,
@@ -378,7 +389,7 @@ class URLMatchEvaluator(BaseEvaluator):
     ) -> EvalResult:
         """Check if final URL matches reference."""
         current_url = kwargs.get("current_url", "")
-        
+
         if not config.reference_url:
             return EvalResult(
                 success=False,
@@ -386,13 +397,13 @@ class URLMatchEvaluator(BaseEvaluator):
                 eval_type=self.eval_type,
                 explanation="No reference URL provided",
             )
-        
+
         # Normalize URLs for comparison
         current_normalized = current_url.rstrip("/").lower()
         ref_normalized = config.reference_url.rstrip("/").lower()
-        
+
         success = current_normalized == ref_normalized
-        
+
         return EvalResult(
             success=success,
             score=1.0 if success else 0.0,
@@ -401,7 +412,7 @@ class URLMatchEvaluator(BaseEvaluator):
             details={
                 "current_url": current_url,
                 "reference_url": config.reference_url,
-            }
+            },
         )
 
 
@@ -409,11 +420,12 @@ class URLMatchEvaluator(BaseEvaluator):
 # LLM Judge Evaluator
 # =============================================================================
 
+
 class LLMJudgeEvaluator(BaseEvaluator):
     """Evaluate using an LLM as a judge."""
-    
+
     eval_type = EvalType.LLM_JUDGE
-    
+
     JUDGE_PROMPT = """Evaluate if the agent successfully completed the task.
 
 TASK DESCRIPTION:
@@ -439,17 +451,18 @@ Respond with JSON:
 
     def __init__(self, llm_client: Optional[Any] = None):
         self._client = llm_client
-    
+
     def _get_client(self):
         if self._client is None:
             import os
+
             try:
                 from openai import OpenAI
             except ImportError:
                 raise ImportError("openai package required")
             self._client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         return self._client
-    
+
     def evaluate(
         self,
         output: str,
@@ -460,13 +473,13 @@ Respond with JSON:
         """Evaluate using LLM judge."""
         task = kwargs.get("task_description", "Complete the assigned task")
         criteria = "\n".join(config.reference_answers or ["Task completed successfully"])
-        
+
         prompt = self.JUDGE_PROMPT.format(
             task=task,
             criteria=criteria,
             output=output[:2000],  # Truncate for context limits
         )
-        
+
         try:
             client = self._get_client()
             response = client.chat.completions.create(
@@ -476,16 +489,16 @@ Respond with JSON:
                 max_tokens=500,
                 response_format={"type": "json_object"},
             )
-            
+
             result = json.loads(response.choices[0].message.content)
-            
+
             return EvalResult(
                 success=result.get("success", False),
                 score=result.get("score", 0.0),
                 eval_type=self.eval_type,
                 explanation=result.get("explanation", ""),
             )
-            
+
         except Exception as e:
             return EvalResult(
                 success=False,
@@ -499,10 +512,11 @@ Respond with JSON:
 # Combined Evaluator
 # =============================================================================
 
+
 class CombinedEvaluator:
     """
     Combine multiple evaluators for comprehensive task evaluation.
-    
+
     Example:
         evaluator = CombinedEvaluator()
         result = evaluator.evaluate(
@@ -514,7 +528,7 @@ class CombinedEvaluator:
             )
         )
     """
-    
+
     def __init__(self):
         self.evaluators: dict[EvalType, BaseEvaluator] = {
             EvalType.STRING_MATCH: StringMatchEvaluator(),
@@ -523,7 +537,7 @@ class CombinedEvaluator:
             EvalType.URL_MATCH: URLMatchEvaluator(),
             EvalType.LLM_JUDGE: LLMJudgeEvaluator(),
         }
-    
+
     def add_evaluator(
         self,
         eval_type: EvalType,
@@ -531,7 +545,7 @@ class CombinedEvaluator:
     ):
         """Add or replace an evaluator."""
         self.evaluators[eval_type] = evaluator
-    
+
     def evaluate(
         self,
         output: str,
@@ -542,25 +556,25 @@ class CombinedEvaluator:
     ) -> EvalResult:
         """
         Run all configured evaluators.
-        
+
         Args:
             output: Agent output to evaluate
             config: Evaluation configuration
             trace: Optional execution trace
             aggregation: How to combine results ("all", "any", "average")
             **kwargs: Additional arguments for evaluators
-            
+
         Returns:
             Combined evaluation result
         """
         results = []
-        
+
         for eval_type in config.eval_types:
             evaluator = self.evaluators.get(eval_type)
             if evaluator:
                 result = evaluator.evaluate(output, config, trace, **kwargs)
                 results.append(result)
-        
+
         if not results:
             return EvalResult(
                 success=True,
@@ -568,7 +582,7 @@ class CombinedEvaluator:
                 eval_type=EvalType.STRING_MATCH,
                 explanation="No evaluators configured",
             )
-        
+
         # Aggregate results
         if aggregation == "all":
             success = all(r.success for r in results)
@@ -579,9 +593,9 @@ class CombinedEvaluator:
         else:  # average
             success = sum(r.success for r in results) > len(results) / 2
             score = sum(r.score for r in results) / len(results) if results else 0.0
-        
+
         explanations = [r.explanation for r in results if r.explanation]
-        
+
         return EvalResult(
             success=success,
             score=score,
@@ -592,7 +606,7 @@ class CombinedEvaluator:
                     {"type": r.eval_type.value, "success": r.success, "score": r.score}
                     for r in results
                 ]
-            }
+            },
         )
 
 
@@ -600,41 +614,40 @@ class CombinedEvaluator:
 # Evaluator Router (WebArena-style)
 # =============================================================================
 
+
 def evaluator_router(
     config_file: Union[str, Path],
     **kwargs,
 ) -> CombinedEvaluator:
     """
     Create an evaluator based on task configuration file.
-    
+
     This mimics WebArena's evaluator_router function.
-    
+
     Args:
         config_file: Path to task configuration JSON
         **kwargs: Additional evaluator options
-        
+
     Returns:
         Configured CombinedEvaluator
     """
     with open(config_file) as f:
         config_data = json.load(f)
-    
+
     eval_data = config_data.get("eval", {})
     eval_config = EvalConfig.from_dict(eval_data)
-    
+
     evaluator = CombinedEvaluator()
-    
+
     # Add specialized evaluators if needed
     if kwargs.get("browser_page"):
         evaluator.add_evaluator(
-            EvalType.PROGRAM_HTML,
-            HTMLContentEvaluator(browser_page=kwargs["browser_page"])
+            EvalType.PROGRAM_HTML, HTMLContentEvaluator(browser_page=kwargs["browser_page"])
         )
-    
+
     if kwargs.get("llm_client"):
         evaluator.add_evaluator(
-            EvalType.LLM_JUDGE,
-            LLMJudgeEvaluator(llm_client=kwargs["llm_client"])
+            EvalType.LLM_JUDGE, LLMJudgeEvaluator(llm_client=kwargs["llm_client"])
         )
-    
+
     return evaluator
