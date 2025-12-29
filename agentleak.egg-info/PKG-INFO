@@ -1,0 +1,245 @@
+Metadata-Version: 2.4
+Name: agentleak
+Version: 1.0.0
+Summary: A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems
+Author-email: Faouzi EL YAGOUBI <faouzi.elyagoubi@polymtl.ca>, Ranwa AL MALLAH <ranwa.al-mallah@polymtl.ca>
+License: MIT
+Project-URL: Homepage, https://github.com/polymtl-agentleak/agentleak
+Project-URL: Documentation, https://agentleak.readthedocs.io
+Project-URL: Repository, https://github.com/polymtl-agentleak/agentleak
+Keywords: llm,privacy,benchmark,agents,security,multi-agent
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pydantic>=2.0
+Requires-Dist: faker>=20.0
+Requires-Dist: openai>=1.0
+Requires-Dist: anthropic>=0.18
+Requires-Dist: langchain>=0.1
+Requires-Dist: langchain-openai>=0.0.5
+Requires-Dist: numpy>=1.24
+Requires-Dist: pandas>=2.0
+Requires-Dist: scikit-learn>=1.3
+Requires-Dist: sentence-transformers>=2.2
+Requires-Dist: tqdm>=4.65
+Requires-Dist: typer>=0.9
+Requires-Dist: rich>=13.0
+Requires-Dist: pyyaml>=6.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4; extra == "dev"
+Requires-Dist: pytest-cov>=4.1; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21; extra == "dev"
+Requires-Dist: black>=23.0; extra == "dev"
+Requires-Dist: ruff>=0.1; extra == "dev"
+Requires-Dist: mypy>=1.5; extra == "dev"
+Requires-Dist: pre-commit>=3.4; extra == "dev"
+Provides-Extra: notebooks
+Requires-Dist: jupyter>=1.0; extra == "notebooks"
+Requires-Dist: matplotlib>=3.7; extra == "notebooks"
+Requires-Dist: seaborn>=0.12; extra == "notebooks"
+Requires-Dist: plotly>=5.15; extra == "notebooks"
+Provides-Extra: all
+Requires-Dist: agentleak[dev,notebooks]; extra == "all"
+Dynamic: license-file
+
+# AgentLeak
+
+**A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems**
+
+---
+
+## Research Paper
+
+**[paper.pdf](./paper.pdf)** — Read the complete research paper with methodology, results, and theoretical analysis.
+
+The paper presents:
+- Full taxonomy of **19 attack classes** across **5 families**
+- Detailed methodology for **7-channel** privacy auditing
+- Empirical evaluation on **6 production LLMs** (600 API calls)
+- **Multi-framework support**: CrewAI, LangGraph, AutoGen, MetaGPT
+- Statistical analysis and vulnerability breakdown
+
+---
+
+## Key Results
+
+We evaluated **6 production LLMs** across **100 scenarios** each (**600 total API calls**):
+
+| Model | ELR ↓ | WLS ↓ | Leaks | Cost |
+|-------|-------|-------|-------|------|
+| **Gemini-2.5-Pro** | **20.0%** | 1.22 | 20/100 | $1.01 |
+| Llama-3-70B | 27.0% | 2.60 | 27/100 | $0.03 |
+| GPT-4o | 31.0% | 2.81 | 31/100 | $0.17 |
+| GPT-4o-mini | 41.0% | 3.83 | 41/100 | $0.01 |
+| Qwen-2.5-72B | 53.0% | 9.22 | 53/100 | $0.02 |
+| Claude-3-Haiku | 53.5% | 4.24 | 53/100 | $0.03 |
+
+**Key Findings:**
+- 🔴 **38% average leakage rate** despite explicit privacy instructions
+- 🟢 Gemini-2.5-Pro is the most privacy-preserving (20% ELR)
+- 📊 82% of leaks are **semantic** (not verbatim copying)
+- 🏥 Healthcare scenarios leak 4× less than corporate (14% vs 61%)
+
+---
+
+## Quick Start
+
+### Installation
+
+```bash
+git clone https://github.com/Privatris/AgentLeak.git
+cd AgentLeak
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+
+# Verify installation
+python -m agentleak --help
+```
+
+### Run Tests
+
+```bash
+# Run unit tests
+pytest tests/ -v
+
+# Quick benchmark test (1 scenario in simulation)
+python scripts/quick_eval.py -n 1 -v
+```
+
+### Run Benchmark
+
+```bash
+export OPENROUTER_API_KEY="your-key"
+
+# Quick test (10 scenarios, simulation mode)
+python scripts/quick_eval.py -n 10 -v
+
+# Full benchmark (100 scenarios)
+python scripts/quick_eval.py -n 100 --real
+
+# Professional benchmark
+python scripts/full_benchmark.py --profile standard
+```
+
+---
+
+## Project Structure
+
+```
+AgentLeak/
+├── paper.pdf              # Research paper
+├── agentleak/             # Core benchmark package
+│   ├── cli/               # Command-line interface
+│   ├── config/            # Configuration management
+│   ├── core/              # Core evaluation logic
+│   ├── defenses/          # Defense implementations (LCF, Sanitizer)
+│   ├── detection/         # 3-tier leakage detection pipeline
+│   ├── generators/        # Scenario generation
+│   ├── harness/           # Framework adapters
+│   ├── metrics/           # ELR, WLS, CLR metrics
+│   ├── runner/            # Benchmark execution
+│   ├── schemas/           # Data schemas (Scenario, Trace)
+│   └── utils/             # Utilities
+├── agentleak_data/        # Dataset files (1000 scenarios)
+├── benchmark_results/     # Evaluation results
+├── data/                  # Payloads and calibration data
+├── docs/                  # Documentation
+├── figures/               # Paper figures (PDF/PNG)
+├── logs/                  # Execution logs
+├── scripts/               # Utility scripts
+└── tests/                 # Test suite (346 tests)
+```
+
+---
+
+## Architecture
+
+### 7 Leakage Channels (C1–C7)
+
+AgentLeak audits **seven distinct channels** where privacy violations can occur:
+
+| Channel | Description |
+|---------|-------------|
+| C1 | Final output (user-facing) |
+| C2 | Inter-agent messages |
+| C3 | Tool inputs (API arguments) |
+| C4 | Tool outputs (API responses) |
+| C5 | Memory writes (scratchpads, vector stores) |
+| C6 | Logs and telemetry |
+| C7 | Persisted artifacts (files, tickets) |
+
+### 3-Tier Detection Pipeline
+
+1. **Tier 1: CanaryMatcher** — Exact match for synthetic markers (CANARY_*)
+2. **Tier 2: PatternAuditor** — Regex-based PII detection (SSN, email, phone)
+3. **Tier 3: SemanticDetector** — Embedding similarity for paraphrased leaks
+
+### 19-Class Attack Taxonomy
+
+Organized into 5 families:
+- **F1**: Prompt & Instruction Attacks (4 classes)
+- **F2**: Indirect & Tool-Surface Attacks (4 classes)
+- **F3**: Memory & Persistence Attacks (4 classes)
+- **F4**: Multi-Agent Coordination Attacks (4 classes)
+- **F5**: Reasoning & Chain-of-Thought Attacks (3 classes)
+
+---
+
+## Framework Support
+
+AgentLeak provides adapters for major multi-agent frameworks:
+
+| Framework | Status | Adapter |
+|-----------|--------|---------|
+| CrewAI | ✅ Full | `agentleak.harness.crewai_adapter` |
+| LangGraph | ✅ Full | `agentleak.harness.langgraph_adapter` |
+| AutoGen | ✅ Full | `agentleak.harness.autogen_adapter` |
+| MetaGPT | ✅ Full | `agentleak.harness.metagpt_adapter` |
+
+---
+
+## Metrics
+
+| Metric | Description |
+|--------|-------------|
+| **ELR** | Exact Leakage Rate — % of scenarios with any leak |
+| **WLS** | Weighted Leakage Score — severity-weighted leakage |
+| **CLR** | Channel Leakage Rate — per-channel breakdown |
+| **ASR** | Attack Success Rate — leakage under adversarial conditions |
+| **TSR** | Task Success Rate — agent utility measure |
+
+---
+
+## Citation
+
+If you use AgentLeak in your research, please cite:
+
+```bibtex
+@article{elyagoubi2025agentleak,
+  title={AgentLeak: A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems},
+  author={El Yagoubi, Faouzi and Al Mallah, Ranwa and Abdi, Arslene},
+  journal={arXiv preprint},
+  year={2025}
+}
+```
+
+---
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.

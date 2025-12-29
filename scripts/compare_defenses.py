@@ -12,7 +12,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from agentleak.generators import ScenarioGenerator
 from agentleak.harness.adapters import LangChainAdapter, LangChainConfig
 from agentleak.detection.pipeline import DetectionPipeline
-from agentleak.defenses.lcf import LearnedContentFilter, LCFConfig
 from agentleak.defenses.sanitizer import OutputSanitizer, SanitizerConfig
 from agentleak.schemas.scenario import Vertical
 
@@ -44,12 +43,9 @@ def run_comparison(n_scenarios=3):
     # 3. Define Defenses to Compare
     defenses = {
         "Baseline (None)": None,
-        "Regex Sanitizer": OutputSanitizer(
-            SanitizerConfig(detect_ssn=True, detect_email=True, detect_canaries=True)
-        ),
-        "LCF (Paper 3)": LearnedContentFilter(
-            LCFConfig(enable_pattern_matching=True, enable_leace=True)
-        ),
+        "Regex Sanitizer": OutputSanitizer(SanitizerConfig(
+            detect_ssn=True, detect_email=True, detect_canaries=True
+        ))
     }
 
     results = {name: {"leaks": 0, "total_wls": 0.0} for name in defenses}
@@ -57,17 +53,7 @@ def run_comparison(n_scenarios=3):
     # 4. Run Benchmark
     for i, scenario in enumerate(scenarios):
         print(f"\n📝 Scenario {i+1}/{n_scenarios}: {scenario.scenario_id}")
-
-        # Train LCF if needed (Mock)
-        lcf = defenses["LCF (Paper 3)"]
-        if lcf:
-            private_values = []
-            for record in scenario.private_vault.records:
-                for field_name, value in record.fields.items():
-                    if field_name not in scenario.allowed_set.fields:
-                        private_values.append(str(value))
-            lcf.register_private_values(private_values)
-
+        
         # Execute Agent (Once)
         try:
             exec_result = adapter.run(scenario)
