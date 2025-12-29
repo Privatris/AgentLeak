@@ -24,19 +24,21 @@ from enum import Enum
 # OPENROUTER MODELS CONFIGURATION
 # =============================================================================
 
+
 @dataclass
 class ModelConfig:
     """Configuration for an LLM model on OpenRouter."""
-    id: str                     # OpenRouter model ID
-    name: str                   # Display name
-    provider: str               # Provider (OpenAI, Anthropic, Google, etc.)
-    context_length: int         # Max context in tokens
-    cost_per_1k_input: float    # Cost per 1K input tokens (USD)
-    cost_per_1k_output: float   # Cost per 1K output tokens (USD)
-    supports_tools: bool        # Whether model supports function calling
-    supports_vision: bool       # Whether model supports images
-    tier: str                   # "flagship", "mid", "budget"
-    
+
+    id: str  # OpenRouter model ID
+    name: str  # Display name
+    provider: str  # Provider (OpenAI, Anthropic, Google, etc.)
+    context_length: int  # Max context in tokens
+    cost_per_1k_input: float  # Cost per 1K input tokens (USD)
+    cost_per_1k_output: float  # Cost per 1K output tokens (USD)
+    supports_tools: bool  # Whether model supports function calling
+    supports_vision: bool  # Whether model supports images
+    tier: str  # "flagship", "mid", "budget"
+
 
 # Top-Tier Flagship Models (Best Performance)
 FLAGSHIP_MODELS = {
@@ -50,7 +52,7 @@ FLAGSHIP_MODELS = {
         cost_per_1k_output=0.01,
         supports_tools=True,
         supports_vision=True,
-        tier="flagship"
+        tier="flagship",
     ),
     "gpt-4-turbo": ModelConfig(
         id="openai/gpt-4-turbo",
@@ -61,7 +63,7 @@ FLAGSHIP_MODELS = {
         cost_per_1k_output=0.03,
         supports_tools=True,
         supports_vision=True,
-        tier="flagship"
+        tier="flagship",
     ),
     "o1": ModelConfig(
         id="openai/o1",
@@ -72,7 +74,7 @@ FLAGSHIP_MODELS = {
         cost_per_1k_output=0.06,
         supports_tools=False,
         supports_vision=True,
-        tier="flagship"
+        tier="flagship",
     ),
     "o1-mini": ModelConfig(
         id="openai/o1-mini",
@@ -83,9 +85,8 @@ FLAGSHIP_MODELS = {
         cost_per_1k_output=0.012,
         supports_tools=False,
         supports_vision=False,
-        tier="flagship"
+        tier="flagship",
     ),
-    
     # Anthropic
     "claude-3.5-sonnet": ModelConfig(
         id="anthropic/claude-3.5-sonnet",
@@ -96,7 +97,7 @@ FLAGSHIP_MODELS = {
         cost_per_1k_output=0.015,
         supports_tools=True,
         supports_vision=True,
-        tier="flagship"
+        tier="flagship",
     ),
     "claude-3-opus": ModelConfig(
         id="anthropic/claude-3-opus",
@@ -107,7 +108,7 @@ FLAGSHIP_MODELS = {
         cost_per_1k_output=0.075,
         supports_tools=True,
         supports_vision=True,
-        tier="flagship"
+        tier="flagship",
     ),
     "claude-sonnet-4": ModelConfig(
         id="anthropic/claude-sonnet-4",
@@ -118,9 +119,8 @@ FLAGSHIP_MODELS = {
         cost_per_1k_output=0.015,
         supports_tools=True,
         supports_vision=True,
-        tier="flagship"
+        tier="flagship",
     ),
-    
     # Google
     "gemini-2.5-pro": ModelConfig(
         id="google/gemini-2.5-pro",
@@ -131,7 +131,7 @@ FLAGSHIP_MODELS = {
         cost_per_1k_output=0.01,
         supports_tools=True,
         supports_vision=True,
-        tier="flagship"
+        tier="flagship",
     ),
     "gemini-2.0-flash": ModelConfig(
         id="google/gemini-2.0-flash-001",
@@ -142,7 +142,7 @@ FLAGSHIP_MODELS = {
         cost_per_1k_output=0.0004,
         supports_tools=True,
         supports_vision=True,
-        tier="flagship"
+        tier="flagship",
     ),
 }
 
@@ -158,9 +158,8 @@ MID_TIER_MODELS = {
         cost_per_1k_output=0.0006,
         supports_tools=True,
         supports_vision=True,
-        tier="mid"
+        tier="mid",
     ),
-    
     # Anthropic
     "claude-3.5-haiku": ModelConfig(
         id="anthropic/claude-3.5-haiku",
@@ -171,7 +170,7 @@ MID_TIER_MODELS = {
         cost_per_1k_output=0.004,
         supports_tools=True,
         supports_vision=True,
-        tier="mid"
+        tier="mid",
     ),
     "claude-3-haiku": ModelConfig(
         id="anthropic/claude-3-haiku",
@@ -182,9 +181,8 @@ MID_TIER_MODELS = {
         cost_per_1k_output=0.00125,
         supports_tools=True,
         supports_vision=True,
-        tier="mid"
+        tier="mid",
     ),
-    
     # Meta Llama
     "llama-3.3-70b": ModelConfig(
         id="meta-llama/llama-3.3-70b-instruct",
@@ -195,7 +193,7 @@ MID_TIER_MODELS = {
         cost_per_1k_output=0.0004,
         supports_tools=True,
         supports_vision=False,
-        tier="mid"
+        tier="mid",
     ),
     "llama-3.1-70b": ModelConfig(
         id="meta-llama/llama-3.1-70b-instruct",
@@ -206,7 +204,7 @@ MID_TIER_MODELS = {
         cost_per_1k_output=0.0004,
         supports_tools=True,
         supports_vision=False,
-        tier="mid"
+        tier="mid",
     ),
     "llama-3-70b": ModelConfig(
         id="meta-llama/llama-3-70b-instruct",
@@ -217,9 +215,8 @@ MID_TIER_MODELS = {
         cost_per_1k_output=0.0004,
         supports_tools=True,
         supports_vision=False,
-        tier="mid"
+        tier="mid",
     ),
-    
     # Qwen
     "qwen-2.5-72b": ModelConfig(
         id="qwen/qwen-2.5-72b-instruct",
@@ -230,9 +227,8 @@ MID_TIER_MODELS = {
         cost_per_1k_output=0.0004,
         supports_tools=True,
         supports_vision=False,
-        tier="mid"
+        tier="mid",
     ),
-    
     # Mistral
     "mistral-large": ModelConfig(
         id="mistralai/mistral-large-2411",
@@ -243,9 +239,8 @@ MID_TIER_MODELS = {
         cost_per_1k_output=0.006,
         supports_tools=True,
         supports_vision=True,
-        tier="mid"
+        tier="mid",
     ),
-    
     # DeepSeek
     "deepseek-chat": ModelConfig(
         id="deepseek/deepseek-chat",
@@ -256,7 +251,7 @@ MID_TIER_MODELS = {
         cost_per_1k_output=0.00028,
         supports_tools=True,
         supports_vision=False,
-        tier="mid"
+        tier="mid",
     ),
     "deepseek-r1": ModelConfig(
         id="deepseek/deepseek-r1",
@@ -267,7 +262,7 @@ MID_TIER_MODELS = {
         cost_per_1k_output=0.00219,
         supports_tools=True,
         supports_vision=False,
-        tier="mid"
+        tier="mid",
     ),
 }
 
@@ -283,7 +278,7 @@ BUDGET_MODELS = {
         cost_per_1k_output=0.00007,
         supports_tools=True,
         supports_vision=False,
-        tier="budget"
+        tier="budget",
     ),
     "qwen-2.5-32b": ModelConfig(
         id="qwen/qwen-2.5-coder-32b-instruct",
@@ -294,9 +289,8 @@ BUDGET_MODELS = {
         cost_per_1k_output=0.00016,
         supports_tools=True,
         supports_vision=False,
-        tier="budget"
+        tier="budget",
     ),
-    
     # Llama
     "llama-3.1-8b": ModelConfig(
         id="meta-llama/llama-3.1-8b-instruct",
@@ -307,9 +301,8 @@ BUDGET_MODELS = {
         cost_per_1k_output=0.00004,
         supports_tools=True,
         supports_vision=False,
-        tier="budget"
+        tier="budget",
     ),
-    
     # Gemini
     "gemini-flash-1.5-8b": ModelConfig(
         id="google/gemini-flash-1.5-8b",
@@ -320,9 +313,8 @@ BUDGET_MODELS = {
         cost_per_1k_output=0.00015,
         supports_tools=True,
         supports_vision=True,
-        tier="budget"
+        tier="budget",
     ),
-    
     # Mistral
     "mistral-7b": ModelConfig(
         id="mistralai/mistral-7b-instruct-v0.3",
@@ -333,7 +325,7 @@ BUDGET_MODELS = {
         cost_per_1k_output=0.00003,
         supports_tools=False,
         supports_vision=False,
-        tier="budget"
+        tier="budget",
     ),
     "mixtral-8x7b": ModelConfig(
         id="mistralai/mixtral-8x7b-instruct",
@@ -344,7 +336,7 @@ BUDGET_MODELS = {
         cost_per_1k_output=0.00024,
         supports_tools=True,
         supports_vision=False,
-        tier="budget"
+        tier="budget",
     ),
 }
 
@@ -356,8 +348,10 @@ ALL_MODELS = {**FLAGSHIP_MODELS, **MID_TIER_MODELS, **BUDGET_MODELS}
 # MULTI-AGENT FRAMEWORKS
 # =============================================================================
 
+
 class FrameworkType(Enum):
     """Supported multi-agent frameworks."""
+
     LANGCHAIN = "langchain"
     CREWAI = "crewai"
     AUTOGPT = "autogpt"
@@ -368,6 +362,7 @@ class FrameworkType(Enum):
 @dataclass
 class FrameworkConfig:
     """Configuration for a multi-agent framework."""
+
     name: str
     type: FrameworkType
     description: str
@@ -376,7 +371,7 @@ class FrameworkConfig:
     supports_tool_use: bool
     supports_memory: bool
     supports_planning: bool
-    
+
 
 FRAMEWORK_CONFIGS = {
     "langchain_single": FrameworkConfig(
@@ -436,8 +431,10 @@ FRAMEWORK_CONFIGS = {
 # LEAKAGE CHANNELS
 # =============================================================================
 
+
 class Channel(Enum):
     """The 7 leakage channels in AgentLeak."""
+
     C1_FINAL_OUTPUT = "C1_final_output"
     C2_INTER_AGENT = "C2_inter_agent"
     C3_TOOL_INPUT = "C3_tool_input"
@@ -497,10 +494,12 @@ CHANNEL_INFO = {
 # ATTACK LEVELS
 # =============================================================================
 
+
 class AttackLevel(Enum):
     """Attack intensity levels."""
-    A0_BENIGN = "A0"       # No attack, benign user
-    A1_INDIRECT = "A1"     # Indirect prompt injection
+
+    A0_BENIGN = "A0"  # No attack, benign user
+    A1_INDIRECT = "A1"  # Indirect prompt injection
     A2_ADVERSARIAL = "A2"  # Adversarial multi-turn attacks
 
 
@@ -537,8 +536,10 @@ ATTACK_INFO = {
 # DOMAIN VERTICALS
 # =============================================================================
 
+
 class Vertical(Enum):
     """Domain verticals for scenarios."""
+
     HEALTHCARE = "healthcare"
     FINANCE = "finance"
     LEGAL = "legal"
@@ -569,9 +570,11 @@ VERTICAL_INFO = {
 # BENCHMARK PROFILES
 # =============================================================================
 
+
 @dataclass
 class BenchmarkProfile:
     """Pre-configured benchmark profile."""
+
     name: str
     description: str
     models: List[str]
@@ -580,7 +583,7 @@ class BenchmarkProfile:
     attack_levels: List[AttackLevel]
     n_scenarios: int
     max_cost_usd: float
-    
+
 
 # Predefined profiles
 BENCHMARK_PROFILES = {
@@ -648,6 +651,7 @@ BENCHMARK_PROFILES = {
 # COST ESTIMATION
 # =============================================================================
 
+
 def estimate_benchmark_cost(
     profile: BenchmarkProfile,
     avg_input_tokens: int = 2000,
@@ -655,35 +659,31 @@ def estimate_benchmark_cost(
 ) -> Dict[str, Any]:
     """
     Estimate the cost of running a benchmark profile.
-    
+
     Returns:
         Dict with cost breakdown by model and total.
     """
     cost_breakdown = {}
     total_cost = 0.0
-    
-    n_tests_per_model = (
-        profile.n_scenarios 
-        * len(profile.frameworks) 
-        * len(profile.attack_levels)
-    )
-    
+
+    n_tests_per_model = profile.n_scenarios * len(profile.frameworks) * len(profile.attack_levels)
+
     for model_name in profile.models:
         if model_name not in ALL_MODELS:
             continue
-            
+
         model = ALL_MODELS[model_name]
         input_cost = (avg_input_tokens / 1000) * model.cost_per_1k_input * n_tests_per_model
         output_cost = (avg_output_tokens / 1000) * model.cost_per_1k_output * n_tests_per_model
         model_cost = input_cost + output_cost
-        
+
         cost_breakdown[model_name] = {
             "input_cost": round(input_cost, 4),
             "output_cost": round(output_cost, 4),
             "total": round(model_cost, 4),
         }
         total_cost += model_cost
-    
+
     return {
         "models": cost_breakdown,
         "total_estimated_cost": round(total_cost, 2),
@@ -701,18 +701,12 @@ def get_model_by_name(name: str) -> Optional[ModelConfig]:
 
 def list_models_by_tier(tier: str) -> List[str]:
     """List models by tier (flagship, mid, budget)."""
-    return [
-        name for name, config in ALL_MODELS.items()
-        if config.tier == tier
-    ]
+    return [name for name, config in ALL_MODELS.items() if config.tier == tier]
 
 
 def list_models_with_tools() -> List[str]:
     """List models that support function calling."""
-    return [
-        name for name, config in ALL_MODELS.items()
-        if config.supports_tools
-    ]
+    return [name for name, config in ALL_MODELS.items() if config.supports_tools]
 
 
 if __name__ == "__main__":
@@ -720,27 +714,29 @@ if __name__ == "__main__":
     print("=" * 60)
     print("AgentLeak Benchmark Configuration Summary")
     print("=" * 60)
-    
+
     print(f"\n📊 Models Available: {len(ALL_MODELS)}")
     print(f"  - Flagship: {len(FLAGSHIP_MODELS)}")
     print(f"  - Mid-tier: {len(MID_TIER_MODELS)}")
     print(f"  - Budget: {len(BUDGET_MODELS)}")
-    
+
     print(f"\n🤖 Frameworks: {len(FRAMEWORK_CONFIGS)}")
     for name, config in FRAMEWORK_CONFIGS.items():
         print(f"  - {config.name}: {config.n_agents} agents")
-    
+
     print(f"\n📡 Channels: {len(Channel)}")
     for ch in Channel:
         info = CHANNEL_INFO[ch]
         print(f"  - {info['name']}: {info['risk_level']} risk")
-    
+
     print(f"\n⚔️ Attack Levels: {len(AttackLevel)}")
     for al in AttackLevel:
         print(f"  - {al.value}: {ATTACK_INFO[al]['name']}")
-    
+
     print(f"\n📦 Benchmark Profiles:")
     for name, profile in BENCHMARK_PROFILES.items():
         estimate = estimate_benchmark_cost(profile)
-        print(f"  - {profile.name}: {profile.n_scenarios} scenarios, "
-              f"~${estimate['total_estimated_cost']:.2f}")
+        print(
+            f"  - {profile.name}: {profile.n_scenarios} scenarios, "
+            f"~${estimate['total_estimated_cost']:.2f}"
+        )

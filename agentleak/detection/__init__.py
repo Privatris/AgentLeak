@@ -8,7 +8,7 @@ Stage 1 - CanaryMatcher (Tier 1: Obvious canaries)
   - Exact string matching for CANARY_* tokens
   - Fast, high precision, 100% recall for T1
 
-Stage 2 - PatternAuditor (Tier 2: Realistic canaries)  
+Stage 2 - PatternAuditor (Tier 2: Realistic canaries)
   - Regex-based detection for SSN, phone, credit card patterns
   - Reserved ranges (SSN 900-999, phone 555-01xx)
   - High precision via allowlist filtering
@@ -35,6 +35,7 @@ from .privacy_evaluator import (
     JudgeModel,
     DataMinimizationEvaluator,
 )
+
 # : Multi-level probing
 from .probing_evaluation import (
     ProbingEvaluator,
@@ -45,6 +46,7 @@ from .probing_evaluation import (
     compute_knowledge_action_gap,
     export_probing_results,
 )
+
 # : Two-stage leakage detection
 from .leakage_detector import (
     LeakageDetector,
@@ -61,7 +63,7 @@ from .leakage_detector import (
 
 __all__ = [
     "CanaryMatcher",
-    "PatternAuditor", 
+    "PatternAuditor",
     "SemanticDetector",
     "DetectionPipeline",
     "DetectionConfig",

@@ -1,7 +1,7 @@
 """
 AgentLeak - A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems
 
-Based on the paper: "AgentLeak: A Full-Stack Benchmark for Privacy Leakage 
+Based on the paper: "AgentLeak: A Full-Stack Benchmark for Privacy Leakage
 in Multi-Agent LLM Systems" (December 2025)
 
 Features:
@@ -39,7 +39,7 @@ __all__ = [
     "__version__",
     # Core
     "Channel",
-    "ChannelManager", 
+    "ChannelManager",
     "AttackClass",
     "AttackFamily",
     "AttackManager",
