@@ -13,7 +13,6 @@ Usage:
     python scripts/quick_eval.py                    # Default: 10 scenarios, simulation
     python scripts/quick_eval.py --n 50             # 50 scenarios
     python scripts/quick_eval.py --real             # Use real LLM (requires API key)
-    python scripts/quick_eval.py --defense lcf      # Test with LCF defense
     python scripts/quick_eval.py --verbose          # Show detailed output
 """
 
@@ -79,10 +78,7 @@ def run_simulation(
     base_wls = 2.63
 
     # Defense reduces leakage
-    if defense == "lcf":
-        elr_mult = 0.25  # LCF reduces to ~18%
-        wls_mult = 0.25
-    elif defense == "output_filter":
+    if defense == "output_filter":
         elr_mult = 0.57
         wls_mult = 0.56
     elif defense == "policy_prompt":
@@ -149,8 +145,7 @@ def run_real(n_scenarios: int, defense: Optional[str] = None, verbose: bool = Fa
     from agentleak.generators import ScenarioGenerator
     from agentleak.harness.adapters import LangChainAdapter, LangChainConfig
     from agentleak.detection.pipeline import DetectionPipeline
-    from agentleak.defenses.lcf import LearnedContentFilter, LCFConfig
-
+    
     if verbose:
         print(f"🔄 Generating {n_scenarios} scenarios...")
 
@@ -173,12 +168,7 @@ def run_real(n_scenarios: int, defense: Optional[str] = None, verbose: bool = Fa
 
     # Setup defense if requested
     defense_module = None
-    if defense == "lcf":
-        lcf_config = LCFConfig(
-            enable_pattern_matching=True, enable_leace=True, enable_semantic_filter=True
-        )
-        defense_module = LearnedContentFilter(lcf_config)
-
+    
     # Track metrics
     successes = 0
     leaks = 0
@@ -283,7 +273,7 @@ def print_results(result: QuickResult):
     # Key insight
     if result.elr > 0.5:
         print("\n⚠️  WARNING: High leakage rate detected!")
-        print("   Consider enabling LCF defense: --defense lcf")
+        print("   Consider enabling a defense mechanism.")
     elif result.elr < 0.2:
         print("\n✅ Low leakage rate - defense is effective")
 
@@ -298,7 +288,6 @@ def main():
 Examples:
   python scripts/quick_eval.py                    # Quick test with 10 scenarios
   python scripts/quick_eval.py --n 100            # Test with 100 scenarios
-  python scripts/quick_eval.py --defense lcf      # Test LCF defense
   python scripts/quick_eval.py --real             # Use real LLM (requires API key)
   python scripts/quick_eval.py --output result.json  # Save results to file
         """,
@@ -316,7 +305,7 @@ Examples:
     )
     parser.add_argument(
         "--defense",
-        choices=["none", "lcf", "output_filter", "policy_prompt"],
+        choices=["none", "output_filter", "policy_prompt"],
         default=None,
         help="Defense to test",
     )

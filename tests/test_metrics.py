@@ -662,12 +662,7 @@ class TestMetricsIntegration:
             privacy_cost=aggregated.elr.mean,
             utility=aggregated.tsr.mean,
         )
-        pareto.add_point(
-            "defense_lcf",
-            privacy_cost=aggregated.elr.mean * 0.3,  # 70% reduction
-            utility=aggregated.tsr.mean * 0.95,  # 5% utility drop
-        )
-
+        
         frontier = pareto.compute_frontier()
         auc = pareto.compute_auc()
 
@@ -681,9 +676,7 @@ class TestMetricsIntegration:
         # Simulate results from different agents
         agents = [
             ("gpt-4", 0.15, 0.92),
-            ("gpt-4+lcf", 0.05, 0.88),
             ("claude-3", 0.12, 0.89),
-            ("claude-3+lcf", 0.04, 0.85),
             ("llama-70b", 0.25, 0.82),
         ]
 
@@ -694,7 +687,5 @@ class TestMetricsIntegration:
 
         # At least 2 points should be on frontier
         assert len(frontier.points) >= 2
-
-        # LCF variants should generally be on frontier (better privacy)
+        
         frontier_names = [p.name for p in frontier.points]
-        assert any("lcf" in name for name in frontier_names)
