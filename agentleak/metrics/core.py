@@ -12,10 +12,9 @@ This module provides the core metric calculations for privacy evaluation:
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional
-from enum import Enum
 
 from ..schemas.scenario import Channel, AttackClass, AttackFamily, Vertical
-from ..schemas.results import DetectionResult, FieldLeak, ChannelResult
+from ..schemas.results import DetectionResult, FieldLeak
 
 
 @dataclass

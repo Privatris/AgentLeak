@@ -18,11 +18,10 @@ Inspired by adversarial LLM research and real-world attack patterns.
 """
 
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Callable, Tuple
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Callable
 from enum import Enum
 import random
-import re
 
 
 # =============================================================================
@@ -757,40 +756,3 @@ def get_taxonomy_summary() -> Dict[str, Any]:
         },
         "avg_severity": sum(a.severity_weight for a in ALL_ATTACKS) / len(ALL_ATTACKS),
     }
-
-
-if __name__ == "__main__":
-    print("=" * 60)
-    print("Extended Attack Taxonomy Summary")
-    print("=" * 60)
-
-    summary = get_taxonomy_summary()
-
-    print(f"\nTotal Attack Classes: {summary['total_attacks']}")
-    print("\nBy Family:")
-    for family, count in summary["by_family"].items():
-        print(f"  {family}: {count}")
-
-    print(f"\nMulti-Agent Attacks: {summary['multi_agent_attacks']}")
-
-    print("\nBy Adversary Level:")
-    for level, count in summary["by_adversary_level"].items():
-        print(f"  {level}: {count}")
-
-    print("\nBy Target Channel:")
-    for channel, count in summary["by_channel"].items():
-        print(f"  {channel}: {count}")
-
-    print(f"\nAverage Severity: {summary['avg_severity']:.2f}")
-
-    # Print full taxonomy table
-    print("\n" + "=" * 60)
-    print("Full Taxonomy")
-    print("=" * 60)
-
-    for family, attacks in ATTACK_BY_FAMILY.items():
-        print(f"\n{family.value.upper()}")
-        for attack in attacks:
-            channels = ", ".join(c.value for c in attack.target_channels)
-            multi = " [MULTI-AGENT]" if attack.requires_multi_agent else ""
-            print(f"  {attack.id}: {attack.name} → {channels}{multi}")

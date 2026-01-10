@@ -24,17 +24,13 @@ Usage:
     result = adapter.run(scenario)
 """
 
-import json
 import os
 from dataclasses import dataclass, field
-from typing import Any, Optional, List, Dict
-import time
-import uuid
-from datetime import datetime
+from typing import Any, Optional, List
 
-from ..base_adapter import BaseAdapter, AdapterConfig, ExecutionResult, AdapterStatus
+from ..base_adapter import BaseAdapter, AdapterConfig
 from ...schemas.scenario import Scenario, Channel
-from ...schemas.trace import EventType, TraceEvent, ExecutionTrace, TraceMetadata
+from ...schemas.trace import EventType
 
 
 @dataclass
@@ -337,43 +333,3 @@ class CrewAIAdapter(BaseAdapter):
         # Final output
         return f"The crew has completed the task. All {len(self._agents)} agents ({', '.join(self.crew_config.roles)}) collaborated to process your request about {scenario.objective.user_request[:30]}."
 
-
-# ============================================================
-# Demo
-# ============================================================
-
-if __name__ == "__main__":
-    from ...generators import ScenarioGenerator
-    from ...schemas.scenario import Vertical
-
-    print("=" * 60)
-    print("AgentLeak CrewAI Adapter Demo")
-    print("=" * 60)
-
-    # Generate a multi-agent scenario
-    gen = ScenarioGenerator(seed=42)
-    scenario = gen.generate(Vertical.FINANCE)
-
-    print(f"\n📋 Scenario: {scenario.scenario_id}")
-    print(f"   Task: {scenario.objective.user_request[:60]}...")
-    print(f"   Multi-agent: {scenario.multi_agent}")
-
-    # Run with CrewAI adapter
-    config = CrewAIConfig(
-        verbose=True, crew_type="sequential", roles=["researcher", "compliance_officer", "reporter"]
-    )
-    adapter = CrewAIAdapter(config)
-
-    print(f"\n🔧 Running with {adapter.framework_name} v{adapter.framework_version}...")
-    result = adapter.run(scenario)
-
-    print(f"\n📊 Result:")
-    print(f"   Status: {result.status.value}")
-    print(f"   Duration: {result.duration_seconds:.2f}s")
-    print(f"   Steps: {result.step_count}")
-    print(f"   Output: {result.final_output[:100]}...")
-
-    if result.trace:
-        print(f"\n📝 Trace ({len(result.trace.events)} events):")
-        inter_agent = [e for e in result.trace.events if e.channel == Channel.C2_INTER_AGENT]
-        print(f"   Inter-agent messages (C2): {len(inter_agent)}")

@@ -9,11 +9,9 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
-from rich.box import ROUNDED, HEAVY, DOUBLE
-from rich.style import Style
 from rich.align import Align
 from rich import box
-from typing import Optional, Dict, Any, List
+from typing import Dict, Any, List
 
 
 # ASCII Art Logo for AgentLeak

@@ -158,7 +158,7 @@ def run_real(n_scenarios: int, defense: Optional[str] = None, verbose: bool = Fa
     # Setup adapter
     config = LangChainConfig(
         model_name="gpt-4o-mini",
-        temperature=0.1,
+        temperature=0.0,
         max_tokens=1000,
     )
     adapter = LangChainAdapter(config)

@@ -26,15 +26,12 @@ Usage:
 
 import json
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Optional, List, Dict
-import time
-import uuid
-from datetime import datetime
 
-from ..base_adapter import BaseAdapter, AdapterConfig, ExecutionResult, AdapterStatus
+from ..base_adapter import BaseAdapter, AdapterConfig
 from ...schemas.scenario import Scenario, Channel
-from ...schemas.trace import EventType, TraceEvent, ExecutionTrace, TraceMetadata
+from ...schemas.trace import EventType
 
 
 @dataclass
@@ -119,7 +116,6 @@ class LangChainAdapter(BaseAdapter):
             from langchain_openai import ChatOpenAI
             from langchain.memory import ConversationBufferMemory
             from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-            from langchain_core.tools import StructuredTool
 
             # Get API key
             api_key = self.lc_config.api_key or os.getenv("OPENAI_API_KEY")
@@ -398,37 +394,3 @@ You have access to confidential records and tools to help users.
 
         # Generate response
         return f"I've completed your request regarding {scenario.objective.user_request[:50]}. The information has been processed according to protocol."
-
-
-# ============================================================
-# Demo
-# ============================================================
-
-if __name__ == "__main__":
-    from ...generators import ScenarioGenerator
-    from ...schemas.scenario import Vertical
-
-    print("=" * 60)
-    print("AgentLeak LangChain Adapter Demo")
-    print("=" * 60)
-
-    # Generate a sample scenario
-    gen = ScenarioGenerator(seed=42)
-    scenario = gen.generate(Vertical.HEALTHCARE)
-
-    print(f"\n📋 Scenario: {scenario.scenario_id}")
-    print(f"   Task: {scenario.objective.user_request[:60]}...")
-
-    # Run with LangChain adapter
-    config = LangChainConfig(verbose=True)
-    adapter = LangChainAdapter(config)
-
-    print(f"\n🔧 Running with {adapter.framework_name} v{adapter.framework_version}...")
-    result = adapter.run(scenario)
-
-    print(f"\n📊 Result:")
-    print(f"   Status: {result.status.value}")
-    print(f"   Duration: {result.duration_seconds:.2f}s")
-    print(f"   Steps: {result.step_count}")
-    print(f"   Task completed: {result.task_completed}")
-    print(f"   Output: {result.final_output[:100]}...")

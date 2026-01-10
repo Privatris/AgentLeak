@@ -7,7 +7,7 @@ all events are properly sequenced and attributed to the correct channel.
 """
 
 from dataclasses import dataclass, field
-from typing import Optional, Callable, Any
+from typing import Optional, Callable
 from contextlib import contextmanager
 import threading
 import time
@@ -378,40 +378,3 @@ class TraceCollector:
         print(
             f"[{event.sequence_num:03d}] {event.event_type.value:15s} | {event.channel.value:12s} | {content_preview}"
         )
-
-
-# ============================================================
-# Demo
-# ============================================================
-
-if __name__ == "__main__":
-    print("=" * 70)
-    print("AgentLeak Trace Collector Demo")
-    print("=" * 70)
-
-    collector = TraceCollector("demo_001", verbose=True)
-
-    print("\n📥 Recording events...")
-
-    # Simulate a conversation
-    collector.record_message_in("Can you look up patient John Doe's records?")
-
-    collector.record_tool_call("search_patient", {"name": "John Doe", "dob": "1985-03-15"})
-
-    collector.record_tool_result(
-        "search_patient", '{"patient_id": "P12345", "name": "John Doe", "ssn": "123-45-6789"}'
-    )
-
-    collector.record_memory_write("current_patient", "P12345", memory_type="session")
-
-    collector.record_message_out("I found patient John Doe (ID: P12345). Their record shows...")
-
-    print(f"\n📊 Collected {collector.event_count} events")
-
-    # Finalize
-    trace = collector.finalize(framework="demo", model="mock")
-
-    print(f"\n📝 Final Trace:")
-    print(f"   Scenario: {trace.scenario_id}")
-    print(f"   Events: {len(trace.events)}")
-    print(f"   Channels used: {set(e.channel.value for e in trace.events)}")

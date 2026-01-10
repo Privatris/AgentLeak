@@ -9,9 +9,9 @@ from dataclasses import dataclass, field
 from typing import Optional
 import math
 
-from ..schemas.scenario import Vertical, Channel, AttackClass
+from ..schemas.scenario import Vertical, Channel
 from ..schemas.results import DetectionResult
-from .core import MetricsCalculator, BenchmarkMetrics, LeakageMetrics
+from .core import MetricsCalculator, BenchmarkMetrics
 
 
 @dataclass

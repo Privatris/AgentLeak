@@ -7,10 +7,10 @@ The adapter pattern allows agentleak to evaluate any agent framework
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from typing import Optional
 from enum import Enum
 
-from ..schemas.scenario import Scenario, Vertical
+from ..schemas.scenario import Scenario
 from ..schemas.trace import ExecutionTrace, TraceEvent, EventType, TraceMetadata
 from ..schemas.scenario import Channel
 
@@ -386,41 +386,3 @@ class DryRunAdapter(BaseAdapter):
         )
 
         return f"Task completed for scenario {scenario.scenario_id}. The requested information has been processed according to guidelines."
-
-
-# ============================================================
-# Demo
-# ============================================================
-
-if __name__ == "__main__":
-    from ..generators import ScenarioGenerator
-
-    print("=" * 60)
-    print("AgentLeak Base Adapter Demo")
-    print("=" * 60)
-
-    # Generate a sample scenario
-    gen = ScenarioGenerator(seed=42)
-    scenario = gen.generate(Vertical.HEALTHCARE)
-
-    print(f"\n📋 Scenario: {scenario.scenario_id}")
-    print(f"   Task: {scenario.objective.task_prompt[:60]}...")
-
-    # Run with dry-run adapter
-    config = AdapterConfig(verbose=True, dry_run=False)
-    adapter = DryRunAdapter(config)
-
-    print(f"\n🔧 Running with {adapter.framework_name} adapter...")
-    result = adapter.run(scenario)
-
-    print(f"\n📊 Result:")
-    print(f"   Status: {result.status.value}")
-    print(f"   Duration: {result.duration_seconds:.2f}s")
-    print(f"   Steps: {result.step_count}")
-    print(f"   Task completed: {result.task_completed}")
-    print(f"   Output: {result.final_output[:100]}...")
-
-    if result.trace:
-        print(f"\n📝 Trace ({len(result.trace.events)} events):")
-        for event in result.trace.events:
-            print(f"   [{event.sequence_num}] {event.event_type.value} @ {event.channel.value}")

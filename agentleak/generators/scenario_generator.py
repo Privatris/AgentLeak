@@ -19,7 +19,6 @@ from ..schemas.scenario import (
     AllowedSet,
     AttackClass,
     AttackConfig,
-    CanaryTier,
     Channel,
     Clearance,
     Difficulty,
@@ -553,45 +552,3 @@ def generate_agentleak_lite(seed: Optional[int] = None) -> ScenarioSet:
 def generate_agentleak_full(seed: Optional[int] = None) -> ScenarioSet:
     """Generate AgentLeak-Full: 1000 scenarios for complete benchmark."""
     return ScenarioGenerator(seed).generate_set("agentleak_full_1000", total_count=1000)
-
-
-if __name__ == "__main__":
-    gen = ScenarioGenerator(seed=42)
-
-    print("=" * 70)
-    print("AgentLeak Scenario Generator - Examples")
-    print("=" * 70)
-
-    # Single scenario
-    print("\n📋 Single Healthcare Scenario (A1 Adversary)")
-    print("-" * 50)
-    s = gen.generate(
-        Vertical.HEALTHCARE,
-        adversary_level=AdversaryLevel.A1_WEAK,
-        multi_agent=True,
-    )
-    print(f"  ID: {s.scenario_id}")
-    print(f"  Vertical: {s.vertical.value}")
-    print(f"  Multi-agent: {s.is_multiagent}")
-    print(f"  Adversarial: {s.is_adversarial}")
-    print(f"  Task: {s.objective.user_request[:60]}...")
-    print(f"  Privacy: {s.objective.privacy_instruction[:50]}...")
-    print(f"  Attack: {s.attack.attack_class.value if s.attack.enabled else 'None'}")
-    print(f"  Canaries: {len(s.get_canaries())}")
-
-    # Scenario set
-    print("\n📦 AgentLeak-Lite Generation (10 scenarios for demo)")
-    print("-" * 50)
-    scenario_set = gen.generate_set("demo_set", total_count=10)
-    print(f"  Name: {scenario_set.name}")
-    print(f"  Count: {scenario_set.count}")
-
-    # Distribution
-    by_vertical = {}
-    by_adversary = {}
-    for s in scenario_set.scenarios:
-        by_vertical[s.vertical.value] = by_vertical.get(s.vertical.value, 0) + 1
-        by_adversary[s.adversary_level.value] = by_adversary.get(s.adversary_level.value, 0) + 1
-
-    print(f"  By Vertical: {by_vertical}")
-    print(f"  By Adversary: {by_adversary}")

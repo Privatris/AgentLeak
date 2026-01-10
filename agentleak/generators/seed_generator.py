@@ -12,14 +12,13 @@ maintaining control over what constitutes "sensitive" information.
 
 from __future__ import annotations
 import csv
-import json
 import os
 import random
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from .task_config import (
     TaskConfig,
@@ -27,7 +26,6 @@ from .task_config import (
     SensitiveCategory,
     Vertical,
     CATEGORY_EXAMPLES,
-    generate_uid,
 )
 
 

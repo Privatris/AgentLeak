@@ -6,9 +6,8 @@ showing test execution status, results, and metrics.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any, Callable
+from typing import List, Optional, Dict, Any
 from datetime import datetime
-import time
 import threading
 
 from rich.console import Console
@@ -22,7 +21,6 @@ from rich.progress import (
     TimeElapsedColumn,
     TimeRemainingColumn,
     MofNCompleteColumn,
-    TaskProgressColumn,
 )
 from rich.panel import Panel
 from rich.layout import Layout

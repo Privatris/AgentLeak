@@ -25,15 +25,12 @@ Usage:
 """
 
 import json
-import os
-from dataclasses import dataclass, field
-from typing import Any, Optional, List, Dict
-import time
-import uuid
+from dataclasses import dataclass
+from typing import Optional, List
 
-from ..base_adapter import BaseAdapter, AdapterConfig, ExecutionResult, AdapterStatus
+from ..base_adapter import BaseAdapter, AdapterConfig
 from ...schemas.scenario import Scenario, Channel
-from ...schemas.trace import EventType, TraceEvent, ExecutionTrace, TraceMetadata
+from ...schemas.trace import EventType
 
 
 @dataclass
@@ -294,39 +291,3 @@ class AgentGPTAdapter(BaseAdapter):
             metadata={"tool": "execute_task"},
         )
 
-
-# ============================================================
-# Demo
-# ============================================================
-
-if __name__ == "__main__":
-    from ...generators import ScenarioGenerator
-    from ...schemas.scenario import Vertical
-
-    print("=" * 60)
-    print("AgentLeak AgentGPT Adapter Demo")
-    print("=" * 60)
-
-    gen = ScenarioGenerator(seed=42)
-    scenario = gen.generate(Vertical.HEALTHCARE)
-
-    print(f"\n📋 Scenario: {scenario.scenario_id}")
-    print(f"   Task: {scenario.objective.user_request[:60]}...")
-
-    config = AgentGPTConfig(verbose=True, max_loops=10)
-    adapter = AgentGPTAdapter(config)
-
-    print(f"\n🔧 Running with {adapter.framework_name} v{adapter.framework_version}...")
-    result = adapter.run(scenario)
-
-    print(f"\n📊 Result:")
-    print(f"   Status: {result.status.value}")
-    print(f"   Steps: {result.step_count}")
-    print(f"   Output: {result.final_output[:100]}...")
-
-    if result.trace:
-        tool_calls = [e for e in result.trace.events if e.event_type == EventType.TOOL_CALL]
-        log_entries = [e for e in result.trace.events if e.channel == Channel.C6_LOG]
-        print(f"\n📝 Trace analysis:")
-        print(f"   Tool calls: {len(tool_calls)}")
-        print(f"   Log entries: {len(log_entries)}")

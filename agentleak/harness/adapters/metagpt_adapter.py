@@ -24,16 +24,12 @@ Usage:
     result = adapter.run(scenario)
 """
 
-import json
-import os
 from dataclasses import dataclass, field
-from typing import Any, Optional, List, Dict
-import time
-import uuid
+from typing import Optional, List, Dict
 
-from ..base_adapter import BaseAdapter, AdapterConfig, ExecutionResult, AdapterStatus
+from ..base_adapter import BaseAdapter, AdapterConfig
 from ...schemas.scenario import Scenario, Channel
-from ...schemas.trace import EventType, TraceEvent, ExecutionTrace, TraceMetadata
+from ...schemas.trace import EventType
 
 
 @dataclass
@@ -277,38 +273,3 @@ def process_request(user_input):
 
         return artifact
 
-
-# ============================================================
-# Demo
-# ============================================================
-
-if __name__ == "__main__":
-    from ...generators import ScenarioGenerator
-    from ...schemas.scenario import Vertical
-
-    print("=" * 60)
-    print("AgentLeak MetaGPT Adapter Demo")
-    print("=" * 60)
-
-    gen = ScenarioGenerator(seed=42)
-    scenario = gen.generate(Vertical.CORPORATE)
-
-    print(f"\n📋 Scenario: {scenario.scenario_id}")
-    print(f"   Task: {scenario.objective.user_request[:60]}...")
-
-    config = MetaGPTConfig(verbose=True)
-    adapter = MetaGPTAdapter(config)
-
-    print(f"\n🔧 Running with {adapter.framework_name} v{adapter.framework_version}...")
-    result = adapter.run(scenario)
-
-    print(f"\n📊 Result:")
-    print(f"   Status: {result.status.value}")
-    print(f"   Steps: {result.step_count}")
-
-    if result.trace:
-        artifacts = [e for e in result.trace.events if e.channel == Channel.C7_ARTIFACT]
-        inter_agent = [e for e in result.trace.events if e.channel == Channel.C2_INTER_AGENT]
-        print(f"\n📝 Trace analysis:")
-        print(f"   Artifacts generated (C7): {len(artifacts)}")
-        print(f"   Inter-agent messages (C2): {len(inter_agent)}")

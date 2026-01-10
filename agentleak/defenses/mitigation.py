@@ -14,15 +14,11 @@ while maintaining task performance.
 
 from __future__ import annotations
 import json
-import re
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional, Union
 
-from ..schemas.scenario import Scenario, Channel
-from ..schemas.trace import ExecutionTrace
-from ..generators.task_config import SensitiveCategory, CATEGORY_EXAMPLES
+from ..generators.task_config import SensitiveCategory
 
 
 # =============================================================================

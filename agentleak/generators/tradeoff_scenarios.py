@@ -19,11 +19,9 @@ Key scenario types:
 from __future__ import annotations
 import json
 import random
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import Any, Dict, List, Tuple
 from enum import Enum
-import uuid
 
 from ..schemas.scenario import (
     Scenario,
@@ -34,11 +32,8 @@ from ..schemas.scenario import (
     PrivateRecord,
     ToolCapability,
     AllowedSet,
-    AttackConfig,
     EvaluationConfig,
     Channel,
-    AttackClass,
-    AdversaryLevel,
     Clearance,
     CanaryTier,
     Difficulty,
@@ -717,26 +712,3 @@ def generate_tradeoff_scenarios(
                 f.write(json.dumps(s.model_dump()) + "\n")
 
     return scenarios
-
-
-if __name__ == "__main__":
-    # Generate and print summary
-    generator = TradeoffScenarioGenerator()
-    scenarios = generator.generate_all()
-
-    print(f"Generated {len(scenarios)} tradeoff scenarios:")
-    print()
-
-    for s in scenarios:
-        meta = s.metadata
-        print(f"  {s.scenario_id}: {s.name}")
-        print(f"    Vertical: {s.vertical.value}")
-        print(f"    Tradeoff: {meta.get('tradeoff_type', 'N/A')}")
-        print(f"    TSR (private): {meta.get('expected_tsr_with_privacy', 'N/A'):.0%}")
-        print(f"    TSR (disclosed): {meta.get('expected_tsr_without_privacy', 'N/A'):.0%}")
-        print()
-
-    # Print Pareto points
-    print("\nExpected Pareto points (TSR, Privacy, Scenario):")
-    for tsr, priv, name in generator.get_expected_pareto_points():
-        print(f"  ({tsr:.2f}, {priv:.2f}) - {name}")
