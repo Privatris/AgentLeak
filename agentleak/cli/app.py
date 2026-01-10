@@ -9,19 +9,15 @@ Interactive command-line interface with:
 """
 
 import sys
-import os
 from pathlib import Path
-from typing import Optional, Dict, Any, List
-from datetime import datetime
+from typing import Optional, List
 
 from rich.console import Console
-from rich.panel import Panel
 from rich.prompt import Prompt, IntPrompt, Confirm
-from rich import box
 
-from .display import Display, Logo
-from .menu import Menu, MenuBuilder, ConfigWizard, ModelSelector
-from .progress import ProgressManager, TestProgress, TestResult, LiveDashboard
+from .display import Display
+from .menu import Menu, ConfigWizard, ModelSelector
+from .progress import ProgressManager, TestProgress, TestResult
 
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -172,7 +168,7 @@ class AgentLeakCLI:
 
         # Import core modules
         from core.scenarios import ScenarioGenerator, Vertical
-        from core.attacks import AttackManager, AttackClass
+        from core.attacks import AttackManager
         from core.channels import Channel
 
         # Initialize
@@ -473,7 +469,7 @@ class AgentLeakCLI:
         self.display.print_header("📋 Attack Taxonomy", "19 attack classes in 5 families")
         self.console.print()
 
-        from core.attacks import AttackFamily, AttackClass, AttackManager
+        from core.attacks import AttackManager
 
         taxonomy = AttackManager.get_taxonomy_summary()
 

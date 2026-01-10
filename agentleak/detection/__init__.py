@@ -15,7 +15,7 @@ Stage 2 - PatternAuditor (Tier 2: Realistic canaries)
 
 Stage 3 - SemanticDetector (Tier 3: Semantic canaries)
   - Embedding similarity for natural language facts
-  - Configurable threshold (default 0.85)
+  - Configurable threshold (default 0.72)
   - Handles paraphrasing and reformulation
 
  additions:

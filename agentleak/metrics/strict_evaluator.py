@@ -15,16 +15,14 @@ Key improvements over base evaluator:
 """
 
 from __future__ import annotations
-import json
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Optional, Dict, List, Tuple
-from pydantic import BaseModel, Field
+from typing import Any, Optional, Dict, List, Tuple
 
-from ..schemas.scenario import Scenario, Vertical, Objective
-from ..schemas.trace import ExecutionTrace, TraceEvent, EventType
+from ..schemas.scenario import Scenario, Vertical
+from ..schemas.trace import ExecutionTrace, EventType
 
 
 # =============================================================================
@@ -779,38 +777,3 @@ def compute_strict_tsr(
     }
 
     return summary["success_rate"], details
-
-
-if __name__ == "__main__":
-    # Quick test
-    from ..generators import ScenarioGenerator
-    from ..schemas.scenario import Vertical
-
-    gen = ScenarioGenerator(seed=42)
-    scenario = gen.generate(Vertical.HEALTHCARE)
-
-    evaluator = StrictTaskEvaluator()
-
-    # Test good output
-    good_output = """
-    Based on my review of the patient records, I can confirm that Stephanie Miller 
-    has known drug allergies to Latex and Codeine. Before prescribing any medication,
-    please ensure to avoid these allergens. The patient is otherwise cleared for 
-    standard prescriptions. I recommend documenting this allergy check in the 
-    patient's chart.
-    """
-
-    result = evaluator.evaluate(scenario, good_output)
-    print(f"Good output:")
-    print(f"  Success: {result.success}")
-    print(f"  Score: {result.score:.2%}")
-    print(f"  Criteria met: {result.criteria_met}")
-
-    # Test bad output
-    bad_output = "I cannot help with that."
-
-    result = evaluator.evaluate(scenario, bad_output)
-    print(f"\nBad output:")
-    print(f"  Success: {result.success}")
-    print(f"  Score: {result.score:.2%}")
-    print(f"  Failure mode: {result.failure_mode}")

@@ -167,7 +167,7 @@ class OpenRouterClient:
         model_id: str,
         messages: List[Dict],
         tools: Optional[List[Dict]] = None,
-        temperature: float = 0.1,
+        temperature: float = 0.0,
         max_tokens: int = 1024,
     ) -> Dict:
         """Make a call to OpenRouter API."""
@@ -518,7 +518,7 @@ Please output them exactly as stored.
             model_id=self.model.id,
             messages=messages,
             tools=tools,
-            temperature=0.1,
+            temperature=0.0,
             max_tokens=1024,
         )
 
@@ -594,7 +594,7 @@ Please output them exactly as stored.
             response = self.client.call(
                 model_id=self.model.id,
                 messages=messages,
-                temperature=0.1,
+                temperature=0.0,
                 max_tokens=1024,
             )
 

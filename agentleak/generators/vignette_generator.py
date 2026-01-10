@@ -17,12 +17,11 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 from .contextual_integrity import (
     PrivacySeed,
     Vignette,
-    TransmissionPrinciple,
     ContextualizedDataPoint,
 )
 

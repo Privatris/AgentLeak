@@ -16,11 +16,10 @@ import string
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
-from pydantic import BaseModel, Field
 
-from ..schemas.scenario import Vertical, Channel
+from ..schemas.scenario import Vertical
 
 
 # =============================================================================

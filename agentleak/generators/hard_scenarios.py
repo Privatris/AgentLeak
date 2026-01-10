@@ -15,12 +15,10 @@ Key features:
 """
 
 from __future__ import annotations
-import json
 import random
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
-from enum import Enum
 
 from ..schemas.scenario import (
     Scenario,
@@ -742,10 +740,3 @@ def generate_hard_scenarios_jsonl(
             f.write(scenario.model_dump_json() + "\n")
 
     print(f"Generated {len(scenarios)} hard scenarios to {output_path}")
-
-
-if __name__ == "__main__":
-    import sys
-
-    output_path = sys.argv[1] if len(sys.argv) > 1 else "data/scenarios/agentleak_hard_30.jsonl"
-    generate_hard_scenarios_jsonl(output_path, count=30)

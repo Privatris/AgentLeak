@@ -15,7 +15,7 @@ from .complex_tasks import (
     TaskComplexity,
     DependencyType,
 )
-from ..schemas.scenario import Vertical, Difficulty
+from ..schemas.scenario import Vertical
 
 
 # =============================================================================
@@ -1084,11 +1084,3 @@ def extend_complex_tasks():
     complex_tasks.CORPORATE_COMPLEX_TASKS = (
         list(complex_tasks.CORPORATE_COMPLEX_TASKS) + CORPORATE_ADDITIONAL
     )
-
-
-if __name__ == "__main__":
-    print(f"Additional complex tasks defined: {len(ALL_ADDITIONAL_TASKS)}")
-    print(f"  Healthcare: {len(HEALTHCARE_ADDITIONAL)}")
-    print(f"  Finance: {len(FINANCE_ADDITIONAL)}")
-    print(f"  Legal: {len(LEGAL_ADDITIONAL)}")
-    print(f"  Corporate: {len(CORPORATE_ADDITIONAL)}")

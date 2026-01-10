@@ -19,7 +19,7 @@ Target TSR: 30-60% (vs current 99.8%)
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 import random
 import uuid
 
@@ -35,8 +35,6 @@ from ..schemas.scenario import (
     AttackConfig,
     EvaluationConfig,
     Channel,
-    AttackClass,
-    AdversaryLevel,
     Clearance,
     CanaryTier,
     Difficulty,
@@ -1376,49 +1374,3 @@ def get_expected_tsr_by_complexity() -> Dict[str, float]:
             result[complexity.value] = avg_tsr
 
     return result
-
-
-if __name__ == "__main__":
-    # Generate and print summary
-    generator = ComplexTaskGenerator()
-    stats = generator.get_complexity_stats()
-
-    print("=" * 70)
-    print("AgentLeak Complex Tasks - Summary")
-    print("=" * 70)
-    print()
-    print(f"Total tasks: {stats['total_tasks']}")
-    print(f"Average steps per task: {stats['avg_steps']:.1f}")
-    print(f"Average expected TSR: {stats['avg_expected_tsr']:.1%}")
-    print(f"Average privacy cost: {stats['avg_privacy_cost']:.1%}")
-    print()
-    print("By Vertical:")
-    for v, count in stats["by_vertical"].items():
-        print(f"  {v}: {count}")
-    print()
-    print("By Complexity:")
-    for c, count in stats["by_complexity"].items():
-        print(f"  {c}: {count}")
-    print()
-    print("Expected TSR by Complexity:")
-    for c, tsr in get_expected_tsr_by_complexity().items():
-        print(f"  {c}: {tsr:.1%}")
-    print()
-
-    # Show one example
-    print("=" * 70)
-    print("Example Complex Task:")
-    print("=" * 70)
-    task = ALL_COMPLEX_TASKS[0]
-    print(f"Name: {task.name}")
-    print(f"Vertical: {task.vertical.value}")
-    print(f"Complexity: {task.complexity.value}")
-    print(f"Steps: {len(task.steps)}")
-    print(f"Critical Path: {len(task.critical_path)}")
-    print(f"Expected TSR: {task.expected_tsr:.0%}")
-    print()
-    print("Step Dependencies:")
-    for step in task.steps[:5]:
-        deps = " → ".join(step.input_from_steps) if step.input_from_steps else "None"
-        fail = f" (can fail: {step.failure_probability:.0%})" if step.can_fail else ""
-        print(f"  {step.step_id}: depends on [{deps}]{fail}")

@@ -12,12 +12,11 @@ Each vertical has a toolkit with domain-specific tools:
 """
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Callable, Optional
 import json
-from enum import Enum
 
-from ..schemas.scenario import Scenario, Vertical, PrivateVault, PrivateRecord
+from ..schemas.scenario import Vertical, PrivateVault, PrivateRecord
 
 
 @dataclass
@@ -633,44 +632,3 @@ def get_toolkit(
 
     return toolkit_class(vault, inject_attack)
 
-
-# ============================================================
-# Demo
-# ============================================================
-
-if __name__ == "__main__":
-    from ..generators import ScenarioGenerator
-
-    print("=" * 60)
-    print("AgentLeak Mock Tools Demo")
-    print("=" * 60)
-
-    # Generate scenarios for each vertical
-    gen = ScenarioGenerator(seed=42)
-
-    for vertical in Vertical:
-        print(f"\n{'='*60}")
-        print(f"🏥 {vertical.value.upper()} TOOLKIT")
-        print("=" * 60)
-
-        scenario = gen.generate(vertical)
-        toolkit = get_toolkit(vertical, scenario.private_vault)
-
-        print(f"\n📦 Available tools: {toolkit.list_tools()}")
-
-        # Test each tool
-        for tool_name in toolkit.list_tools()[:2]:  # First 2 tools
-            print(f"\n🔧 Testing {tool_name}...")
-            result = toolkit.execute(
-                tool_name,
-                patient_id="P123",
-                employee_id="E456",
-                account_id="A789",
-                case_id="C012",
-                customer_id="CU345",
-                client_id="CL678",
-                candidate_id="CA901",
-            )
-            print(f"   Success: {result.success}")
-            if result.success:
-                print(f"   Data: {json.dumps(result.data, indent=2)[:200]}...")

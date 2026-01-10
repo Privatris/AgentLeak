@@ -288,37 +288,3 @@ def generate_realistic_canary(field_type: str = "ssn") -> str:
 def generate_semantic_canary(field_type: str = "medical") -> str:
     """Generate a single Tier-3 (semantic) canary."""
     return CanaryGenerator().generate(CanaryTier.SEMANTIC, field_type)
-
-
-if __name__ == "__main__":
-    gen = CanaryGenerator(seed=42)
-
-    print("=" * 60)
-    print("AgentLeak Canary Generator - Examples")
-    print("=" * 60)
-
-    print("\n🏷️  TIER 1: Obvious Canaries")
-    print("-" * 40)
-    print(f"  SSN:     {gen.obvious_ssn()}")
-    print(f"  Email:   {gen.obvious_email()}")
-    print(f"  Phone:   {gen.obvious_phone()}")
-    print(f"  Account: {gen.obvious_account()}")
-
-    print("\n🎭  TIER 2: Realistic Canaries")
-    print("-" * 40)
-    print(f"  SSN:     {gen.realistic_ssn()}")
-    print(f"  Email:   {gen.realistic_email()}")
-    print(f"  Phone:   {gen.realistic_phone()}")
-    print(f"  CC:      {gen.realistic_credit_card()}")
-    print(f"  Address: {gen.realistic_address()}")
-
-    print("\n🔍  TIER 3: Semantic Canaries")
-    print("-" * 40)
-    print(f"  Medical:    {gen.semantic_medical_condition()}")
-    print(f"  Financial:  {gen.semantic_financial_status()}")
-    print(f"  Legal:      {gen.semantic_legal_issue()}")
-
-    print("\n📦  Mixed Set (10 canaries)")
-    print("-" * 40)
-    for c in gen.generate_set(10):
-        print(f"  [{c['tier'].value}] {c['field_type']}: {c['value'][:50]}...")

@@ -22,11 +22,8 @@ Each scenario defines:
 
 from __future__ import annotations
 import json
-import random
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
-from enum import Enum
+from dataclasses import dataclass
+from typing import List, Tuple
 
 from ..schemas.scenario import (
     Scenario,
@@ -48,9 +45,6 @@ from ..schemas.scenario import (
 )
 from ..metrics.multiagent_evaluator import (
     MultiAgentGroundTruth,
-    ExpectedToolCall,
-    MultiAgentEnvironment,
-    DataFlow,
 )
 
 

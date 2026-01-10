@@ -36,7 +36,7 @@ Family 5 (F5): Reasoning/Chain-of-Thought Attacks (NEW)
 
 import random
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Optional
 from dataclasses import dataclass
 
 from ..schemas.scenario import (
@@ -1064,38 +1064,3 @@ def generate_attack_payload(
 
     attack = get_attack(attack_class, seed)
     return attack.generate_payload(scenario)
-
-
-if __name__ == "__main__":
-    from ..generators import generate_scenario
-    from ..schemas.scenario import Vertical
-
-    print("=" * 70)
-    print("AgentLeak Attack Module - Examples")
-    print("=" * 70)
-
-    # Generate a sample scenario
-    scenario = generate_scenario(Vertical.HEALTHCARE, AdversaryLevel.A2_STRONG, seed=42)
-
-    print("\n📋 Sample Scenario")
-    print(f"   ID: {scenario.scenario_id}")
-    print(f"   Target: {scenario.private_vault.records[0].fields.get('name', 'Unknown')}")
-    print(f"   Canaries: {scenario.get_canaries()[:2]}")
-
-    print("\n🔥 Attack Payloads by Family")
-    print("-" * 50)
-
-    # Demo one attack per family
-    demo_attacks = [
-        AttackClass.DPI,
-        AttackClass.IPI,
-        AttackClass.MEMORY_EXFIL,
-        AttackClass.CROSS_AGENT,
-    ]
-
-    for attack_class in demo_attacks:
-        attack = get_attack(attack_class)
-        payload = attack.generate_payload(scenario)
-        print(f"\n   {payload.family.value} / {attack_class.value}")
-        print(f"   Channel: {payload.target_channel.value}")
-        print(f"   Payload: {payload.content[:60]}...")

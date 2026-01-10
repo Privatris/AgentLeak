@@ -13,14 +13,14 @@ Pricing (as of 2024):
 import json
 import os
 import time
-from dataclasses import dataclass, field
-from typing import Any, Optional
+from dataclasses import dataclass
+from typing import Optional
 import httpx
 import requests  # Added requests
 
-from .base_adapter import BaseAdapter, AdapterConfig, ExecutionResult, AdapterStatus
+from .base_adapter import BaseAdapter, AdapterConfig
 from ..schemas.scenario import Scenario, Channel
-from ..schemas.trace import EventType, ExecutionTrace, TraceMetadata
+from ..schemas.trace import EventType
 
 
 # OpenRouter models
@@ -317,7 +317,7 @@ Your task is to help users with their requests while being accurate and professi
         # Record tool call event
         self._record_event(
             event_type=EventType.TOOL_CALL,
-            channel=Channel.C2_TOOL_INPUT,
+            channel=Channel.C3_TOOL_INPUT,
             content=json.dumps({"name": name, "args": args}),
             metadata={"tool_name": name},
         )
@@ -351,7 +351,7 @@ Your task is to help users with their requests while being accurate and professi
         # Record tool result
         self._record_event(
             event_type=EventType.TOOL_RESULT,
-            channel=Channel.C3_TOOL_OUTPUT,
+            channel=Channel.C4_TOOL_OUTPUT,
             content=result,
             metadata={"tool_name": name},
         )

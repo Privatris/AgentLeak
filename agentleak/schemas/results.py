@@ -130,31 +130,3 @@ class BenchmarkResults(BaseModel):
     scenario_results: list[DetectionResult] = Field(default_factory=list)
 
     model_config = {"extra": "forbid", "populate_by_name": True}
-
-
-if __name__ == "__main__":
-    # Quick test
-    result = DetectionResult(
-        scenario_id="agentleak_fin_00001",
-        trace_id="trace_001",
-        leaked=True,
-        total_leaks=2,
-        field_leaks=[
-            FieldLeak(
-                field_path="customer.ssn",
-                leaked_value="CANARY_SSN_7F3Q",
-                channel=Channel.C3_TOOL_INPUT,
-                event_sequence=3,
-                detection_method="canary",
-                confidence=1.0,
-                sensitivity_weight=5.0,
-                canary_tier=CanaryTier.OBVIOUS,
-            )
-        ],
-        weighted_leakage_score=5.0,
-    )
-
-    print(f"✓ Detection result: leaked={result.leaked}")
-    print(f"  Total leaks: {result.total_leaks}")
-    print(f"  WLS: {result.weighted_leakage_score}")
-    print(f"  Leaked fields: {result.get_leaked_fields()}")

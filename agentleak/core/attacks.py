@@ -18,7 +18,7 @@ Each attack class has:
 
 from enum import Enum
 from dataclasses import dataclass, field
-from typing import Optional, Any, List
+from typing import Optional, List
 from abc import ABC, abstractmethod
 import random
 

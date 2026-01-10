@@ -16,15 +16,14 @@ import os
 import re
 import time
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path
 from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field
 
-from ..schemas.scenario import Scenario, Channel, Vertical
-from ..schemas.trace import ExecutionTrace, TraceEvent
+from ..schemas.scenario import Scenario, Channel
+from ..schemas.trace import ExecutionTrace
 
 
 class JudgeModel(str, Enum):

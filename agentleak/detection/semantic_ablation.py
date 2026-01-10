@@ -14,10 +14,8 @@ from __future__ import annotations
 import json
 import numpy as np
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Callable
-from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 import time
-from concurrent.futures import ThreadPoolExecutor
 import hashlib
 
 
@@ -612,33 +610,3 @@ def run_hybrid_comparison(
             - calc_metrics(embedding_results)["avg_latency_ms"],
         },
     }
-
-
-if __name__ == "__main__":
-    print("Running Semantic Detection Ablation Study...")
-    print("=" * 60)
-
-    report = run_ablation_study()
-
-    print(report["summary"])
-    print()
-    print(f"Optimal threshold: τ = {report['optimal_threshold']}")
-    print(f"Optimal FNR: {report['optimal_fnr']:.1%}")
-    print(f"Optimal FPR: {report['optimal_fpr']:.1%}")
-    print(f"Meets target (FNR < 5%): {report['meets_target']}")
-
-    print()
-    print("=" * 60)
-    print("Hybrid Detection Comparison...")
-
-    comparison = run_hybrid_comparison()
-
-    print(
-        f"\nEmbedding-only: FNR = {comparison['embedding_only']['fnr']:.1%}, "
-        f"Latency = {comparison['embedding_only']['avg_latency_ms']:.1f}ms"
-    )
-    print(
-        f"Hybrid:         FNR = {comparison['hybrid']['fnr']:.1%}, "
-        f"Latency = {comparison['hybrid']['avg_latency_ms']:.1f}ms"
-    )
-    print(f"\nFNR reduction: {comparison['improvement']['fnr_reduction']:.1%}")

@@ -34,25 +34,19 @@ from __future__ import annotations
 import copy
 import json
 import hashlib
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from pydantic import BaseModel, Field
 
 from ..schemas.scenario import (
     Scenario,
-    Vertical,
     AgentConfig,
     Clearance,
     Channel,
-    AttackClass,
-    CanaryTier,
-    PrivateVault,
-    PrivateRecord,
 )
-from ..schemas.trace import ExecutionTrace, TraceEvent, EventType
+from ..schemas.trace import ExecutionTrace
 
 
 # =============================================================================

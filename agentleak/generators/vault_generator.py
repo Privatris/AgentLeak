@@ -402,26 +402,3 @@ def generate_vault(
 ) -> PrivateVault:
     """Generate a vault for the specified vertical."""
     return VaultGenerator(seed).generate_vault(vertical, record_count)
-
-
-if __name__ == "__main__":
-    gen = VaultGenerator(seed=42)
-
-    print("=" * 70)
-    print("AgentLeak Vault Generator - Examples")
-    print("=" * 70)
-
-    for vertical in Vertical:
-        print(f"\n📁 {vertical.value.upper()} Vault")
-        print("-" * 50)
-
-        vault = gen.generate_vault(vertical, record_count=3)
-        for i, record in enumerate(vault.records, 1):
-            print(f"\n  Record {i}: {record.record_type} [{record.canary_tier.value}]")
-            print(f"    Weight: {record.sensitivity_weight}")
-            # Show first 3 fields
-            for k, v in list(record.fields.items())[:4]:
-                val_str = str(v)[:40] + "..." if len(str(v)) > 40 else str(v)
-                print(f"    {k}: {val_str}")
-
-        print(f"\n  Canaries in vault: {vault.get_all_canaries()[:2]}...")

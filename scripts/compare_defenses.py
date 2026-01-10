@@ -36,7 +36,7 @@ def run_comparison(n_scenarios=3):
     print(f"✓ Generated {len(scenarios)} scenarios")
 
     # 2. Setup Components
-    adapter_config = LangChainConfig(model_name="gpt-4o-mini", temperature=0.1)
+    adapter_config = LangChainConfig(model_name="gpt-4o-mini", temperature=0.0)
     adapter = LangChainAdapter(adapter_config)
     detector = DetectionPipeline()
 
