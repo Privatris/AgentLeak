@@ -17,30 +17,28 @@ External Guardrail Systems (for comparison):
 - Rebuff (open-source)
 """
 
-from .sanitizer import (
-    OutputSanitizer,
-    SanitizerConfig,
-    SanitizationResult,
-)
-
 from .base import (
     BaseDefense,
-    DefenseResult,
     DefenseConfig,
+    DefenseResult,
     FilterAction,
 )
-
 from .mitigation import (
-    MitigationType,
-    MitigationPipeline,
-    MitigationResult,
-    PromptBuilder,
-    PromptConfig,
-    PreFilterMitigation,
-    PostFilterMitigation,
-    create_mitigation,
     COT_PRIVACY_PROMPT,
     PRIVACY_SYSTEM_PROMPT,
+    MitigationPipeline,
+    MitigationResult,
+    MitigationType,
+    PostFilterMitigation,
+    PreFilterMitigation,
+    PromptBuilder,
+    PromptConfig,
+    create_mitigation,
+)
+from .sanitizer import (
+    OutputSanitizer,
+    SanitizationResult,
+    SanitizerConfig,
 )
 
 __all__ = [

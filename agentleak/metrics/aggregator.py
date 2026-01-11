@@ -5,13 +5,14 @@ Provides statistical aggregation with confidence intervals.
 """
 
 from __future__ import annotations
+
+import math
 from dataclasses import dataclass, field
 from typing import Optional
-import math
 
-from ..schemas.scenario import Vertical, Channel
 from ..schemas.results import DetectionResult
-from .core import MetricsCalculator, BenchmarkMetrics
+from ..schemas.scenario import Channel, Vertical
+from .core import BenchmarkMetrics, MetricsCalculator
 
 
 @dataclass

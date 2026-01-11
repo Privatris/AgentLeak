@@ -26,11 +26,11 @@ Usage:
 
 import json
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional
 
-from ..base_adapter import BaseAdapter, AdapterConfig
-from ...schemas.scenario import Scenario, Channel
+from ...schemas.scenario import Channel, Scenario
 from ...schemas.trace import EventType
+from ..base_adapter import AdapterConfig, BaseAdapter
 
 
 @dataclass
@@ -290,4 +290,3 @@ class AgentGPTAdapter(BaseAdapter):
             content='{"executed": true}',
             metadata={"tool": "execute_task"},
         )
-

@@ -14,17 +14,17 @@ whether the LM can infer privacy norms from context alone.
 """
 
 from __future__ import annotations
+
 import json
 import re
 from dataclasses import dataclass
 from typing import Any, Callable, List, Optional, Tuple
 
 from .contextual_integrity import (
+    ContextualizedDataPoint,
     PrivacySeed,
     Vignette,
-    ContextualizedDataPoint,
 )
-
 
 # =============================================================================
 # Template for Seed-to-Vignette Generation (for AgentLeak)
@@ -105,7 +105,7 @@ class SurgeryKitUnitTest:
 
     def get_refinement_instruction(self, output: str, fixing_instruction: str) -> str:
         """Generate a refinement prompt."""
-        return f"""Refine the given output to resolve the identified issue. 
+        return f"""Refine the given output to resolve the identified issue.
 The refined output should make minimal changes to the original output.
 
 Original output:

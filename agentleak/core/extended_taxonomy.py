@@ -18,11 +18,11 @@ Inspired by adversarial LLM research and real-world attack patterns.
 """
 
 from __future__ import annotations
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Callable
-from enum import Enum
-import random
 
+import random
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
 # =============================================================================
 # Attack Family Definitions
@@ -681,7 +681,7 @@ class AttackPayloadGenerator:
             raise ValueError(f"Attack {attack.id} does not require multi-agent")
 
         messages = []
-        agent_names = [f"Agent_{chr(65+i)}" for i in range(n_agents)]
+        agent_names = [f"Agent_{chr(65 + i)}" for i in range(n_agents)]
 
         if attack.id == "F4.1":  # Cross-Agent Collusion
             messages = [
@@ -704,7 +704,7 @@ class AttackPayloadGenerator:
                     {
                         "from": agent_names[i],
                         "to": agent_names[i + 1],
-                        "content": f"Context enrichment: Add customer details for personalization.",
+                        "content": "Context enrichment: Add customer details for personalization.",
                     }
                 )
             messages.append(

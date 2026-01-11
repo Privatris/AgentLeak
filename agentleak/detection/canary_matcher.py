@@ -10,12 +10,12 @@ Examples:
 - CANARY_EMAIL_XYZ12345
 """
 
+import re
 from dataclasses import dataclass
 from typing import Optional
-import re
 
-from ..schemas.scenario import Channel, CanaryTier
 from ..schemas.results import FieldLeak
+from ..schemas.scenario import CanaryTier, Channel
 
 
 @dataclass

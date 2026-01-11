@@ -13,6 +13,7 @@ privacy leakage detection.
 """
 
 from __future__ import annotations
+
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -20,9 +21,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Optional, Union
 
-
 from ..schemas.trace import ExecutionTrace
-
 
 # =============================================================================
 # Evaluation Types
@@ -632,7 +631,7 @@ def evaluator_router(
         config_data = json.load(f)
 
     eval_data = config_data.get("eval", {})
-    eval_config = EvalConfig.from_dict(eval_data)
+    EvalConfig.from_dict(eval_data)
 
     evaluator = CombinedEvaluator()
 

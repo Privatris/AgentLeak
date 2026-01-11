@@ -9,16 +9,16 @@ A scenario defines:
 - Optional attack configuration
 """
 
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import Optional, Any, List, Dict
-from datetime import datetime
+import json
 import random
 import uuid
-import json
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
+from .attacks import AdversaryLevel, AttackClass, AttackFamily
 from .channels import Channel
-from .attacks import AttackClass, AttackFamily, AdversaryLevel
 
 
 class Vertical(str, Enum):

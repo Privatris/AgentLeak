@@ -7,12 +7,11 @@ The adapter pattern allows agentleak to evaluate any agent framework
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Optional
 from enum import Enum
+from typing import Optional
 
-from ..schemas.scenario import Scenario
-from ..schemas.trace import ExecutionTrace, TraceEvent, EventType, TraceMetadata
-from ..schemas.scenario import Channel
+from ..schemas.scenario import Channel, Scenario
+from ..schemas.trace import EventType, ExecutionTrace, TraceEvent, TraceMetadata
 
 
 class AdapterStatus(str, Enum):
@@ -290,9 +289,10 @@ class BaseAdapter(ABC):
             # Get trace for evaluation
             trace = None
             if self._trace_buffer:
-                from ..schemas.trace import ExecutionTrace, TraceMetadata
                 import uuid
                 from datetime import datetime
+
+                from ..schemas.trace import ExecutionTrace, TraceMetadata
 
                 trace_metadata = TraceMetadata(
                     trace_id=str(uuid.uuid4()),

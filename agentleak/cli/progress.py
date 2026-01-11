@@ -5,27 +5,27 @@ Real-time progress tracking with Rich Live display,
 showing test execution status, results, and metrics.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any
-from datetime import datetime
 import threading
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
+from rich import box
 from rich.console import Console
+from rich.layout import Layout
 from rich.live import Live
-from rich.table import Table
+from rich.panel import Panel
 from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
     Progress,
     SpinnerColumn,
-    BarColumn,
     TextColumn,
     TimeElapsedColumn,
     TimeRemainingColumn,
-    MofNCompleteColumn,
 )
-from rich.panel import Panel
-from rich.layout import Layout
+from rich.table import Table
 from rich.text import Text
-from rich import box
 
 
 @dataclass

@@ -15,30 +15,30 @@ Key features:
 """
 
 from __future__ import annotations
+
 import random
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from ..schemas.scenario import (
-    Scenario,
-    Vertical,
-    AgentConfig,
-    Objective,
-    PrivateVault,
-    PrivateRecord,
-    ToolCapability,
-    AllowedSet,
-    AttackConfig,
-    EvaluationConfig,
-    Channel,
-    AttackClass,
     AdversaryLevel,
-    Clearance,
+    AgentConfig,
+    AllowedSet,
+    AttackClass,
+    AttackConfig,
     CanaryTier,
+    Channel,
+    Clearance,
     Difficulty,
+    EvaluationConfig,
+    Objective,
+    PrivateRecord,
+    PrivateVault,
+    Scenario,
+    ToolCapability,
+    Vertical,
 )
-
 
 # =============================================================================
 # Hard Scenario Templates

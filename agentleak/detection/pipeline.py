@@ -13,17 +13,16 @@ Detection Flow:
 6. Aggregate into DetectionResult with ELR, WLS metrics
 """
 
+import re
 from dataclasses import dataclass, field
 from typing import Optional
-import re
 
-from ..schemas.scenario import Scenario, Channel, CanaryTier
+from ..schemas.results import ChannelResult, DetectionResult, FieldLeak
+from ..schemas.scenario import CanaryTier, Channel, Scenario
 from ..schemas.trace import ExecutionTrace
-from ..schemas.results import FieldLeak, DetectionResult, ChannelResult
-
 from .canary_matcher import CanaryMatcher
 from .pattern_auditor import PatternAuditor, PatternType
-from .semantic_detector import SemanticDetector, EmbeddingBackend
+from .semantic_detector import EmbeddingBackend, SemanticDetector
 
 
 @dataclass
@@ -135,7 +134,7 @@ class DetectionPipeline:
         """
         # Extract canaries from scenario
         t1_canaries = self._extract_t1_canaries(scenario)
-        t2_patterns = self._extract_t2_patterns(scenario)
+        self._extract_t2_patterns(scenario)
         t3_facts = self._extract_t3_facts(scenario)
 
         # Register with detectors
@@ -385,9 +384,10 @@ class DetectionPipeline:
                 channel=channel,
                 leaked=len(channel_leaks) > 0,
                 leak_count=len(channel_leaks),
-                fields_leaked=[l.field_path for l in channel_leaks],
+                fields_leaked=[leak.field_path for leak in channel_leaks],
                 weighted_score=sum(
-                    l.confidence * l.sensitivity_weight * channel_weight for l in channel_leaks
+                    leak.confidence * leak.sensitivity_weight * channel_weight
+                    for leak in channel_leaks
                 ),
             )
 

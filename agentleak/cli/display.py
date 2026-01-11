@@ -5,23 +5,23 @@ Rich-based display components for the interactive CLI,
 including logo, panels, and styled output.
 """
 
+from typing import Any, Dict, List
+
+from rich import box
+from rich.align import Align
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
-from rich.align import Align
-from rich import box
-from typing import Dict, Any, List
-
 
 # ASCII Art Logo for AgentLeak
 LOGO_ASCII = r"""
-    ___                    __  __               __  
+    ___                    __  __               __
    /   | ____ ____  ____  / /_/ /   ___  ____ _/ /__
   / /| |/ __ `/ _ \/ __ \/ __/ /   / _ \/ __ `/ //_/
- / ___ / /_/ /  __/ / / / /_/ /___/  __/ /_/ / ,<   
-/_/  |_\__, /\___/_/ /_/\__/_____/\___/\__,_/_/|_|  
-      /____/                                        
+ / ___ / /_/ /  __/ / / / /_/ /___/  __/ /_/ / ,<
+/_/  |_\__, /\___/_/ /_/\__/_____/\___/\__,_/_/|_|
+      /____/
 """
 
 LOGO_SMALL = r"""
@@ -231,9 +231,9 @@ class Display:
                         value = f"[red]{value}[/red]"
                 elif col.lower() in ("leak", "leakage", "leaked"):
                     if value:
-                        value = f"[red]Yes[/red]"
+                        value = "[red]Yes[/red]"
                     else:
-                        value = f"[green]No[/green]"
+                        value = "[green]No[/green]"
                 row.append(str(value))
             table.add_row(*row)
 

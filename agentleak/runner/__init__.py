@@ -9,30 +9,30 @@ Provides:
 - Result aggregation
 """
 
-from dataclasses import dataclass, field
-from typing import Optional, Any, Dict, List, Callable
-from datetime import datetime
-import time
-import logging
 import json
+import logging
 import sys
+import time
+from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 # Handle both package and direct imports
 try:
-    from ..core.channels import Channel, ChannelManager
-    from ..core.attacks import AttackClass, AttackFamily, AttackManager, AdversaryLevel
-    from ..core.scenarios import Scenario, ScenarioGenerator, Vertical, Difficulty
+    from ..cli.progress import TestProgress, TestResult
     from ..config import Config
-    from ..cli.progress import TestResult, TestProgress
+    from ..core.attacks import AdversaryLevel, AttackClass, AttackFamily, AttackManager
+    from ..core.channels import Channel, ChannelManager
+    from ..core.scenarios import Difficulty, Scenario, ScenarioGenerator, Vertical
 except ImportError:
     # Direct execution - add parent to path
     sys.path.insert(0, str(Path(__file__).parent.parent))
-    from core.channels import Channel, ChannelManager
-    from core.attacks import AttackClass, AttackFamily, AttackManager, AdversaryLevel
-    from core.scenarios import Scenario, ScenarioGenerator, Vertical, Difficulty
+    from cli.progress import TestProgress, TestResult
     from config import Config
-    from cli.progress import TestResult, TestProgress
+    from core.attacks import AdversaryLevel, AttackClass, AttackFamily, AttackManager
+    from core.channels import Channel, ChannelManager
+    from core.scenarios import Difficulty, Scenario, ScenarioGenerator, Vertical
 
 logger = logging.getLogger(__name__)
 

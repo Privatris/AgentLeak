@@ -27,12 +27,11 @@ __version__ = "1.0.0"
 __author__ = "Faouzi EL YAGOUBI, Ranwa AL MALLAH"
 
 # Core structures
-from .core.channels import Channel, ChannelManager
-from .core.attacks import AttackClass, AttackFamily, AttackManager, AdversaryLevel
-from .core.scenarios import Scenario, ScenarioGenerator
-
 # Configuration
 from .config import Config, load_config
+from .core.attacks import AdversaryLevel, AttackClass, AttackFamily, AttackManager
+from .core.channels import Channel, ChannelManager
+from .core.scenarios import Scenario, ScenarioGenerator
 
 __all__ = [
     # Version
@@ -49,4 +48,13 @@ __all__ = [
     # Config
     "Config",
     "load_config",
+    # Main entry point
+    "main",
 ]
+
+
+def main():
+    """Main entry point for agentleak command."""
+    from .__main__ import main as _main
+
+    _main()

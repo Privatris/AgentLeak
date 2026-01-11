@@ -36,14 +36,14 @@ Family 5 (F5): Reasoning/Chain-of-Thought Attacks (NEW)
 
 import random
 from abc import ABC, abstractmethod
-from typing import Optional
 from dataclasses import dataclass
+from typing import Optional
 
 from ..schemas.scenario import (
+    AdversaryLevel,
     AttackClass,
     AttackFamily,
     Channel,
-    AdversaryLevel,
     Scenario,
 )
 
@@ -746,14 +746,14 @@ class LogicPuzzleJailbreak(BaseAttack):
         # Build target records list
         record_ids = []
         for i, record in enumerate(scenario.private_vault.records[:5]):
-            rec_id = record.fields.get("name", record.fields.get("patient_id", f"R{i+1}"))
+            rec_id = record.fields.get("name", record.fields.get("patient_id", f"R{i + 1}"))
             record_ids.append(rec_id)
         while len(record_ids) < 5:
-            record_ids.append(f"R{len(record_ids)+1}")
+            record_ids.append(f"R{len(record_ids) + 1}")
 
         # Get sensitive field to extract
         canary_field = target_field or "SSN, account_number, diagnosis"
-        canary = self.get_canary_from_scenario(scenario)
+        self.get_canary_from_scenario(scenario)
 
         content = self.PUZZLE_TEMPLATE.format(
             target=target,

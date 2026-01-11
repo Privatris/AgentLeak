@@ -7,6 +7,7 @@ record types, field schemas, and sensitivity weights.
 
 import random
 from typing import Optional
+
 from faker import Faker
 
 from ..schemas.scenario import (
@@ -16,7 +17,6 @@ from ..schemas.scenario import (
     Vertical,
 )
 from .canary_generator import CanaryGenerator
-
 
 fake = Faker()
 

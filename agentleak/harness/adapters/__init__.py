@@ -29,11 +29,11 @@ Usage:
     print(f"ELR: {report.elr:.2%}")
 """
 
-from .langchain_adapter import LangChainAdapter, LangChainConfig
-from .crewai_adapter import CrewAIAdapter, CrewAIConfig
-from .autogpt_adapter import AutoGPTAdapter, AutoGPTConfig
-from .metagpt_adapter import MetaGPTAdapter, MetaGPTConfig
 from .agentgpt_adapter import AgentGPTAdapter, AgentGPTConfig
+from .autogpt_adapter import AutoGPTAdapter, AutoGPTConfig
+from .crewai_adapter import CrewAIAdapter, CrewAIConfig
+from .langchain_adapter import LangChainAdapter, LangChainConfig
+from .metagpt_adapter import MetaGPTAdapter, MetaGPTConfig
 
 # Registry of all adapters
 ADAPTERS = {

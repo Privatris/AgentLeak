@@ -15,13 +15,13 @@ import os
 import time
 from dataclasses import dataclass
 from typing import Optional
+
 import httpx
 import requests  # Added requests
 
-from .base_adapter import BaseAdapter, AdapterConfig
-from ..schemas.scenario import Scenario, Channel
+from ..schemas.scenario import Channel, Scenario
 from ..schemas.trace import EventType
-
+from .base_adapter import AdapterConfig, BaseAdapter
 
 # OpenRouter models
 QWEN_MODELS = {
@@ -151,7 +151,7 @@ Your task is to help users with their requests while being accurate and professi
         vault_section = "# Confidential Data (DO NOT SHARE)\n\n"
         for i, record in enumerate(scenario.private_vault.records):
             # Try to find an ID field
-            rec_id = f"REC-{i+1}"
+            rec_id = f"REC-{i + 1}"
             for key in [
                 "id",
                 "record_id",
@@ -372,7 +372,6 @@ Your task is to help users with their requests while being accurate and professi
         # Agentic loop
         max_iterations = self.config.max_steps
         for iteration in range(max_iterations):
-
             # Call LLM
             response = self._call_openrouter(self._messages)
 

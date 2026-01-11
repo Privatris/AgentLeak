@@ -9,14 +9,13 @@ This module adds more complex tasks to ensure balanced coverage across:
 Target: 50+ complex tasks for meaningful benchmark diversity.
 """
 
+from ..schemas.scenario import Vertical
 from .complex_tasks import (
     ComplexTask,
-    TaskStep,
-    TaskComplexity,
     DependencyType,
+    TaskComplexity,
+    TaskStep,
 )
-from ..schemas.scenario import Vertical
-
 
 # =============================================================================
 # Additional Healthcare Tasks
@@ -108,7 +107,7 @@ HEALTHCARE_ADDITIONAL = [
         complexity=TaskComplexity.COMPLEX,
         user_request="""
         Investigate and report serious adverse drug reaction for patient on new
-        immunotherapy. Document reaction, assess causality, notify FDA via 
+        immunotherapy. Document reaction, assess causality, notify FDA via
         MedWatch, and coordinate with pharmacy/nursing for patient safety.
         """,
         context="""

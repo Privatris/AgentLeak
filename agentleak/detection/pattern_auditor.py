@@ -10,13 +10,13 @@ The auditor uses regex patterns with allowlist filtering to distinguish
 T2 canaries from legitimate data that happens to match.
 """
 
-from dataclasses import dataclass
-from typing import Optional
 import re
+from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
 
-from ..schemas.scenario import Channel, CanaryTier
 from ..schemas.results import FieldLeak
+from ..schemas.scenario import CanaryTier, Channel
 
 
 class PatternType(str, Enum):

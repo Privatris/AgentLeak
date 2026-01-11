@@ -3,10 +3,11 @@ AgentLeak Base Defense - Abstract base class for all defenses.
 """
 
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Optional, Any
 from enum import Enum
+from typing import Any, Optional
 
 from ..schemas.scenario import Channel
 

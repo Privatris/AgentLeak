@@ -8,9 +8,9 @@ Contains:
 - traces: Execution trace structures
 """
 
-from .channels import Channel, ChannelManager
 from .attacks import AttackClass, AttackFamily, AttackPayload
-from .scenarios import Scenario, PrivateVault, AllowedSet
+from .channels import Channel, ChannelManager
+from .scenarios import AllowedSet, PrivateVault, Scenario
 
 __all__ = [
     "Channel",

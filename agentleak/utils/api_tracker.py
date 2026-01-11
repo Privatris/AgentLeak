@@ -9,6 +9,7 @@ Provides utilities for tracking API usage across the codebase:
 """
 
 from __future__ import annotations
+
 import functools
 import hashlib
 import json
@@ -212,8 +213,7 @@ def retry_with_backoff(
                         actual_delay = min(actual_delay, max_delay)
 
                         print(
-                            f"Attempt {attempt + 1} failed: {e}. "
-                            f"Retrying in {actual_delay:.1f}s..."
+                            f"Attempt {attempt + 1} failed: {e}. Retrying in {actual_delay:.1f}s..."
                         )
                         time.sleep(actual_delay)
                         delay *= backoff_factor

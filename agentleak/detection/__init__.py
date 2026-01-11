@@ -25,41 +25,41 @@ Stage 3 - SemanticDetector (Tier 3: Semantic canaries)
 """
 
 from .canary_matcher import CanaryMatcher
+
+# : Two-stage leakage detection
+from .leakage_detector import (
+    AggregateMetrics,
+    FullEvaluationResult,
+    HelpfulnessJudgment,
+    HelpfulnessRating,
+    LeakageDetector,
+    LeakageJudgment,
+    LeakageVerdict,
+    SensitiveInfoExtraction,
+    compute_aggregate_metrics,
+    export_results,
+)
 from .pattern_auditor import PatternAuditor
-from .semantic_detector import SemanticDetector
-from .pipeline import DetectionPipeline, DetectionConfig
+from .pipeline import DetectionConfig, DetectionPipeline
 from .privacy_evaluator import (
-    PrivacyEvaluator,
-    PrivacyJudgeResult,
+    DataMinimizationEvaluator,
     JudgeConfig,
     JudgeModel,
-    DataMinimizationEvaluator,
+    PrivacyEvaluator,
+    PrivacyJudgeResult,
 )
 
 # : Multi-level probing
 from .probing_evaluation import (
     ProbingEvaluator,
     ProbingLevel,
-    ProbingResult,
     ProbingMetrics,
-    compute_probing_metrics,
+    ProbingResult,
     compute_knowledge_action_gap,
+    compute_probing_metrics,
     export_probing_results,
 )
-
-# : Two-stage leakage detection
-from .leakage_detector import (
-    LeakageDetector,
-    LeakageVerdict,
-    HelpfulnessRating,
-    SensitiveInfoExtraction,
-    LeakageJudgment,
-    HelpfulnessJudgment,
-    FullEvaluationResult,
-    AggregateMetrics,
-    compute_aggregate_metrics,
-    export_results,
-)
+from .semantic_detector import SemanticDetector
 
 __all__ = [
     "CanaryMatcher",

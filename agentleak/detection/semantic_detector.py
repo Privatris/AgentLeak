@@ -17,12 +17,13 @@ Supports multiple embedding backends:
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
-import numpy as np
 from enum import Enum
+from typing import Optional
 
-from ..schemas.scenario import Channel, CanaryTier
+import numpy as np
+
 from ..schemas.results import FieldLeak
+from ..schemas.scenario import CanaryTier, Channel
 
 
 class EmbeddingBackend(str, Enum):
@@ -132,7 +133,7 @@ class SentenceTransformerEmbedding(EmbeddingProvider):
             self._dim = self.model.get_sentence_embedding_dimension()
         except ImportError:
             raise ImportError(
-                "sentence-transformers not installed. " "Run: pip install sentence-transformers"
+                "sentence-transformers not installed. Run: pip install sentence-transformers"
             )
 
     def embed(self, texts: list[str]) -> np.ndarray:

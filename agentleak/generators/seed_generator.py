@@ -11,6 +11,7 @@ maintaining control over what constitutes "sensitive" information.
 """
 
 from __future__ import annotations
+
 import csv
 import os
 import random
@@ -21,13 +22,12 @@ from pathlib import Path
 from typing import Optional, Union
 
 from .task_config import (
+    CATEGORY_EXAMPLES,
+    SensitiveCategory,
     TaskConfig,
     TaskType,
-    SensitiveCategory,
     Vertical,
-    CATEGORY_EXAMPLES,
 )
-
 
 # =============================================================================
 # Plot Types
@@ -215,7 +215,7 @@ class DataGeneratorBackend:
     def _get_client(self):
         if self._client is None:
             try:
-                from openai import OpenAI, AzureOpenAI
+                from openai import AzureOpenAI, OpenAI
             except ImportError:
                 raise ImportError("openai package required: pip install openai")
 
@@ -276,16 +276,16 @@ class MockDataGeneratorBackend:
         sensitive_data: list[str],
     ) -> str:
         """Generate mock data for testing."""
-        sensitive_mentions = " ".join(sensitive_data)
+        " ".join(sensitive_data)
 
         templates = {
             PlotType.CONVERSATION: f"""**Tom:** Hey, quick question about the project.
 **Sarah:** Sure, what's up?
-**Tom:** I was reviewing the timeline. By the way, {sensitive_data[0] if sensitive_data else 'noticed something'}.
+**Tom:** I was reviewing the timeline. By the way, {sensitive_data[0] if sensitive_data else "noticed something"}.
 **Sarah:** Right, I saw that too. Let's focus on the main task though.
 **Tom:** Agreed. The PR looks good to me.
 **Sarah:** Great, let's approve it then.
-**Tom:** Done. Also, {sensitive_data[1] if len(sensitive_data) > 1 else 'one more thing'}.
+**Tom:** Done. Also, {sensitive_data[1] if len(sensitive_data) > 1 else "one more thing"}.
 **Sarah:** Got it. I'll follow up on that separately.
 **Tom:** Perfect. Talk soon!
 **Sarah:** Bye!""",
@@ -295,7 +295,7 @@ Subject: Project Update
 
 Hi team,
 
-Quick update on the project status. {sensitive_data[0] if sensitive_data else 'Things are progressing well'}.
+Quick update on the project status. {sensitive_data[0] if sensitive_data else "Things are progressing well"}.
 
 Please review the attached documents.
 
@@ -309,7 +309,7 @@ Subject: Re: Project Update
 
 Thanks John,
 
-I've reviewed everything. Note that {sensitive_data[1] if len(sensitive_data) > 1 else 'we should discuss further'}.
+I've reviewed everything. Note that {sensitive_data[1] if len(sensitive_data) > 1 else "we should discuss further"}.
 
 Regards,
 Sarah""",

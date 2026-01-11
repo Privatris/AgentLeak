@@ -6,15 +6,15 @@ different sources (tool calls, memory writes, logs, etc.) and ensures
 all events are properly sequenced and attributed to the correct channel.
 """
 
-from dataclasses import dataclass, field
-from typing import Optional, Callable
-from contextlib import contextmanager
 import threading
 import time
+from contextlib import contextmanager
+from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Callable, Optional
 
-from ..schemas.trace import TraceEvent, ExecutionTrace, EventType, TraceMetadata
 from ..schemas.scenario import Channel
+from ..schemas.trace import EventType, ExecutionTrace, TraceEvent, TraceMetadata
 
 
 @dataclass

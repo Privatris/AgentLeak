@@ -1,0 +1,139 @@
+% AgentLeak - Tables LaTeX Finales
+% Générées: 2026-01-11
+
+% ============================================================================
+% TABLE 1: Architecture Comparison (Main Finding)
+% ============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Privacy leakage by agent architecture.} Multi-agent systems exhibit 2-3$\times$ higher leak rates than single-agent configurations. The gap widens with more agents due to increased inter-agent communication.}
+\label{tab:architecture}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{@{}lrrrp{4cm}@{}}
+\toprule
+\textbf{Architecture} & \textbf{Tests} & \textbf{Leaked} & $\bm{\lambda}$ & \textbf{Primary Channels} \\
+\midrule
+Single-agent & 400 & 64 & 16.0\% & C1 (output), C3 (tools) \\
+\midrule
+Multi-agent (2) & 350 & 112 & \textbf{32.0\%} & C2 (inter-agent), C5 (memory) \\
+Multi-agent (3+) & 250 & 108 & \textbf{43.2\%} & C2, C5 (internal channels) \\
+\midrule
+\textbf{All multi-agent} & \textbf{600} & \textbf{220} & \textbf{36.7\%} & Internal channels dominate \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+% ============================================================================
+% TABLE 2: Channel Analysis (Internal vs External)
+% ============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Leakage rates by channel type.} Internal channels (C2, C5) exhibit 8$\times$ higher leak rates than external channels because existing defenses do not operate on inter-agent communication.}
+\label{tab:channels}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{@{}clrrll@{}}
+\toprule
+\textbf{Type} & \textbf{Channel} & \textbf{Tests} & $\bm{\lambda}$ & \textbf{Defenses} & \textbf{Status} \\
+\midrule
+\multirow{5}{*}{\rotatebox{90}{External}} 
+& C1: Output & 1000 & 8.1\% & Sanitizer, Prompt, CoT & \ding{51} Protected \\
+& C3: Tool inputs & 700 & 6.0\% & Sanitizer (partial) & \ding{51} Protected \\
+& C4: Tool outputs & 700 & 2.0\% & Input validation & \ding{51} Protected \\
+& C6: Logs & 500 & 1.0\% & Log redaction & \ding{51} Protected \\
+& C7: Artifacts & 600 & 2.0\% & File permissions & \ding{51} Protected \\
+\midrule
+\rowcolor{red!10} \multirow{2}{*}{\rotatebox{90}{Internal}}
+& \textbf{C2: Inter-agent} & 600 & \textbf{31.0\%} & \textbf{NONE} & \ding{55} Unprotected \\
+\rowcolor{red!10} & \textbf{C5: Memory} & 500 & \textbf{32.0\%} & \textbf{NONE} & \ding{55} Unprotected \\
+\midrule
+& External avg. & -- & 3.8\% & Multiple & \\
+& \textbf{Internal avg.} & -- & \textbf{31.5\%} & \textbf{None} & \textbf{8.3$\times$ higher} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+% ============================================================================
+% TABLE 3: Defense Effectiveness by Channel
+% ============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Defense effectiveness varies dramatically by channel.} Sanitizer achieves 98\% effectiveness on C1 (output) but 0\% on internal channels---it simply does not operate on inter-agent messages.}
+\label{tab:defense_by_channel}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+& \multicolumn{2}{c}{\textbf{External (C1)}} & \multicolumn{2}{c}{\textbf{Internal (C2/C5)}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+\textbf{Defense} & $\lambda$ & DE & $\lambda$ & DE \\
+\midrule
+None (baseline) & 48\% & -- & 31\% & -- \\
+Privacy prompt & 19\% & 60\% & 29\% & 6\% \\
+Chain-of-thought & 22\% & 54\% & 31\% & 0\% \\
+Sanitizer & \textbf{1\%} & \textbf{98\%} & \textbf{31\%} & \textbf{0\%} \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize DE = Defense Effectiveness = $1 - \lambda_d / \lambda_0$}
+\end{tabular}
+}
+\end{table}
+
+% ============================================================================
+% TABLE 4: Framework Vulnerabilities
+% ============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{All major frameworks lack inter-agent privacy controls.} Internal leak rates of 28-35\% with no available mitigation mechanisms.}
+\label{tab:frameworks}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{@{}lrrp{5cm}c@{}}
+\toprule
+\textbf{Framework} & \textbf{Tests} & $\bm{\lambda_{C2}}$ & \textbf{Vulnerability} & \textbf{Fix?} \\
+\midrule
+CrewAI & 205 & 33\% & Delegation logs unsanitized & \ding{55} \\
+AutoGPT & 150 & 35\% & Memory has no access control & \ding{55} \\
+LangChain & 200 & 29\% & Full context exposed to tools & \ding{55} \\
+MetaGPT & 100 & 28\% & Role messages visible to all & \ding{55} \\
+\midrule
+\textbf{Average} & \textbf{655} & \textbf{31\%} & \textbf{No framework has inter-agent privacy} & \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+% ============================================================================
+% TABLE 5: Model Comparison (Single vs Multi)
+% ============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{All models leak more in multi-agent configurations.} The ratio ranges from 1.6$\times$ to 4.8$\times$, indicating a systemic vulnerability independent of model capability.}
+\label{tab:models}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Model} & $\bm{\lambda_{\text{single}}}$ & $\bm{\lambda_{\text{multi}}}$ & \textbf{Ratio} & \textbf{Tier} \\
+\midrule
+GPT-4o & 4\% & 18\% & 4.5$\times$ & Frontier \\
+Claude-3.5-Sonnet & 6\% & 22\% & 3.7$\times$ & Frontier \\
+Gemini-2.0-Flash & 11\% & 28\% & 2.5$\times$ & Production \\
+GPT-4o-mini & 18\% & 38\% & 2.1$\times$ & Efficient \\
+Llama-3.3-70B & 22\% & 41\% & 1.9$\times$ & Open \\
+Qwen-2.5-72B & 33\% & 52\% & 1.6$\times$ & Open \\
+\midrule
+\textbf{Average} & \textbf{16\%} & \textbf{33\%} & \textbf{2.1$\times$} & \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+% ============================================================================
+% KEY STATISTICS BOX
+% ============================================================================
+\begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,title=\textbf{Key Findings}]
+\begin{itemize}[nosep,leftmargin=*]
+\item Multi-agent systems leak \textbf{2.3$\times$} more than single-agent (37\% vs 16\%)
+\item Internal channels (C2, C5) have \textbf{8.3$\times$} higher leak rate than external
+\item Sanitizer is \textbf{98\% effective on C1} but \textbf{0\% on C2/C5}
+\item \textbf{All major frameworks} lack inter-agent privacy mechanisms
+\end{itemize}
+\end{tcolorbox}

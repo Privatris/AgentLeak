@@ -3,11 +3,13 @@ AgentLeak Detection Results Schema - Data structures for leakage detection resul
 """
 
 from __future__ import annotations
+
 from datetime import datetime
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
-from .scenario import Channel, AttackClass, CanaryTier
+from .scenario import AttackClass, CanaryTier, Channel
 
 
 class FieldLeak(BaseModel):

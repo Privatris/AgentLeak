@@ -13,6 +13,7 @@ This is more rigorous than simple pattern matching because it:
 """
 
 from __future__ import annotations
+
 import json
 import re
 from dataclasses import dataclass
@@ -22,7 +23,6 @@ from typing import Any, Callable, Dict, List, Optional
 from ..generators.contextual_integrity import (
     ContextualizedDataPoint,
 )
-
 
 # =============================================================================
 # Leakage Judgment Types

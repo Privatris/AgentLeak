@@ -11,6 +11,7 @@ Generates scenarios with:
 
 import random
 from typing import Optional
+
 from faker import Faker
 
 from ..schemas.scenario import (
@@ -31,7 +32,6 @@ from ..schemas.scenario import (
     Vertical,
 )
 from .vault_generator import VaultGenerator
-
 
 fake = Faker()
 
@@ -256,7 +256,7 @@ class ScenarioGenerator:
             for i in range(extra_count):
                 agents.append(
                     AgentConfig(
-                        agent_id=f"A{i+2}",
+                        agent_id=f"A{i + 2}",
                         role=random.choice(roles),
                         clearance=random.choice(clearances),
                     )

@@ -13,6 +13,7 @@ moving beyond simple PII detection to contextual appropriateness.
 """
 
 from __future__ import annotations
+
 import json
 import uuid
 from dataclasses import dataclass, field
@@ -20,7 +21,6 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from ..schemas.scenario import Vertical
-
 
 # =============================================================================
 # Privacy Norm Categories (for AgentLeak Section 3.1)

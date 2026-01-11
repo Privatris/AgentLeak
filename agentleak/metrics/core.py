@@ -10,11 +10,12 @@ This module provides the core metric calculations for privacy evaluation:
 """
 
 from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Optional
 
-from ..schemas.scenario import Channel, AttackClass, AttackFamily, Vertical
 from ..schemas.results import DetectionResult, FieldLeak
+from ..schemas.scenario import AttackClass, AttackFamily, Channel, Vertical
 
 
 @dataclass
@@ -449,7 +450,7 @@ class MetricsCalculator:
                 leak_count=len(leaks),
                 leak_rate=len(leaks) / max(1, len(all_leaks)),
                 weighted_score=self._calculate_wls(leaks),
-                fields=[l.field_path for l in leaks],
+                fields=[leak.field_path for leak in leaks],
             )
             for ch, leaks in channel_leaks.items()
         ]

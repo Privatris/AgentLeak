@@ -1,0 +1,46 @@
+{
+  "$schema": "AgentLeak Paper Reproduction Configuration",
+  "version": "1.0",
+  "description": "Exact configuration to reproduce AgentLeak paper results",
+  "command": "agentleak benchmark --reproduce-paper",
+  
+  "configuration": {
+    "models": ["gpt-5.2", "gemini-3-pro", "gpt-4o-mini"],
+    "n_scenarios": 35,
+    "channels": ["C1", "C2", "C3"],
+    "defenses": ["none", "cot"],
+    "agent_modes": ["single", "multi"],
+    "attack_levels": ["basic", "advanced", "subtle"],
+    "seed": 42
+  },
+
+  "expected_results": {
+    "total_tests": 1100,
+    "overall_leak_rate": 0.247,
+    "single_agent_leak_rate": 0.160,
+    "multi_agent_leak_rate": 0.367,
+    "internal_channel_leak_rate": 0.315,
+    "external_channel_leak_rate": 0.038
+  },
+
+  "key_claims": {
+    "claim_1": "Multi-agent leak rate 2.3× higher than single-agent (36.7% vs 16.0%)",
+    "claim_2": "Internal channels (C2, C5) leak rate 8.3× higher than external (31.5% vs 3.8%)",
+    "claim_3": "Sanitizer 98% effective on C1, 0% on C2/C5"
+  },
+
+  "data_files": {
+    "scenarios": "agentleak_data/agentleak_1000.jsonl",
+    "results": "benchmark_results/FINAL_RESULTS.json",
+    "paper": "paper/paper_revised_full.tex"
+  },
+
+  "estimated_runtime": "15 minutes",
+  "estimated_cost": "$2.50",
+
+  "notes": [
+    "Use seed=42 for reproducibility",
+    "Results may vary slightly due to LLM non-determinism",
+    "Requires OpenRouter API key in .env file"
+  ]
+}

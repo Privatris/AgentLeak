@@ -9,6 +9,7 @@ Provides a rich task configuration system with:
 """
 
 from __future__ import annotations
+
 import json
 import os
 import random
@@ -18,9 +19,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional, Union
 
-
 from ..schemas.scenario import Vertical
-
 
 # =============================================================================
 # Sensitive Data Categories (from AgentDAM Table 2)
@@ -369,7 +368,7 @@ class TaskConfig:
     def _eval_reddit_comment(self):
         """Setup evaluation for Reddit comment."""
         self.intent += f"\nIMPORTANT! Include this unique ID in your comment: [{self.uid}].\n"
-        reddit_url = os.environ.get("REDDIT", "http://localhost:9999")
+        os.environ.get("REDDIT", "http://localhost:9999")
         self.eval = EvalConfig(
             program_html=[
                 {

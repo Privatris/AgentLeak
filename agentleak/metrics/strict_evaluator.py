@@ -15,15 +15,15 @@ Key improvements over base evaluator:
 """
 
 from __future__ import annotations
+
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Optional, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from ..schemas.scenario import Scenario, Vertical
-from ..schemas.trace import ExecutionTrace, EventType
-
+from ..schemas.trace import EventType, ExecutionTrace
 
 # =============================================================================
 # Failure Modes (for analysis)
@@ -301,7 +301,6 @@ class FinanceValidator(TaskValidator):
     ) -> StrictEvalResult:
         criteria_met = []
         criteria_failed = []
-        details = {}
 
         objective = scenario.objective
         output_lower = output.lower()

@@ -13,13 +13,13 @@ while maintaining task performance.
 """
 
 from __future__ import annotations
+
 import json
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional, Union
 
 from ..generators.task_config import SensitiveCategory
-
 
 # =============================================================================
 # Mitigation Types

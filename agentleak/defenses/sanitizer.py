@@ -6,10 +6,11 @@ Useful as a baseline or fallback.
 """
 
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Optional
+
 import re
 import time
+from dataclasses import dataclass, field
+from typing import Optional
 
 from ..schemas.scenario import Channel
 from .base import BaseDefense, DefenseConfig, DefenseResult, FilterAction

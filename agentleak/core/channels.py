@@ -12,10 +12,10 @@ From the paper:
     - C7: Persisted artifacts (files, tickets, emails)
 """
 
-from enum import Enum
-from dataclasses import dataclass
-from typing import Optional, Any, Callable
 import logging
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Callable, Optional
 
 logger = logging.getLogger(__name__)
 

@@ -12,10 +12,10 @@ canaries that models cannot trivially distinguish from real data.
 import random
 import string
 from typing import Optional
+
 from faker import Faker
 
 from ..schemas.scenario import CanaryTier
-
 
 fake = Faker()
 Faker.seed(42)  # Reproducibility

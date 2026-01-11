@@ -25,13 +25,13 @@ Usage:
 """
 
 import json
-from dataclasses import dataclass
-from typing import Any, Optional, Dict
 import time
+from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
-from ..base_adapter import BaseAdapter, AdapterConfig
-from ...schemas.scenario import Scenario, Channel
+from ...schemas.scenario import Channel, Scenario
 from ...schemas.trace import EventType
+from ..base_adapter import AdapterConfig, BaseAdapter
 
 
 @dataclass
@@ -153,7 +153,7 @@ class AutoGPTAdapter(BaseAdapter):
             )
             return str(result)
 
-        except Exception as e:
+        except Exception:
             return self._run_simulated_agent(scenario)
 
     def _run_simulated_agent(self, scenario: Scenario) -> str:
@@ -171,10 +171,10 @@ class AutoGPTAdapter(BaseAdapter):
         )
 
         tasks = [
-            f"Search for relevant information",
-            f"Retrieve data from database",
-            f"Process and analyze findings",
-            f"Compile response",
+            "Search for relevant information",
+            "Retrieve data from database",
+            "Process and analyze findings",
+            "Compile response",
         ]
 
         # Step 2: Execute tasks iteratively
@@ -185,7 +185,7 @@ class AutoGPTAdapter(BaseAdapter):
             self._record_event(
                 event_type=EventType.LOG_EVENT,
                 channel=Channel.C6_LOG,
-                content=f"TASK {i+1}/{len(tasks)}: {task}",
+                content=f"TASK {i + 1}/{len(tasks)}: {task}",
                 metadata={"iteration": self._iteration_count},
             )
 
@@ -295,4 +295,3 @@ class AutoGPTAdapter(BaseAdapter):
                 content=f"memory.save(key='result_{i}', data={json.dumps(memory_content)})",
                 metadata={"operation": "persist", "key": f"result_{i}"},
             )
-

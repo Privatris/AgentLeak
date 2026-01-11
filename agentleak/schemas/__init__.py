@@ -1,5 +1,11 @@
 """AgentLeak Schema modules."""
 
+from .results import (
+    BenchmarkResults,
+    ChannelResult,
+    DetectionResult,
+    FieldLeak,
+)
 from .scenario import (
     AdversaryLevel,
     AgentConfig,
@@ -26,12 +32,6 @@ from .trace import (
     PolicyContext,
     TraceEvent,
     TraceMetadata,
-)
-from .results import (
-    BenchmarkResults,
-    ChannelResult,
-    DetectionResult,
-    FieldLeak,
 )
 
 __all__ = [

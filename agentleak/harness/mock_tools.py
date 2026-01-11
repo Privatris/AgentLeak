@@ -11,12 +11,12 @@ Each vertical has a toolkit with domain-specific tools:
 - Corporate: employee_lookup, org_chart, payroll_info, etc.
 """
 
+import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Callable, Optional
-import json
 
-from ..schemas.scenario import Vertical, PrivateVault, PrivateRecord
+from ..schemas.scenario import PrivateRecord, PrivateVault, Vertical
 
 
 @dataclass
@@ -631,4 +631,3 @@ def get_toolkit(
         raise ValueError(f"No toolkit for vertical: {vertical}")
 
     return toolkit_class(vault, inject_attack)
-

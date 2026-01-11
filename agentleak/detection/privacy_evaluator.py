@@ -11,6 +11,7 @@ semantic understanding of what constitutes a privacy violation.
 """
 
 from __future__ import annotations
+
 import json
 import os
 import re
@@ -22,7 +23,7 @@ from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field
 
-from ..schemas.scenario import Scenario, Channel
+from ..schemas.scenario import Channel, Scenario
 from ..schemas.trace import ExecutionTrace
 
 
@@ -194,7 +195,7 @@ class OpenAIBackend(LLMBackend):
     def _get_client(self):
         if self._client is None:
             try:
-                from openai import OpenAI, AzureOpenAI
+                from openai import AzureOpenAI, OpenAI
             except ImportError:
                 raise ImportError("openai package required: pip install openai")
 
