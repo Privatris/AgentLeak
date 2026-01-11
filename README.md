@@ -111,7 +111,7 @@ agentleak/           # Main package
 
 agentleak_data/      # Benchmark data (1000 scenarios)
 benchmark_results/   # Evaluation results
-paper/               # LaTeX paper source
+data/scenarios/      # Additional scenario sets
 scripts/             # Utility scripts
 tests/               # Test suite
 ```

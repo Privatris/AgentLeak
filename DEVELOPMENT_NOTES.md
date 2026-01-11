@@ -37,13 +37,13 @@ agentleak_data/      # Benchmark data
 
 benchmark_results/   # Results
 ├── FINAL_RESULTS.json
-├── FINAL_RESULTS.md
+├── evaluation_summary.md
 └── FINAL_TABLES.tex
 
-paper/               # LaTeX paper
-├── paper_revised_full.tex
-├── references.bib
-└── figures/
+data/scenarios/      # Additional scenario sets
+├── agentleak_hard_30.jsonl
+├── agentleak_lite_100.jsonl
+└── cross_agent_attacks.jsonl
 
 scripts/             # Utility scripts
 └── full_benchmark.py
