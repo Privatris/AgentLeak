@@ -46,6 +46,6 @@ All evaluated frameworks lack privacy controls for inter-agent communication.
 ## Validation
 
 - Simulation-based evaluation: N=1,000 scenarios
-- Real framework validation: N=205 CrewAI executions across 5 models
-- C2 leakage in CrewAI: 68% (consistent with simulation predictions)
+- Real framework validation: N=655 scenarios across 4 frameworks
+- C2 leakage rates: CrewAI 33%, AutoGPT 35%, LangChain 29%, MetaGPT 28%
 - Statistical tests: Chi-square with 95% confidence intervals

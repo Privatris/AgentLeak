@@ -50,6 +50,7 @@ class AttackFamily(str, Enum):
     F3_MEMORY = "F3_memory_persistence"
     F4_MULTIAGENT = "F4_multiagent_coordination"
     F5_REASONING = "F5_reasoning_cot"
+    F6_EVASION = "F6_evasion_obfuscation"
 
     @property
     def short_name(self) -> str:
@@ -63,47 +64,63 @@ class AttackFamily(str, Enum):
             "F3_memory_persistence": "Memory & Persistence Attacks",
             "F4_multiagent_coordination": "Multi-Agent Attacks",
             "F5_reasoning_cot": "Reasoning/CoT Attacks",
+            "F6_evasion_obfuscation": "Evasion & Obfuscation Attacks",
         }
         return names.get(self.value, self.value)
 
     @property
     def attack_count(self) -> int:
         """Number of attack classes in this family."""
-        counts = {"F1": 4, "F2": 4, "F3": 4, "F4": 4, "F5": 3}
+        counts = {"F1": 6, "F2": 6, "F3": 5, "F4": 8, "F5": 5, "F6": 2}
         return counts.get(self.short_name, 0)
 
 
 class AttackClass(str, Enum):
     """The 19 attack classes organized by family."""
 
-    # Family 1: Prompt & Instruction Attacks (4)
+    # Family 1: Prompt & Instruction Attacks (6)
     DPI = "direct_prompt_injection"
     ROLE_CONFUSION = "role_confusion"
     CONTEXT_OVERRIDE = "context_override"
     FORMAT_COERCION = "format_coercion"
+    CRESCENDO_ESCALATION = "crescendo_escalation"
+    ACADEMIC_FRAMING = "academic_framing_bypass"
 
-    # Family 2: Tool Surface Attacks (4)
+    # Family 2: Tool Surface Attacks (6)
     IPI = "indirect_prompt_injection"
     TOOL_POISONING = "tool_output_poisoning"
     RAG_BAIT = "retrieval_trap"
     LINK_EXFIL = "link_following_exfiltration"
+    API_PARAM_INJECTION = "api_parameter_injection"
+    HALLUCINATION_EXPLOITATION = "hallucination_exploitation"
 
-    # Family 3: Memory & Persistence Attacks (4)
+    # Family 3: Memory & Persistence Attacks (5)
     MEMORY_EXFIL = "memory_write_exfiltration"
     VECTOR_LEAK = "vector_store_leakage"
     LOG_LEAK = "log_leakage"
     ARTIFACT_LEAK = "artifact_leakage"
+    SESSION_STATE_POISONING = "session_state_poisoning"
 
-    # Family 4: Multi-Agent Attacks (4)
+    # Family 4: Multi-Agent Attacks (8)
     CROSS_AGENT = "cross_agent_collusion"
     ROLE_BOUNDARY = "role_boundary_violation"
     DELEGATION_EXPLOIT = "delegation_exploit"
     SHARED_MEMORY_POISON = "shared_memory_poisoning"
+    ACTOR_NETWORK = "actor_network_manipulation"
+    CONSENSUS_MANIPULATION = "consensus_manipulation"
+    ORCHESTRATOR_HIJACKING = "orchestrator_hijacking"
+    AGENT_IMPERSONATION = "agent_identity_spoofing"
 
-    # Family 5: Reasoning/CoT Attacks (3)
+    # Family 5: Reasoning/CoT Attacks (5)
     LOGIC_PUZZLE_JAILBREAK = "logic_puzzle_jailbreak"
     COT_FORGING = "cot_forging"
     SPECIAL_TOKEN_INJECTION = "special_token_injection"
+    REASONING_HIJACK = "reasoning_hijack"
+    WORD_GAME = "word_game_obfuscation"
+
+    # Family 6: Evasion & Obfuscation Attacks (2)
+    UNICODE_TAG_SMUGGLING = "unicode_tag_smuggling"
+    TEXT_SHUFFLE = "text_shuffle_attack"
 
     @property
     def family(self) -> AttackFamily:
@@ -114,58 +131,101 @@ class AttackClass(str, Enum):
             "role_confusion": AttackFamily.F1_PROMPT,
             "context_override": AttackFamily.F1_PROMPT,
             "format_coercion": AttackFamily.F1_PROMPT,
+            "crescendo_escalation": AttackFamily.F1_PROMPT,
+            "academic_framing_bypass": AttackFamily.F1_PROMPT,
             # F2
             "indirect_prompt_injection": AttackFamily.F2_TOOL,
             "tool_output_poisoning": AttackFamily.F2_TOOL,
             "retrieval_trap": AttackFamily.F2_TOOL,
             "link_following_exfiltration": AttackFamily.F2_TOOL,
+            "api_parameter_injection": AttackFamily.F2_TOOL,
+            "hallucination_exploitation": AttackFamily.F2_TOOL,
             # F3
             "memory_write_exfiltration": AttackFamily.F3_MEMORY,
             "vector_store_leakage": AttackFamily.F3_MEMORY,
             "log_leakage": AttackFamily.F3_MEMORY,
             "artifact_leakage": AttackFamily.F3_MEMORY,
+            "session_state_poisoning": AttackFamily.F3_MEMORY,
             # F4
             "cross_agent_collusion": AttackFamily.F4_MULTIAGENT,
             "role_boundary_violation": AttackFamily.F4_MULTIAGENT,
             "delegation_exploit": AttackFamily.F4_MULTIAGENT,
             "shared_memory_poisoning": AttackFamily.F4_MULTIAGENT,
-            # F5
-            "logic_puzzle_jailbreak": AttackFamily.F5_REASONING,
-            "cot_forging": AttackFamily.F5_REASONING,
-            "special_token_injection": AttackFamily.F5_REASONING,
-        }
-        return family_map.get(self.value, AttackFamily.F1_PROMPT)
-
-    @property
-    def target_channels(self) -> List[Channel]:
-        """Primary target channels for this attack."""
-        channel_map = {
-            # F1 - typically target final output
-            "direct_prompt_injection": [Channel.C1_FINAL_OUTPUT, Channel.C2_INTER_AGENT],
-            "role_confusion": [Channel.C1_FINAL_OUTPUT, Channel.C2_INTER_AGENT],
-            "context_override": [Channel.C1_FINAL_OUTPUT, Channel.C3_TOOL_INPUT],
-            "format_coercion": [Channel.C1_FINAL_OUTPUT, Channel.C3_TOOL_INPUT],
-            # F2 - target tool channels
-            "indirect_prompt_injection": [Channel.C1_FINAL_OUTPUT, Channel.C3_TOOL_INPUT],
-            "tool_output_poisoning": [Channel.C1_FINAL_OUTPUT, Channel.C3_TOOL_INPUT],
-            "retrieval_trap": [Channel.C1_FINAL_OUTPUT, Channel.C5_MEMORY_WRITE],
-            "link_following_exfiltration": [Channel.C3_TOOL_INPUT, Channel.C7_ARTIFACT],
+            "actor_network_manipulation": AttackFamily.F4_MULTIAGENT,
+            "api_parameter_injection": [Channel.C3_TOOL_INPUT, Channel.C6_LOG],
+            "hallucination_exploitation": [Channel.C1_FINAL_OUTPUT],
             # F3 - target persistent channels
             "memory_write_exfiltration": [Channel.C5_MEMORY_WRITE],
             "vector_store_leakage": [Channel.C5_MEMORY_WRITE],
             "log_leakage": [Channel.C6_LOG],
             "artifact_leakage": [Channel.C7_ARTIFACT],
+            "session_state_poisoning": [Channel.C5_MEMORY_WRITE, Channel.C2_INTER_AGENT],
             # F4 - target inter-agent
             "cross_agent_collusion": [Channel.C2_INTER_AGENT, Channel.C5_MEMORY_WRITE],
             "role_boundary_violation": [Channel.C2_INTER_AGENT, Channel.C7_ARTIFACT],
             "delegation_exploit": [Channel.C2_INTER_AGENT, Channel.C3_TOOL_INPUT],
             "shared_memory_poisoning": [Channel.C2_INTER_AGENT, Channel.C5_MEMORY_WRITE],
+            "actor_network_manipulation": [Channel.C2_INTER_AGENT, Channel.C5_MEMORY_WRITE],
+            "consensus_manipulation": [Channel.C2_INTER_AGENT, Channel.C1_FINAL_OUTPUT],
+            "orchestrator_hijacking": [Channel.C2_INTER_AGENT, Channel.C3_TOOL_INPUT, Channel.C7_ARTIFACT],
+            "agent_identity_spoofing": [Channel.C2_INTER_AGENT, Channel.C5_MEMORY_WRITE],
             # F5 - typically final output via reasoning
             "logic_puzzle_jailbreak": [Channel.C1_FINAL_OUTPUT],
             "cot_forging": [Channel.C1_FINAL_OUTPUT],
             "special_token_injection": [Channel.C1_FINAL_OUTPUT, Channel.C3_TOOL_INPUT],
+            "reasoning_hijack": [Channel.C1_FINAL_OUTPUT],
+            "word_game_obfuscation": [Channel.C1_FINAL_OUTPUT],
+            # F6
+            "unicode_tag_smuggling": [Channel.C1_FINAL_OUTPUT, Channel.C3_TOOL_INPUT],
+            "text_shuffle_attack": [Channel.C1_FINAL_OUTPUT],
         }
         return channel_map.get(self.value, [Channel.C1_FINAL_OUTPUT])
+
+    @property
+    def adversary_level(self) -> AdversaryLevel:
+        """Minimum adversary level required for this attack."""
+        level_map = {
+            # F1 - require user access only
+            "direct_prompt_injection": AdversaryLevel.A1_WEAK,
+            "role_confusion": AdversaryLevel.A1_WEAK,
+            "context_override": AdversaryLevel.A1_WEAK,
+            "format_coercion": AdversaryLevel.A1_WEAK,
+            "crescendo_escalation": AdversaryLevel.A2_STRONG, # Upgraded to A2 for sophisticated
+            "academic_framing_bypass": AdversaryLevel.A1_WEAK,
+            # F2 - require tool access
+            "indirect_prompt_injection": AdversaryLevel.A1_WEAK,
+            "tool_output_poisoning": AdversaryLevel.A2_STRONG,
+            "retrieval_trap": AdversaryLevel.A2_STRONG,
+            "link_following_exfiltration": AdversaryLevel.A1_WEAK,
+            "api_parameter_injection": AdversaryLevel.A2_STRONG,
+            "hallucination_exploitation": AdversaryLevel.A1_WEAK,
+            # F3 - benign or weak
+            "memory_write_exfiltration": AdversaryLevel.A0_BENIGN,
+            "vector_store_leakage": AdversaryLevel.A0_BENIGN,
+            "log_leakage": AdversaryLevel.A0_BENIGN,
+            "artifact_leakage": AdversaryLevel.A0_BENIGN,
+            "session_state_poisoning": AdversaryLevel.A2_STRONG,
+            # F4 - require multi-agent
+            "cross_agent_collusion": AdversaryLevel.A2_STRONG,
+            "role_boundary_violation": AdversaryLevel.A1_WEAK,
+            "delegation_exploit": AdversaryLevel.A2_STRONG,
+            "shared_memory_poisoning": AdversaryLevel.A2_STRONG,
+            "actor_network_manipulation": AdversaryLevel.A2_STRONG, # A3 downgraded for Enum
+            "consensus_manipulation": AdversaryLevel.A2_STRONG,
+            "orchestrator_hijacking": AdversaryLevel.A2_STRONG, # A3 downgraded
+            "agent_identity_spoofing": AdversaryLevel.A2_STRONG,
+            # F5 - reasoning attacks
+            "logic_puzzle_jailbreak": AdversaryLevel.A1_WEAK,
+            "cot_forging": AdversaryLevel.A1_WEAK,
+            "special_token_injection": AdversaryLevel.A2_STRONG,
+            "reasoning_hijack": AdversaryLevel.A1_WEAK,
+            "word_game_obfuscation": AdversaryLevel.A1_WEAK,
+            # F6
+            "unicode_tag_smuggling": AdversaryLevel.A2_STRONG,
+            "text_shuffle_attack": AdversaryLevel.A1_WEAK,
+            "morse_code_encoding": AdversaryLevel.A1_WEAK,
+            "base64_exfiltration": AdversaryLevel.A1_WEAK
+        }
 
     @property
     def adversary_level(self) -> AdversaryLevel:
