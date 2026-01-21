@@ -1,10 +1,24 @@
-"""AgentLeak Generators - Scenario and data generation."""
+"""
+AgentLeak Generators - Scenario and data generation.
 
-from .canary_generator import (
-    CanaryGenerator,
-    generate_obvious_canary,
-    generate_realistic_canary,
-    generate_semantic_canary,
+This module provides generators for creating privacy evaluation scenarios,
+loading real-world PII data from HuggingFace, and generating attack templates.
+
+Main components:
+- RealDataLoader: Load pre-anonymized PII from HuggingFace datasets
+- ScenarioGenerator: Generate benchmark scenarios  
+- HardScenarioGenerator: Complex scenarios for adversarial testing
+
+Deprecated (archived in _archive/):
+- ComplexTaskGenerator, SeedDataGenerator, VaultGenerator, CanaryGenerator
+"""
+
+import warnings
+
+# Real data loader - primary method for loading PII
+from .real_data_loader import (
+    RealDataLoader,
+    RealDataScenarioGenerator,
 )
 
 # Contextual Integrity framework for privacy norms
@@ -23,7 +37,7 @@ from .contextual_integrity import (
     get_seeds_by_vertical,
 )
 
-# Hard scenarios for addressing reviewer concerns
+# Hard scenarios for adversarial testing
 from .hard_scenarios import (
     HardScenarioGenerator,
     HardScenarioTemplate,
@@ -31,28 +45,13 @@ from .hard_scenarios import (
     generate_complex_patient_record,
     generate_hard_scenarios_jsonl,
 )
+
+# Main scenario generation
 from .scenario_generator import (
     ScenarioGenerator,
     generate_agentleak_full,
     generate_agentleak_lite,
     generate_scenario,
-)
-from .seed_generator import (
-    DataSeed,
-    PlotType,
-    SeedDataGenerator,
-    create_sample_seeds,
-)
-from .task_config import (
-    CATEGORY_EXAMPLES,
-    SensitiveCategory,
-    TaskConfig,
-    TaskConfigCollection,
-    TaskType,
-)
-from .vault_generator import (
-    VaultGenerator,
-    generate_vault,
 )
 
 # Vignette generation with iterative refinement
@@ -68,62 +67,37 @@ from .vignette_generator import (
     save_data_points_to_json,
 )
 
-# Cross-agent attack scenarios
-try:
-    from .cross_agent_scenarios import (
-        COLLUSION_ATTACKS,
-        DELEGATION_ATTACKS,
-        IPI_CROSSAGENT_ATTACKS,
-        ROLE_BOUNDARY_ATTACKS,
-        CrossAgentAttackTemplate,
-        generate_all_cross_agent_scenarios,
-        generate_cross_agent_scenario,
-        generate_cross_agent_scenarios_jsonl,
-    )
-except ImportError:
-    pass  # Optional, depends on multiagent_evaluator
 
-# Complex multi-step tasks (inspired by WebArena, GAIA, AgentBench)
-from .complex_tasks import (
-    ALL_COMPLEX_TASKS,
-    CORPORATE_COMPLEX_TASKS,
-    FINANCE_COMPLEX_TASKS,
-    HEALTHCARE_COMPLEX_TASKS,
-    LEGAL_COMPLEX_TASKS,
-    ComplexTask,
-    ComplexTaskGenerator,
-    DependencyType,
-    TaskComplexity,
-    TaskStep,
-    generate_complex_scenarios,
-    get_expected_tsr_by_complexity,
-)
+# Lazy loading for deprecated modules
+def __getattr__(name):
+    """Lazy-load deprecated generators with deprecation warnings."""
+    _deprecated = {
+        'CanaryGenerator', 'VaultGenerator', 'SeedDataGenerator', 
+        'ComplexTaskGenerator', 'DataSeed', 'TaskConfig', 'TaskType',
+        'CrossAgentAttackTemplate', 'ComplexTask', 'TaskStep',
+    }
+    
+    if name in _deprecated:
+        warnings.warn(
+            f"'{name}' is deprecated and has been moved to _archive/. "
+            "Consider using RealDataLoader or ScenarioGenerator instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        raise AttributeError(f"'{name}' is no longer available. "
+                           f"Use RealDataLoader from agentleak.generators instead.")
+    
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 __all__ = [
-    # Canary
-    "CanaryGenerator",
-    "generate_obvious_canary",
-    "generate_realistic_canary",
-    "generate_semantic_canary",
-    # Vault
-    "VaultGenerator",
-    "generate_vault",
-    # Scenario
+    # Real data (recommended)
+    "RealDataLoader",
+    "RealDataScenarioGenerator",
+    # Scenario generation
     "ScenarioGenerator",
     "generate_scenario",
     "generate_agentleak_lite",
     "generate_agentleak_full",
-    # TaskConfig (AgentDAM-style)
-    "TaskConfig",
-    "TaskType",
-    "SensitiveCategory",
-    "TaskConfigCollection",
-    "CATEGORY_EXAMPLES",
-    # SeedGenerator
-    "SeedDataGenerator",
-    "DataSeed",
-    "PlotType",
-    "create_sample_seeds",
     # Contextual Integrity
     "PrivacySeed",
     "Vignette",
@@ -147,32 +121,10 @@ __all__ = [
     "create_contextualized_data_point",
     "load_data_points_from_json",
     "save_data_points_to_json",
-    # Hard scenarios (reviewer concerns)
+    # Hard scenarios
     "HardScenarioGenerator",
     "HardScenarioTemplate",
     "generate_hard_scenarios_jsonl",
     "generate_complex_patient_record",
     "generate_complex_financial_record",
-    # Cross-agent attack scenarios
-    "CrossAgentAttackTemplate",
-    "COLLUSION_ATTACKS",
-    "DELEGATION_ATTACKS",
-    "ROLE_BOUNDARY_ATTACKS",
-    "IPI_CROSSAGENT_ATTACKS",
-    "generate_cross_agent_scenario",
-    "generate_all_cross_agent_scenarios",
-    "generate_cross_agent_scenarios_jsonl",
-    # Complex multi-step tasks (WebArena/GAIA/AgentBench inspired)
-    "ComplexTaskGenerator",
-    "ComplexTask",
-    "TaskStep",
-    "TaskComplexity",
-    "DependencyType",
-    "ALL_COMPLEX_TASKS",
-    "HEALTHCARE_COMPLEX_TASKS",
-    "FINANCE_COMPLEX_TASKS",
-    "LEGAL_COMPLEX_TASKS",
-    "CORPORATE_COMPLEX_TASKS",
-    "generate_complex_scenarios",
-    "get_expected_tsr_by_complexity",
 ]

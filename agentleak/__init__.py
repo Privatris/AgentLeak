@@ -1,55 +1,102 @@
 """
-AgentLeak - A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems
+AgentLeak - Professional Multi-Agent Privacy Testing Framework
 
-Based on the paper: "AgentLeak: A Full-Stack Benchmark for Privacy Leakage
-in Multi-Agent LLM Systems" (December 2025)
+Clean API for testing privacy leaks in multi-agent LLM systems.
+
+Quick Start:
+    >>> from agentleak import AgentLeakTester, DetectionMode
+    >>> 
+    >>> # Simple privacy check
+    >>> from agentleak import quick_check
+    >>> result = quick_check(
+    ...     vault={"ssn": "123-45-6789"},
+    ...     output="User SSN is 123-45-6789",
+    ...     mode="fast"
+    ... )
+    >>> print(f"Leaked: {result.leaked}")
+    
+    >>> # Advanced testing
+    >>> tester = AgentLeakTester(mode=DetectionMode.HYBRID)
+    >>> result = tester.check(
+    ...     vault=sensitive_data,
+    ...     output=agent_output,
+    ...     channel="C1"
+    ... )
 
 Features:
-- 7 leakage channels (C1-C7)
-- 19 attack classes in 5 families (F1-F5)
-- Multi-tier detection pipeline
-- Output sanitizer and regex-based defenses
-- Interactive CLI with real-time visualization
-
-Modules:
-    - core: Core data structures (channels, attacks, scenarios)
-    - schemas: Pydantic models for scenarios, traces, results
-    - harness: Framework adapters and trace collection
-    - detection: Multi-tier leakage detection
-    - defenses: Privacy defense mechanisms
-    - metrics: ELR, WLS, TSR computation
-    - generators: Scenario and payload generation
-    - cli: Interactive command-line interface
-    - config: Configuration management
+    - 4-tier detection: exact → pattern → semantic → LLM
+    - Multi-channel support (C1-C7)
+    - LLM-as-Judge integrated natively
+    - Early stopping for efficiency
+    - Clean, professional API
 """
 
 __version__ = "1.0.0"
 __author__ = "Faouzi EL YAGOUBI, Ranwa AL MALLAH"
 
-# Core structures
-# Configuration
+# Main API
+from .tester import (
+    AgentLeakTester,
+    DetectionMode,
+    TestResult,
+    quick_check
+)
+
+# Core detection
+from .core.detector import (
+    Detector,
+    DetectionResult,
+    DetectionTier,
+    DetectorPipeline
+)
+
+# Individual detectors
+from .detection.basic_detectors import (
+    ExactDetector,
+    PatternDetector,
+    SemanticDetector
+)
+from .detection.llm_judge import (
+    LLMJudge,
+    LLMConfig
+)
+
+# Legacy core (for backwards compatibility)
+from .core.attacks import AdversaryLevel, AttackClass, AttackFamily
+from .core.channels import Channel
 from .config import Config, load_config
-from .core.attacks import AdversaryLevel, AttackClass, AttackFamily, AttackManager
-from .core.channels import Channel, ChannelManager
-from .core.scenarios import Scenario, ScenarioGenerator
+
 
 __all__ = [
     # Version
     "__version__",
-    # Core
+    
+    # Main API (recommended)
+    "AgentLeakTester",
+    "DetectionMode", 
+    "TestResult",
+    "quick_check",
+    
+    # Core detection (advanced)
+    "Detector",
+    "DetectionResult",
+    "DetectionTier",
+    "DetectorPipeline",
+    
+    # Individual detectors (advanced)
+    "ExactDetector",
+    "PatternDetector",
+    "SemanticDetector",
+    "LLMJudge",
+    "LLMConfig",
+    
+    # Legacy (backwards compatibility)
     "Channel",
-    "ChannelManager",
     "AttackClass",
     "AttackFamily",
-    "AttackManager",
     "AdversaryLevel",
-    "Scenario",
-    "ScenarioGenerator",
-    # Config
     "Config",
     "load_config",
-    # Main entry point
-    "main",
 ]
 
 

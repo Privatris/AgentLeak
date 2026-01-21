@@ -1,5 +1,5 @@
 """
-AgentLeak Privacy Mitigation - Defense strategies inspired by AgentDAM.
+AgentLeak Privacy Mitigation - Defense strategies.
 
 Implements multiple mitigation approaches:
 1. Privacy-aware system prompts with Chain-of-Thought reasoning
@@ -19,7 +19,22 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional, Union
 
-from ..generators.task_config import SensitiveCategory
+
+# =============================================================================
+# Sensitive Data Categories (from AgentDAM Table 2)
+# =============================================================================
+
+
+class SensitiveCategory(str, Enum):
+    """Six categories of sensitive data."""
+
+    PERSONAL_CONTACT = "personal_contact"  # Email, phone, address, username
+    PERSONAL_LIFE = "personal_life"  # Divorce, family matters, illness
+    PERSONAL_IDENTITY = "personal_identity"  # Religion, culture, politics
+    EMPLOYMENT = "employment"  # Salary, performance, employer
+    FINANCIAL = "financial"  # Bank accounts, credit cards, investments
+    EDUCATIONAL = "educational"  # Schools, grades
+    MEDICAL = "medical"  # Diagnoses, treatments, appointments
 
 # =============================================================================
 # Mitigation Types
@@ -253,31 +268,29 @@ SENSITIVE CATEGORIES TO FILTER (if not necessary):
 
 Return ONLY the filtered data with sensitive information removed or replaced with [REDACTED]."""
 
-    def __init__(self, llm_client: Optional[Any] = None):
+    def __init__(self, llm_client: Optional[Any] = None, use_openrouter: bool = True):
         """
         Initialize pre-filter.
 
         Args:
-            llm_client: OpenAI client (creates one if not provided)
+            llm_client: Optional HTTP client (creates one if not provided)
+            use_openrouter: Use OpenRouter instead of OpenAI (default: True)
         """
         self._client = llm_client
+        self.use_openrouter = use_openrouter
+        self.base_url = "https://openrouter.ai/api/v1"
 
     def _get_client(self):
         if self._client is None:
-            import os
-
-            try:
-                from openai import OpenAI
-            except ImportError:
-                raise ImportError("openai package required")
-            self._client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+            import requests
+            self._client = requests
         return self._client
 
     def filter(
         self,
         task: str,
         data: str,
-        model: str = "gpt-4o-mini",
+        model: str = "qwen/qwen-2.5-7b-instruct",
     ) -> str:
         """
         Filter sensitive data before agent execution.
@@ -285,23 +298,38 @@ Return ONLY the filtered data with sensitive information removed or replaced wit
         Args:
             task: The task description
             data: The user data to filter
-            model: LLM model to use
+            model: LLM model to use (default: Qwen 7B on OpenRouter)
 
         Returns:
             Filtered data with unnecessary sensitive info removed
         """
+        import os
+        import json
+
         client = self._get_client()
+        api_key = os.environ.get("OPENROUTER_API_KEY")
+        if not api_key:
+            raise ValueError("OPENROUTER_API_KEY environment variable not set")
 
         prompt = self.FILTER_PROMPT.format(task=task, data=data)
 
-        response = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.0,
-            max_tokens=2000,
+        response = client.post(
+            f"{self.base_url}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.0,
+                "max_tokens": 2000,
+            },
         )
 
-        return response.choices[0].message.content
+        response.raise_for_status()
+        result = response.json()
+        return result["choices"][0]["message"]["content"]
 
 
 # =============================================================================
@@ -340,25 +368,29 @@ Return JSON:
     "explanation": "why this was/wasn't a leak"
 }}"""
 
-    def __init__(self, llm_client: Optional[Any] = None):
+    def __init__(self, llm_client: Optional[Any] = None, use_openrouter: bool = True):
+        """
+        Initialize post-filter.
+
+        Args:
+            llm_client: Optional HTTP client (creates one if not provided)
+            use_openrouter: Use OpenRouter instead of OpenAI (default: True)
+        """
         self._client = llm_client
+        self.use_openrouter = use_openrouter
+        self.base_url = "https://openrouter.ai/api/v1"
 
     def _get_client(self):
         if self._client is None:
-            import os
-
-            try:
-                from openai import OpenAI
-            except ImportError:
-                raise ImportError("openai package required")
-            self._client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+            import requests
+            self._client = requests
         return self._client
 
     def check_and_filter(
         self,
         output: str,
         sensitive_data: list[str],
-        model: str = "gpt-4o-mini",
+        model: str = "qwen/qwen-2.5-7b-instruct",
     ) -> dict[str, Any]:
         """
         Check output for leaks and optionally sanitize.
@@ -366,27 +398,41 @@ Return JSON:
         Args:
             output: The agent's output
             sensitive_data: List of sensitive items to check for
-            model: LLM model to use
+            model: LLM model to use (default: Qwen 7B on OpenRouter)
 
         Returns:
             Dict with leak detection and sanitized output
         """
+        import os
+        import json
+
         client = self._get_client()
+        api_key = os.environ.get("OPENROUTER_API_KEY")
+        if not api_key:
+            raise ValueError("OPENROUTER_API_KEY environment variable not set")
 
         sensitive_str = "\n".join(f"- {item}" for item in sensitive_data)
         prompt = self.CHECK_PROMPT.format(output=output, sensitive_data=sensitive_str)
 
-        response = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.0,
-            max_tokens=1000,
-            response_format={"type": "json_object"},
+        response = client.post(
+            f"{self.base_url}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.0,
+                "max_tokens": 1000,
+            },
         )
 
         try:
-            return json.loads(response.choices[0].message.content)
-        except json.JSONDecodeError:
+            response.raise_for_status()
+            result = response.json()
+            return json.loads(result["choices"][0]["message"]["content"])
+        except (json.JSONDecodeError, KeyError, ValueError):
             return {
                 "leaked": False,
                 "leaked_items": [],

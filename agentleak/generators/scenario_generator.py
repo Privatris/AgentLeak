@@ -31,7 +31,7 @@ from ..schemas.scenario import (
     ToolCapability,
     Vertical,
 )
-from .vault_generator import VaultGenerator
+from ._legacy.vault_generator import VaultGenerator
 
 fake = Faker()
 

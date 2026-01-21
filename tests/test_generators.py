@@ -8,13 +8,13 @@ from agentleak.schemas.scenario import (
     Channel,
     Vertical,
 )
-from agentleak.generators.canary_generator import (
+from agentleak.generators._legacy.canary_generator import (
     CanaryGenerator,
     generate_obvious_canary,
     generate_realistic_canary,
     generate_semantic_canary,
 )
-from agentleak.generators.vault_generator import (
+from agentleak.generators._legacy.vault_generator import (
     VaultGenerator,
     generate_vault,
 )

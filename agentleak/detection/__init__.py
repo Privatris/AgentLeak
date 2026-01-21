@@ -1,95 +1,139 @@
 # AgentLeak Detection Pipeline
 """
-3-Stage Leakage Detection Pipeline for agentleak.
+MODERN Detection Architecture (Recommended)
+==============================================
 
-The detection pipeline operates in three stages to handle the 3-tier canary system:
+Two-tier hybrid approach optimized for performance and accuracy:
 
-Stage 1 - CanaryMatcher (Tier 1: Obvious canaries)
-  - Exact string matching for CANARY_* tokens
-  - Fast, high precision, 100% recall for T1
+TIER 1 & 2: PRESIDIO (Pattern + NER)
+├── Exact canary token matching
+├── Standard PII: SSN, Credit Card, IBAN, Email, Phone
+├── Custom recognizers: Patient ID, IMEI, VIN, Crypto, etc.
+├── ✅ Fast, deterministic, no API calls
+└── Detects: ~18% of leaks (direct pattern matches)
 
-Stage 2 - PatternAuditor (Tier 2: Realistic canaries)
-  - Regex-based detection for SSN, phone, credit card patterns
-  - Reserved ranges (SSN 900-999, phone 555-01xx)
-  - High precision via allowlist filtering
+TIER 3: GEMINI 2.0 FLASH (LLM-as-Judge)
+├── Semantic paraphrase detection
+├── Inference & derivation analysis  
+├── Context-aware evaluation
+├── ✅ Handles complex semantic leakage
+└── Detects: ~82% of leaks (semantic matches)
 
-Stage 3 - SemanticDetector (Tier 3: Semantic canaries)
-  - Embedding similarity for natural language facts
-  - Configurable threshold (default 0.72)
-  - Handles paraphrasing and reformulation
+Quick Start:
+    from agentleak.detection import HybridPipeline
+    
+    pipeline = HybridPipeline()
+    result = pipeline.analyze(text, vault)
+    print(f"Leaks detected: {result.all_leaks}")
 
- additions:
-  - Multi-level probing evaluation (seed, vignette, trajectory)
-  - Two-stage leakage detection (extract → judge)
-  - Helpfulness evaluation for utility-privacy tradeoff
+================================================================================
+LEGACY API (For backward compatibility, use modern API instead)
+================================================================================
 """
 
-from .canary_matcher import CanaryMatcher
-
-# : Two-stage leakage detection
-from .leakage_detector import (
-    AggregateMetrics,
-    FullEvaluationResult,
-    HelpfulnessJudgment,
-    HelpfulnessRating,
-    LeakageDetector,
-    LeakageJudgment,
-    LeakageVerdict,
-    SensitiveInfoExtraction,
-    compute_aggregate_metrics,
-    export_results,
-)
-from .pattern_auditor import PatternAuditor
-from .pipeline import DetectionConfig, DetectionPipeline
-from .privacy_evaluator import (
-    DataMinimizationEvaluator,
-    JudgeConfig,
-    JudgeModel,
-    PrivacyEvaluator,
-    PrivacyJudgeResult,
+# =============================================================================
+# 🎯 RECOMMENDED: HYBRID PIPELINE (Presidio + Gemini)
+# =============================================================================
+from .hybrid_pipeline import (
+    HybridPipeline,
+    HybridConfig,
+    HybridResult,
+    create_hybrid_pipeline,
+    detect_leakage,
 )
 
-# : Multi-level probing
-from .probing_evaluation import (
-    ProbingEvaluator,
-    ProbingLevel,
-    ProbingMetrics,
-    ProbingResult,
-    compute_knowledge_action_gap,
-    compute_probing_metrics,
-    export_probing_results,
+# =============================================================================
+# TIER 1 & 2: PRESIDIO DETECTOR (Pattern + NER)
+# =============================================================================
+from .presidio_detector import (
+    PresidioDetector,
+    PresidioConfig,
+    PresidioMatch,
+    PIICategory,
+    analyze_text,
 )
-from .semantic_detector import SemanticDetector
+
+# =============================================================================
+# TIER 3: GEMINI JUDGE (LLM-as-Judge)
+# =============================================================================
+from .gemini_judge import (
+    GeminiJudge,
+    GeminiJudgeConfig,
+    JudgmentResult,
+    SemanticLeak,
+    LeakageSeverity,
+    evaluate_semantic_leakage,
+)
+
+# =============================================================================
+# LEGACY API: PrivacyJudge (For backward compatibility with benchmarks)
+# =============================================================================
+from .privacy_judge import (
+    PrivacyJudge,
+    JudgeConfiguration,
+    LLMProvider,
+    PrivacyJudgment,
+    quick_evaluate,
+    evaluate_trace,
+    evaluate_scenario,
+    evaluate_benchmark,
+)
+
+# =============================================================================
+# LEGACY API: Basic Detectors (For backward compatibility)
+# =============================================================================
+from .basic_detectors import (
+    ExactDetector,
+    PatternDetector,
+    SemanticDetector,
+    DetectionTier,
+    DetectionResult,
+)
+from .llm_judge import LLMJudge, LLMConfig
+
 
 __all__ = [
-    "CanaryMatcher",
-    "PatternAuditor",
+    # ========== RECOMMENDED API ==========
+    # Hybrid Pipeline (entry point)
+    "HybridPipeline",
+    "HybridConfig",
+    "HybridResult",
+    "create_hybrid_pipeline",
+    "detect_leakage",
+    
+    # ========== TIER 1 & 2 API ==========
+    # Presidio Detector
+    "PresidioDetector",
+    "PresidioConfig",
+    "PresidioMatch",
+    "PIICategory",
+    "analyze_text",
+    
+    # ========== TIER 3 API ==========
+    # Gemini Judge
+    "GeminiJudge",
+    "GeminiJudgeConfig",
+    "JudgmentResult",
+    "SemanticLeak",
+    "LeakageSeverity",
+    "evaluate_semantic_leakage",
+    
+    # ========== LEGACY API (Benchmarks) ==========
+    "PrivacyJudge",
+    "JudgeConfiguration",
+    "LLMProvider",
+    "PrivacyJudgment",
+    "quick_evaluate",
+    "evaluate_trace",
+    "evaluate_scenario",
+    "evaluate_benchmark",
+    
+    # ========== LEGACY COMPATIBILITY ==========
+    "ExactDetector",
+    "PatternDetector",
     "SemanticDetector",
-    "DetectionPipeline",
-    "DetectionConfig",
-    # LLM-based evaluator (AgentDAM-style)
-    "PrivacyEvaluator",
-    "PrivacyJudgeResult",
-    "JudgeConfig",
-    "JudgeModel",
-    "DataMinimizationEvaluator",
-    # Multi-level probing
-    "ProbingEvaluator",
-    "ProbingLevel",
-    "ProbingResult",
-    "ProbingMetrics",
-    "compute_probing_metrics",
-    "compute_knowledge_action_gap",
-    "export_probing_results",
-    # Leakage detection
-    "LeakageDetector",
-    "LeakageVerdict",
-    "HelpfulnessRating",
-    "SensitiveInfoExtraction",
-    "LeakageJudgment",
-    "HelpfulnessJudgment",
-    "FullEvaluationResult",
-    "AggregateMetrics",
-    "compute_aggregate_metrics",
-    "export_results",
+    "DetectionTier",
+    "DetectionResult",
+    "LLMJudge",
+    "LLMConfig",
 ]
