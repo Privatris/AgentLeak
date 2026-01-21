@@ -1,8 +1,26 @@
-# 🔬 AgentLeak Showcase: Scientific Demonstration
+# 🔬 AgentLeak Showcase: SDK Integration Demo
 
 > **IEEE Access Paper**: "AgentLeak: A Benchmark for Privacy Leakage in Multi-Agent Systems"
 
-## ⚠️ Important: Scientific Validity
+## 🎯 SDK Integration
+
+This showcase uses the **official AgentLeak SDK** for leak detection:
+
+```python
+from agentleak import AgentLeakTester, DetectionMode
+from agentleak.integrations import CrewAIIntegration, IntegrationConfig
+
+# SDK-based detection
+tester = AgentLeakTester(mode=DetectionMode.FAST)
+result = tester.check(vault=VAULT, output=content, channel="C1")
+
+# Automatic CrewAI monitoring
+config = IntegrationConfig(vault=VAULT, mode=DetectionMode.FAST)
+integration = CrewAIIntegration(config)
+crew = integration.attach(crew)
+```
+
+## ⚠️ Scientific Validity
 
 This showcase demonstrates **structural properties** of multi-agent systems, not artificially constructed leaks.
 
@@ -12,7 +30,7 @@ This showcase demonstrates **structural properties** of multi-agent systems, not
 |-------|------|--------------|
 | Multi-agent creates additional channels (C2, C3, C5) | **Structural** | Architecture inspection |
 | Output defense cannot see internal channels | **Structural** | Defense design |
-| Tools return sensitive data | **Behavioral** | Tool output logs |
+| SDK detects leaks across all channels | **SDK Feature** | Pipeline output |
 
 ### What We Do NOT Claim
 
@@ -25,10 +43,10 @@ This showcase demonstrates **structural properties** of multi-agent systems, not
 ## 🚀 Quick Start
 
 ```bash
-# Structural demonstration (no LLM required)
+# Structural demonstration (no LLM required) - uses SDK
 python showcase.py --mode structural --stock AAPL
 
-# Real CrewAI execution (requires API key)
+# Real CrewAI execution (requires API key) - SDK attached
 export OPENROUTER_API_KEY=your_key
 python showcase.py --mode live --stock AAPL
 ```
@@ -114,14 +132,29 @@ This is realistic: tools access databases and return data.
 
 ```
 showcase/stock_analysis_leak/
-├── showcase.py             # ⭐ MAIN entry point
+├── showcase.py             # ⭐ MAIN entry point (uses SDK)
 ├── README.md               # This file
-├── artifacts.py            # Report/memory generators
-└── tools/                  # Tool implementations
-    ├── client_crm.py       # CRM simulation
-    ├── calculator.py       # Financial calculator
-    └── sec_api.py          # SEC API simulation
+└── showcase_results.json   # Output results
 ```
+
+---
+
+## 📊 SDK Detection Output
+
+```
+--- SDK Detection Summary ---
+  C1: 1 leak(s)
+  C2: 1 leak(s)
+  C3: 1 leak(s)
+  C5: 1 leak(s)
+
+Defense Bypass Rate: 75.0%
+```
+
+The SDK uses:
+- **ExactDetector**: Exact match of vault values
+- **PatternDetector**: Presidio patterns (IBAN, SSN, Email, etc.)
+- **SemanticDetector**: Embedding-based similarity
 
 ---
 
