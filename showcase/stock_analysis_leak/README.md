@@ -4,18 +4,38 @@ Ce showcase démontre les vulnérabilités de fuite de données dans une applica
 
 ## 🎯 Objectif
 
-Prouver que les systèmes multi-agents exposent des données sensibles sur **tous les canaux** (C1-C5), même quand la sortie finale semble "propre".
+Prouver que les systèmes multi-agents exposent des données sensibles sur **tous les 6 canaux** (C1-C6), même quand la sortie finale semble "propre".
 
-## 📊 Résultats de Validation (21 Jan 2026)
+## 📊 Résultats Multichanaux (21 Jan 2026)
 
-**4/4 Claims Validés ✅**
+### Key Metrics (pour IEEE Access Paper)
+
+| Métrique | Valeur | Signification |
+|----------|--------|---------------|
+| **Total Incidents** | 22 | Fuites détectées |
+| **Unique PII Fields** | 9/11 | 82% des champs vault exposés |
+| **Audit Gap** | 95.5% | Fuites manquées par audit C1-only |
+| **Hidden/Visible Ratio** | 21x | Fuites cachées vs output |
+
+### Répartition par Canal
+
+```
+C1 Output          █░░░░░░░░░░░░░░░░░░░   1  🔴 (seul audité normalement)
+C2 Inter-agent     █████░░░░░░░░░░░░░░░   3  🔴
+C3 Tool I/O        █████░░░░░░░░░░░░░░░   3  🔴
+C4 System Logs     ████████████████████  11  🔴 (source majeure!)
+C5 Memory/State    █░░░░░░░░░░░░░░░░░░░   1  🔴
+C6 Artifacts       █████░░░░░░░░░░░░░░░   3  🔴
+```
+
+### Claims Validés (4/4 ✅)
 
 | Claim | Description | Résultat |
 |-------|-------------|----------|
 | **1** | Multi-agent Penalty | 5 fuites internes vs 0 single-agent |
-| **2** | Internal > External | 2.5x plus de fuites internes |
-| **3** | Audit Gap | 87.5% des fuites manquées par audit C1-only |
-| **4** | Defense Asymmetry | D1 protège C1, pas C2/C5 |
+| **2** | Internal > External | 21x plus de fuites internes |
+| **3** | Audit Gap | 95.5% des fuites manquées par audit C1-only |
+| **4** | Defense Asymmetry | D1 protège C1, pas C2-C6 |
 
 ## 🚀 Quick Start
 
@@ -23,32 +43,37 @@ Prouver que les systèmes multi-agents exposent des données sensibles sur **tou
 # Installation
 pip install crewai litellm
 
-# Test rapide (simulation, pas d'API)
-python run_claims_test.py
+# Test rapide multichannel (simulation, pas d'API)
+python run_multichannel_showcase.py --stock AAPL --dry-run
 
 # Test complet avec CrewAI réel
 export OPENROUTER_API_KEY=sk-or-xxx
-python run_full_showcase.py --stock AAPL
+python run_multichannel_showcase.py --stock AAPL
+
+# Validation des claims uniquement
+python run_claims_test.py
 ```
 
 ## 📁 Scripts Disponibles
 
 | Script | Description | Durée |
 |--------|-------------|-------|
-| `run_claims_test.py` | Validation des 4 claims (simulation) | ~2s |
-| `run_full_showcase.py` | Demo CrewAI réelle avec 3 agents | ~30s |
-| `run_full_showcase.py --dry-run` | Simulation sans API | ~2s |
-| `main.py` | Version originale complète | ~2min |
+| `run_multichannel_showcase.py` | **NEW** Demo 6 canaux complète | ~30s |
+| `run_multichannel_showcase.py --dry-run` | Simulation sans API | ~2s |
+| `run_claims_test.py` | Validation des 4 claims | ~2s |
+| `run_full_showcase.py` | Demo CrewAI avec 3 agents | ~30s |
+| `main.py` | Version originale | ~2min |
 
-## 📊 Canaux Testés
+## 📊 Canaux Testés (C1-C6)
 
-| Canal | Description | Exemple de Fuite |
-|-------|-------------|------------------|
-| **C1** | Sortie finale | Le rapport d'investissement contient un numéro de compte |
-| **C2** | Inter-agent | L'analyste envoie des données clients au conseiller |
-| **C3** | API/Tools | L'outil SEC reçoit des identifiants privés en argument |
-| **C4** | Logs | Les logs de debug contiennent des positions de trading |
-| **C5** | Mémoire | La mémoire partagée stocke l'historique de transactions |
+| Canal | Description | Exemple de Fuite | Count |
+|-------|-------------|------------------|-------|
+| **C1** | Sortie finale | `risk_tolerance` dans recommandation | 1 |
+| **C2** | Inter-agent | Backstory agent: `client_name`, `holdings` | 3 |
+| **C3** | Tool I/O | API call: `GET /portfolio/{account_number}` | 3 |
+| **C4** | Logs système | `DEBUG - SSN verification: 1-85-06-75-xxx` | 11 |
+| **C5** | Mémoire | `agent_memory.json` avec PII persisté | 1 |
+| **C6** | Artifacts | `client_memo.md`, `trade_log.jsonl` | 3 |
 
 ## 🏗️ Architecture
 
