@@ -34,49 +34,38 @@ Ce travail accompagne notre article soumis à IEEE Access : *AgentLeak: A Full-S
 - **32 classes d'attaques** organisées en 6 familles (F1-F6)
 - **3 niveaux d'adversaire** (A0-A2) : passif, utilisateur, développeur
 
-### Pipeline de détection
-- **Tier 1** : Marqueurs canari (correspondance exacte)
-- **Tier 2** : Extraction de patterns (regex, détection PII via Presidio)
-- **Tier 3** : Similarité sémantique (embeddings, LLM-as-Judge)
 
-### Défenses évaluées
-- **D1** : Assainissement de sortie (efficace sur canaux externes)
-- **D2** : Validation d'entrée (protection modérée)
-- **D3** : Protection mémoire (non implémentée par les frameworks)
-- **D4** : Isolation des canaux (nécessite des changements architecturaux)
+# AgentLeak: Benchmark for Data Leakage in Multi-Agent LLM Systems
 
-### Frameworks supportés
+**AgentLeak** is an open-source benchmark for evaluating data leakage in multi-agent systems based on large language models (LLMs). It measures the ability of defenses to limit the disclosure of sensitive information across different channels and attack scenarios.
 
-| Framework | Intégration | Canaux internes | Accès mémoire |
-|-----------|-------------|-----------------|---------------|
-| CrewAI | Native | C2, C5 | Complet |
-| LangChain | Native | C2, C5 | Complet |
-| AutoGPT | Adaptateur | C2, C5 | Limité |
-| MetaGPT | Adaptateur | C2, C5 | Limité |
+![Benchmark](paper/figures/benchmark_overview.png)
 
----
+## Main Features
+
+- **32 attack families** covering major leakage surfaces
+- **7 leakage channels** (output, memory, logs, artifacts, etc.)
+- **Hybrid detection** (PII, LLM-as-Judge, rules)
+- **Integrated and extensible defense mechanisms**
+- **SDK integrations** (LangChain, CrewAI, AutoGPT, MetaGPT)
+- **Comprehensive test suite** (pytest)
 
 ## Installation
 
-### Prérequis
-- Python 3.10 ou supérieur
-- Clé API OpenRouter (ou fournisseur LLM compatible)
+### Prerequisites
 
-### Mise en place
+- Python 3.10+
+- `pip install -e .`
+
+### Quick Installation
 
 ```bash
-git clone https://github.com/Privatris/AgentLeak.git
-cd AgentLeak
-
+git clone https://github.com/agentleak/agentleak.git
+cd agentleak
 pip install -e .
-
-# Configurer la clé API
-export OPENROUTER_API_KEY=votre_cle
-# ou créer un fichier .env
-echo "OPENROUTER_API_KEY=votre_cle" > .env
 ```
 
-### Vérification
+### Test the Installation
 
 ```bash
 pytest tests/ -v --tb=short
@@ -84,39 +73,39 @@ pytest tests/ -v --tb=short
 
 ---
 
-## Utilisation
+## Usage
 
-### Lancer le benchmark
+### Run the Benchmark
 
 ```bash
-# Test rapide (validation)
+# Quick test (validation)
 python -m agentleak run --quick --dry-run
 
-# Benchmark complet
+# Full benchmark
 python -m agentleak run --full
 
-# Filtrer par famille d'attaque
+# Filter by attack family
 python -m agentleak run --attack-family F4 --limit 50
 
-# Avec défenses activées
+# With defenses enabled
 python -m agentleak run --defense D1
 ```
 
-### Reproduire les résultats
+### Reproduce Results
 
-Le dossier `experiments/all_to_all/` contient les scripts de validation des claims du paper :
+The `experiments/all_to_all/` folder contains scripts to validate the claims of the paper:
 
 ```bash
 cd experiments/all_to_all
 
-# Test rapide (smoke test)
+# Quick test (smoke test)
 python smoke_test.py --claims "1,2,3" --scenarios 10
 
-# Benchmark complet
+# Full benchmark
 python master_benchmark.py --mode full
 ```
 
-### Utilisation programmatique
+### Programmatic Usage
 
 ```python
 from agentleak import AgentLeakTester, DetectionMode
@@ -125,79 +114,79 @@ tester = AgentLeakTester(mode=DetectionMode.HYBRID)
 
 result = tester.check(
     vault={"ssn": "123-45-6789", "email": "patient@hospital.com"},
-    output="Le patient dont le SSN est 123-45-6789 a été traité.",
+    output="The patient whose SSN is 123-45-6789 has been treated.",
     channel="C1"
 )
 
-print(f"Fuite détectée : {result.leaked}")
-print(f"Confiance : {result.confidence}")
+print(f"Leak detected: {result.leaked}")
+print(f"Confidence: {result.confidence}")
 ```
 
 ---
 
-## Structure du projet
+## Project Structure
 
 ```
 AgentLeak/
-├── agentleak/                  # Package principal
-│   ├── catalog/                # Définitions canoniques
-│   │   ├── attacks.py          # 32 classes d'attaques
-│   │   ├── defenses.py         # Implémentations des défenses
-│   │   └── channels.py         # 7 canaux de fuite
-│   ├── detection/              # Pipeline de détection
-│   │   ├── basic_detectors.py  # Détecteurs Tier 1-2
+├── agentleak/                  # Main package
+│   ├── catalog/                # Canonical definitions
+│   │   ├── attacks.py          # 32 attack classes
+│   │   ├── defenses.py         # Defense implementations
+│   │   └── channels.py         # 7 leakage channels
+│   ├── detection/              # Detection pipeline
+│   │   ├── basic_detectors.py  # Tier 1-2 detectors
 │   │   ├── llm_judge.py        # LLM-as-Judge
-│   │   └── presidio_detector.py# Détection PII
-│   ├── defenses/               # Mécanismes de défense
-│   ├── integrations/           # Intégrations frameworks
-│   └── metrics/                # Métriques d'évaluation
+│   │   └── presidio_detector.py# PII detection
+│   ├── defenses/               # Defense mechanisms
+│   ├── integrations/           # Framework integrations
+│   └── metrics/                # Evaluation metrics
 │
-├── agentleak_data/             # Données du benchmark
-│   ├── datasets/               # Scénarios
-│   └── prompts/                # Prompts système
+├── agentleak_data/             # Benchmark data
+│   ├── datasets/               # Scenarios
+│   └── prompts/                # System prompts
 │
-├── experiments/                # Scripts de validation
-│   └── all_to_all/             # Benchmark complet
+├── experiments/                # Validation scripts
+│   └── all_to_all/             # Full benchmark
 │
-├── tests/                      # Suite de tests
-├── docs/                       # Documentation détaillée
-└── paper/                      # Sources du paper IEEE
+├── tests/                      # Test suite
+├── docs/                       # Detailed documentation
+└── paper/                      # IEEE paper sources
 ```
 
 ---
 
-## Résultats du benchmark
+## Benchmark Results
 
-### Comparaison architecturale
+### Architectural Comparison
 
-| Architecture | Tests | Taux de fuite | IC 95% |
-|--------------|-------|---------------|--------|
-| Agent unique | 400 | 16.0% | [12.9%, 19.7%] |
-| Multi-agent (2) | 350 | 32.0% | [27.3%, 37.1%] |
-| Multi-agent (3+) | 250 | 43.2% | [37.1%, 49.5%] |
+| Architecture      | Tests | Leakage Rate | 95% CI         |
+|-------------------|-------|--------------|----------------|
+| Single agent      | 400   | 16.0%        | [12.9%, 19.7%] |
+| Multi-agent (2)   | 350   | 32.0%        | [27.3%, 37.1%] |
+| Multi-agent (3+)  | 250   | 43.2%        | [37.1%, 49.5%] |
 
-### Analyse par canal
+### Channel Analysis
 
-| Canal | Type | Taux de fuite | Efficacité défense |
-|-------|------|---------------|-------------------|
-| C1 (Sortie finale) | Externe | 4.8% | 98% |
-| C2 (Inter-agent) | Interne | 31.0% | 0% |
-| C3 (Entrée outil) | Externe | 3.7% | 85% |
-| C4 (Sortie outil) | Externe | 3.2% | 80% |
-| C5 (Mémoire) | Interne | 32.0% | 0% |
-| C6 (Logs) | Externe | 3.2% | 90% |
-| C7 (Artefacts) | Externe | 4.2% | 75% |
+| Channel           | Type    | Leakage Rate | Defense Effectiveness |
+|-------------------|---------|--------------|----------------------|
+| C1 (Final output) | External| 4.8%         | 98%                  |
+| C2 (Inter-agent)  | Internal| 31.0%        | 0%                   |
+| C3 (Tool input)   | External| 3.7%         | 85%                  |
+| C4 (Tool output)  | External| 3.2%         | 80%                  |
+| C5 (Memory)       | Internal| 32.0%        | 0%                   |
+| C6 (Logs)         | External| 3.2%         | 90%                  |
+| C7 (Artifacts)    | External| 4.2%         | 75%                  |
 
-### Performance par famille d'attaque
+### Attack Family Performance
 
-| Famille | Nom | Taux de succès | Canal privilégié |
-|---------|-----|----------------|------------------|
-| F1 | Prompt & Instruction | 62.2% | C1, C2 |
-| F2 | Surface d'outil | 71.7% | C3, C4 |
-| F3 | Mémoire & Persistance | 62.7% | C5 |
-| F4 | Coordination multi-agent | 80.0% | C2 |
-| F5 | Raisonnement & CoT | 62.7% | C2, C5 |
-| F6 | Évasion & Obfuscation | 55.0% | C1 |
+| Family | Name                  | Success Rate | Preferred Channel |
+|--------|-----------------------|--------------|------------------|
+| F1     | Prompt & Instruction  | 62.2%        | C1, C2           |
+| F2     | Tool Surface          | 71.7%        | C3, C4           |
+| F3     | Memory & Persistence  | 62.7%        | C5               |
+| F4     | Multi-agent Coordination| 80.0%      | C2               |
+| F5     | Reasoning & CoT       | 62.7%        | C2, C5           |
+| F6     | Evasion & Obfuscation | 55.0%        | C1               |
 
 ---
 
@@ -215,9 +204,21 @@ AgentLeak/
 
 ---
 
-## Licence
+## License
 
-MIT — voir [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
+
+---
+
+## Contribution
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+```bash
+pip install -e ".[dev]"
+pytest tests/ -v
+black agentleak/ tests/
+```
 
 ---
 
