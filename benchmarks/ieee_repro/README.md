@@ -7,15 +7,22 @@ All figures and tables are generated from actual trace data - **no hardcoded val
 
 ## Quick Start
 
+### Core Channels (C1, C2, C5)
 ```bash
-# 1. Run benchmark (generates timestamped traces)
-python benchmark.py --n 1000 --traces --model openai/gpt-4o-mini
+# 1. Run main benchmark
+python benchmark.py --n 100 --traces --model openai/gpt-4o-mini
 
-# 2. Analyze traces (generates paper_stats.json)
+# 2. Analyze and Generate Data
 python analyze_traces.py
-
-# 3. Generate figures (reads from paper_stats.json)
 python generate_figures.py
+```
+
+### Secondary Channels (C3, C6 - Finding 7)
+```bash
+# Target tool and log leakage
+python benchmark_tools.py --n 100 --model openai/gpt-4o
+
+# Result statistics will print directly to console
 ```
 
 ## Secondary Channels Benchmark (C3/C6)
@@ -90,13 +97,14 @@ Each trace (`results/traces/trace_*.json`) contains:
 
 ## Channels Covered
 
-| Channel | Description | Status |
-|---------|-------------|--------|
-| C1 | Final output to user | ✓ Tracked |
-| C2 | Inter-agent messages | ✓ Tracked |
-| C5 | Memory/state writes | ✓ Tracked |
-| C3-C4 | Tool I/O | Requires tool integration |
-| C6-C7 | Logs/Artifacts | Requires logging hooks |
+| Channel | Description | Benchmark Script |
+|---------|-------------|------------------|
+| C1 | Final output to user | `benchmark.py` |
+| C2 | Inter-agent messages | `benchmark.py` |
+| C5 | Memory/state writes | `benchmark.py` |
+| C3 | Tool Input (Secondary) | `benchmark_tools.py` |
+| C6 | Logs (Secondary) | `benchmark_tools.py` |
+| C4, C7 | Tool Output / Artifacts | Internal Framework Only |
 
 ## Key Claims Validated
 
