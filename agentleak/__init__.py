@@ -50,15 +50,18 @@ from .core.detector import (
     DetectorPipeline
 )
 
-# Individual detectors
-from .detection.basic_detectors import (
-    ExactDetector,
-    PatternDetector,
-    SemanticDetector
+# Detectors (new architecture)
+from .detection.presidio_detector import (
+    PresidioDetector,
+    PresidioConfig,
+    PresidioMatch,
 )
 from .detection.llm_judge import (
     LLMJudge,
-    LLMConfig
+    LLMJudgeConfig as LLMConfig,
+    LLMProvider,
+    JudgmentResult,
+    SemanticLeak,
 )
 
 # Legacy core (for backwards compatibility)
@@ -83,12 +86,17 @@ __all__ = [
     "DetectionTier",
     "DetectorPipeline",
     
-    # Individual detectors (advanced)
-    "ExactDetector",
-    "PatternDetector",
-    "SemanticDetector",
+    # Presidio Detector (Tier 1 & 2)
+    "PresidioDetector",
+    "PresidioConfig",
+    "PresidioMatch",
+    
+    # LLM Judge (Tier 3)
     "LLMJudge",
     "LLMConfig",
+    "LLMProvider",
+    "JudgmentResult",
+    "SemanticLeak",
     
     # Legacy (backwards compatibility)
     "Channel",

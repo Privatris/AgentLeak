@@ -478,7 +478,7 @@ class GuardrailDefense(BaseDefense):
             "and fallback disabled"
         )
     
-    def filter(self, content: str, channel: Channel) -> DefenseResult:
+    def filter(self, content: str, channel: Channel, metadata: Optional[dict[str, Any]] = None) -> DefenseResult:
         """Filter content using guardrail."""
         if not self.should_monitor(channel):
             return DefenseResult(
@@ -516,7 +516,7 @@ class GuardrailDefense(BaseDefense):
         )
         
         if self.config.log_decisions:
-            self._decision_log.append(defense_result)
+            self._log_decision(defense_result)
         
         return defense_result
     

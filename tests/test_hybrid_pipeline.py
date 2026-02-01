@@ -1,5 +1,5 @@
 """
-Tests for HybridPipeline detection combining Presidio and Gemini.
+Tests for HybridPipeline detection combining Presidio and LLM-as-Judge.
 
 Tests the Tier 1-3 hybrid detection architecture using mocks.
 """
@@ -16,14 +16,14 @@ from agentleak.detection.hybrid_pipeline import (
     TierResult,
 )
 from agentleak.detection.presidio_detector import PresidioDetector, PresidioConfig
-from agentleak.detection.gemini_judge import (
-    GeminiJudge,
-    GeminiJudgeConfig,
+from agentleak.detection.llm_judge import (
+    LLMJudge,
+    LLMJudgeConfig,
     JudgmentResult,
     SemanticLeak,
     LeakageSeverity,
 )
-from agentleak.schemas.scenario import Channel, CanaryTier
+from agentleak.schemas.scenario import Channel
 from agentleak.schemas.results import FieldLeak, ChannelResult, DetectionResult
 
 
@@ -36,7 +36,7 @@ def hybrid_config():
     """Configuration for testing."""
     return HybridConfig(
         enable_presidio=True,
-        enable_gemini=False,  # Disable Gemini by default (requires API)
+        enable_llm_judge=False,  # Disable LLM by default (requires API)
         deduplicate=True,
     )
 
@@ -126,10 +126,11 @@ class TestHybridConfig:
         """Test default configuration values."""
         config = HybridConfig()
         assert config.enable_presidio is True
-        assert config.enable_gemini is True
+        assert config.enable_llm_judge is True
+        assert config.enable_gemini is True  # Backward compat alias
         assert config.deduplicate is True
         assert config.presidio_threshold == 0.5
-        assert config.gemini_threshold == 0.72
+        assert config.llm_judge_threshold == 0.72
         
     def test_channel_weights_default(self):
         """Test default channel weights."""
@@ -145,11 +146,12 @@ class TestHybridConfig:
     def test_custom_config(self):
         """Test custom configuration."""
         config = HybridConfig(
-            enable_gemini=False,
+            enable_llm_judge=False,
             presidio_threshold=0.7,
             skip_semantic_on_critical=True,
         )
-        assert config.enable_gemini is False
+        assert config.enable_llm_judge is False
+        assert config.enable_gemini is False  # Alias should work
         assert config.presidio_threshold == 0.7
         assert config.skip_semantic_on_critical is True
 
@@ -188,7 +190,7 @@ class TestHybridResult:
             all_leaks=mock_presidio_leaks,
             has_leakage=True,
             presidio_result=TierResult("presidio", mock_presidio_leaks, 2, 25.0),
-            gemini_result=None,
+            llm_judge_result=None,
             elr=0.5,
             wls=0.45,
             channel_results={},
@@ -199,6 +201,7 @@ class TestHybridResult:
         assert result.has_leakage is True
         assert result.elr == 0.5
         assert len(result.all_leaks) == 2
+        assert result.gemini_result is None  # Backward compat alias
         
     def test_to_detection_result(self, mock_presidio_leaks):
         """Test conversion to DetectionResult."""
@@ -206,7 +209,7 @@ class TestHybridResult:
             all_leaks=mock_presidio_leaks,
             has_leakage=True,
             presidio_result=None,
-            gemini_result=None,
+            llm_judge_result=None,
             elr=0.5,
             wls=0.45,
             channel_results={},
@@ -237,13 +240,13 @@ class TestHybridPipelineInit:
     def test_init_custom_config(self, hybrid_config):
         """Test initialization with custom config."""
         pipeline = HybridPipeline(config=hybrid_config)
-        assert pipeline.config.enable_gemini is False
+        assert pipeline.config.enable_llm_judge is False
         
     def test_lazy_detector_initialization(self):
         """Test that detectors are initialized lazily."""
         pipeline = HybridPipeline()
         assert pipeline._presidio is None
-        assert pipeline._gemini is None
+        assert pipeline._llm_judge is None
         
     def test_presidio_property(self, hybrid_config):
         """Test Presidio detector lazy initialization."""
@@ -281,7 +284,7 @@ class TestHybridPipelineHelpers:
         """Test that config is stored correctly."""
         pipeline = HybridPipeline(config=hybrid_config)
         assert pipeline.config.enable_presidio is True
-        assert pipeline.config.enable_gemini is False
+        assert pipeline.config.enable_llm_judge is False
 
 
 # =============================================================================
@@ -391,9 +394,9 @@ class TestHybridPipelineIntegrationPresidio:
         
     def test_config_enables_presidio(self):
         """Test config properly enables Presidio."""
-        config = HybridConfig(enable_presidio=True, enable_gemini=False)
+        config = HybridConfig(enable_presidio=True, enable_llm_judge=False)
         assert config.enable_presidio is True
-        assert config.enable_gemini is False
+        assert config.enable_llm_judge is False
 
 
 # =============================================================================
@@ -401,16 +404,20 @@ class TestHybridPipelineIntegrationPresidio:
 # =============================================================================
 
 @pytest.mark.skipif(
-    not __import__('os').getenv("GOOGLE_API_KEY"),
-    reason="GOOGLE_API_KEY not set"
+    not (__import__('os').getenv("OPENROUTER_API_KEY") or 
+         __import__('os').getenv("OPENAI_API_KEY") or 
+         __import__('os').getenv("GOOGLE_API_KEY")),
+    reason="No LLM API key set (OPENROUTER_API_KEY, OPENAI_API_KEY, or GOOGLE_API_KEY)"
 )
 class TestHybridPipelineIntegrationFull:
-    """Full integration tests requiring Gemini API."""
+    """Full integration tests requiring LLM API."""
     
-    def test_gemini_detector_initialization(self):
-        """Test Gemini detector can be initialized (requires API key)."""
-        config = HybridConfig(enable_presidio=True, enable_gemini=True)
+    def test_llm_judge_initialization(self):
+        """Test LLM judge can be initialized (requires API key)."""
+        config = HybridConfig(enable_presidio=True, enable_llm_judge=True)
         pipeline = HybridPipeline(config=config)
         
-        gemini = pipeline.gemini
-        assert isinstance(gemini, GeminiJudge)
+        llm_judge = pipeline.llm_judge
+        assert isinstance(llm_judge, LLMJudge)
+        # Backward compat alias should work
+        assert pipeline.gemini is llm_judge

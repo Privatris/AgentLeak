@@ -23,6 +23,7 @@ class FieldLeak(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0)
     sensitivity_weight: float = Field(default=1.0)
     canary_tier: Optional[CanaryTier] = None
+    explanation: Optional[str] = None
 
     model_config = {"extra": "forbid"}
 

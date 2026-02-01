@@ -250,7 +250,7 @@ class PresidioDefense(BaseDefense):
         
         return result
     
-    def filter(self, content: str, channel: Channel) -> DefenseResult:
+    def filter(self, content: str, channel: Channel, metadata: Optional[dict[str, Any]] = None) -> DefenseResult:
         """
         Filter content using Presidio detection.
         
@@ -262,6 +262,12 @@ class PresidioDefense(BaseDefense):
                 original_content=content,
             )
         
+        # Determine entities to ignore from metadata if present
+        # This allows per-request customization (e.g. allowing certain PII for authorized tools)
+        entities_to_ignore = None
+        if metadata and "allowed_pii" in metadata:
+            entities_to_ignore = metadata["allowed_pii"] # List of entity types
+
         result = self.analyze(content, channel)
         
         # Determine action
@@ -287,7 +293,7 @@ class PresidioDefense(BaseDefense):
         
         # Log decision
         if self.config.log_decisions:
-            self._decision_log.append(defense_result)
+            self._log_decision(defense_result)
         
         return defense_result
     

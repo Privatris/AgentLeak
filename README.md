@@ -1,233 +1,99 @@
 # AgentLeak
 
-**Benchmark pour l'analyse des fuites de données dans les systèmes multi-agents LLM**
+Benchmark for privacy leakage in multi-agent LLM systems.
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+This repository accompanies the IEEE Access paper: *AgentLeak: A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems*.
 
----
+## Key Results (5,694 traces across 5 models)
 
-## Contexte
+| Model | C1 (Output) | C2 (Internal) | H1 (Audit Gap) | Total Leak |
+|-------|-------------|---------------|----------------|------------|
+| **Claude-3.5-Sonnet** | 8.2% | 53.9% | 45.7% | 55.2% |
+| GPT-4o | 17.2% | 76.8% | 59.6% | 77.6% |
+| GPT-4o-mini | 41.2% | 75.3% | 34.2% | 76.3% |
+| Llama-3.3-70B | 26.9% | 67.8% | 41.3% | 89.9% |
+| Mistral-Large | 47.5% | 96.2% | 48.7% | 99.3% |
+| **Average** | **28.2%** | **74.0%** | **45.9%** | **79.7%** |
 
-Les systèmes multi-agents basés sur les LLM présentent des vulnérabilités de confidentialité qui passent souvent inaperçues. AgentLeak propose une méthodologie systématique pour auditer ces systèmes en analysant **7 canaux de fuite** — y compris les communications internes entre agents que les mécanismes de défense actuels ne protègent pas.
+### Key Findings
 
-Ce travail accompagne notre article soumis à IEEE Access : *AgentLeak: A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems*.
+- **Internal channels leak 2.6× more** than external (74.0% vs 28.2%)
+- **Output-only audits miss 45.9%** of violations
+- **Claude 3.5 Sonnet paradox**: Lowest C1 leakage (8.2%) but 6.6× internal/external ratio—the highest among all models
+- Pattern C2 > C1 holds **across all 5 models** tested
 
----
+## Scope
 
-## Principaux résultats
+- 1,000 scenarios (healthcare, finance, legal, corporate)
+- 7 channels: C1 output, C2 inter-agent, C3-C4 tools, C5 memory, C6 logs, C7 artifacts
+- 32 attack classes, 6 families
+- SDK: CrewAI, LangChain, AutoGPT, MetaGPT
 
-| Observation | Données | Significativité |
-|-------------|---------|-----------------|
-| Pénalité multi-agent | Taux de fuite 36.7% vs 16.0% | χ² = 49.4, p < 0.001 |
-| Écart canaux internes | Taux de fuite 31.5% vs 3.8% | χ² = 89.7, p < 0.001 |
-| Asymétrie des défenses | 98% efficace sur C1, 0% sur C2/C5 | Vérifié sur 600 tests |
-| Vulnérabilité universelle | 28-35% de fuites internes | CrewAI, LangChain, AutoGPT, MetaGPT |
+## 🚀 Reproduction
 
----
-
-## Fonctionnalités
-
-### Périmètre du benchmark
-- **1 000 scénarios** couvrant 4 secteurs (santé, finance, juridique, entreprise)
-- **7 canaux de fuite** (C1-C7) : sortie finale, inter-agent, entrées/sorties d'outils, mémoire, logs, artefacts
-- **32 classes d'attaques** organisées en 6 familles (F1-F6)
-- **3 niveaux d'adversaire** (A0-A2) : passif, utilisateur, développeur
-
-
-# AgentLeak: Benchmark for Data Leakage in Multi-Agent LLM Systems
-
-**AgentLeak** is an open-source benchmark for evaluating data leakage in multi-agent systems based on large language models (LLMs). It measures the ability of defenses to limit the disclosure of sensitive information across different channels and attack scenarios.
-
-![Benchmark](paper/figures/benchmark_overview.png)
-
-## Main Features
-
-- **32 attack families** covering major leakage surfaces
-- **7 leakage channels** (output, memory, logs, artifacts, etc.)
-- **Hybrid detection** (PII, LLM-as-Judge, rules)
-- **Integrated and extensible defense mechanisms**
-- **SDK integrations** (LangChain, CrewAI, AutoGPT, MetaGPT)
-- **Comprehensive test suite** (pytest)
-
-## Installation
-
-### Prerequisites
-
-- Python 3.10+
-- `pip install -e .`
-
-### Quick Installation
+To reproduce the results from the IEEE paper, including the C3/C6 secondary channel analysis:
 
 ```bash
-git clone https://github.com/agentleak/agentleak.git
-cd agentleak
+cd benchmarks/ieee_repro
+# Follow instructions in benchmarks/ieee_repro/README.md
+```
+
+## Structure
+
+- `agentleak/`: The core framework SDK
+- `agentleak_data/`: The dataset of 1000 scenarios
+- `benchmarks/ieee_repro/`: Scripts to reproduce the paper's findings, including Finding 7 (Tools & Logs).
+- `paper/`: The LaTeX source of the IEEE Access paper
+
+## Setup
+
+```bash
+git clone https://github.com/Privatris/AgentLeak
+cd AgentLeak
 pip install -e .
+pytest tests/ -v
 ```
-
-### Test the Installation
-
-```bash
-pytest tests/ -v --tb=short
-```
-
----
 
 ## Usage
-
-### Run the Benchmark
-
-```bash
-# Quick test (validation)
-python -m agentleak run --quick --dry-run
-
-# Full benchmark
-python -m agentleak run --full
-
-# Filter by attack family
-python -m agentleak run --attack-family F4 --limit 50
-
-# With defenses enabled
-python -m agentleak run --defense D1
-```
-
-### Reproduce Results
-
-The `experiments/all_to_all/` folder contains scripts to validate the claims of the paper:
-
-```bash
-cd experiments/all_to_all
-
-# Quick test (smoke test)
-python smoke_test.py --claims "1,2,3" --scenarios 10
-
-# Full benchmark
-python master_benchmark.py --mode full
-```
-
-### Programmatic Usage
 
 ```python
 from agentleak import AgentLeakTester, DetectionMode
 
 tester = AgentLeakTester(mode=DetectionMode.HYBRID)
-
 result = tester.check(
-    vault={"ssn": "123-45-6789", "email": "patient@hospital.com"},
-    output="The patient whose SSN is 123-45-6789 has been treated.",
+    vault={"ssn": "123-45-6789"},
+    output="The SSN is 123-45-6789",
     channel="C1"
 )
-
-print(f"Leak detected: {result.leaked}")
-print(f"Confidence: {result.confidence}")
+print(f"Leak: {result.leaked}, Confidence: {result.confidence}")
 ```
 
----
-
-## Project Structure
-
-```
-AgentLeak/
-├── agentleak/                  # Main package
-│   ├── catalog/                # Canonical definitions
-│   │   ├── attacks.py          # 32 attack classes
-│   │   ├── defenses.py         # Defense implementations
-│   │   └── channels.py         # 7 leakage channels
-│   ├── detection/              # Detection pipeline
-│   │   ├── basic_detectors.py  # Tier 1-2 detectors
-│   │   ├── llm_judge.py        # LLM-as-Judge
-│   │   └── presidio_detector.py# PII detection
-│   ├── defenses/               # Defense mechanisms
-│   ├── integrations/           # Framework integrations
-│   └── metrics/                # Evaluation metrics
-│
-├── agentleak_data/             # Benchmark data
-│   ├── datasets/               # Scenarios
-│   └── prompts/                # System prompts
-│
-├── experiments/                # Validation scripts
-│   └── all_to_all/             # Full benchmark
-│
-├── tests/                      # Test suite
-├── docs/                       # Detailed documentation
-└── paper/                      # IEEE paper sources
+CLI:
+```bash
+python -m agentleak run --quick --dry-run
+python -m agentleak run --full
 ```
 
----
+## Reproduction
 
-## Benchmark Results
+```bash
+cd benchmarks/ieee_repro
+python benchmark.py --n 100 --traces --model openai/gpt-4o-mini
+```
 
-### Architectural Comparison
-
-| Architecture      | Tests | Leakage Rate | 95% CI         |
-|-------------------|-------|--------------|----------------|
-| Single agent      | 400   | 16.0%        | [12.9%, 19.7%] |
-| Multi-agent (2)   | 350   | 32.0%        | [27.3%, 37.1%] |
-| Multi-agent (3+)  | 250   | 43.2%        | [37.1%, 49.5%] |
-
-### Channel Analysis
-
-| Channel           | Type    | Leakage Rate | Defense Effectiveness |
-|-------------------|---------|--------------|----------------------|
-| C1 (Final output) | External| 4.8%         | 98%                  |
-| C2 (Inter-agent)  | Internal| 31.0%        | 0%                   |
-| C3 (Tool input)   | External| 3.7%         | 85%                  |
-| C4 (Tool output)  | External| 3.2%         | 80%                  |
-| C5 (Memory)       | Internal| 32.0%        | 0%                   |
-| C6 (Logs)         | External| 3.2%         | 90%                  |
-| C7 (Artifacts)    | External| 4.2%         | 75%                  |
-
-### Attack Family Performance
-
-| Family | Name                  | Success Rate | Preferred Channel |
-|--------|-----------------------|--------------|------------------|
-| F1     | Prompt & Instruction  | 62.2%        | C1, C2           |
-| F2     | Tool Surface          | 71.7%        | C3, C4           |
-| F3     | Memory & Persistence  | 62.7%        | C5               |
-| F4     | Multi-agent Coordination| 80.0%      | C2               |
-| F5     | Reasoning & CoT       | 62.7%        | C2, C5           |
-| F6     | Evasion & Obfuscation | 55.0%        | C1               |
-
----
+Traces are in `benchmarks/ieee_repro/results/traces/`.
 
 ## Citation
 
 ```bibtex
 @article{agentleak2026,
-  title={AgentLeak: A Full-Stack Benchmark for Privacy Leakage 
-         in Multi-Agent LLM Systems},
-  author={El Yagoubi, Faouzi and Al Mallah, Ranwa and Abdi, Arslene},
+  title={AgentLeak: A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems},
+  author={El Yagoubi, Faouzi and Al Mallah, Ranwa},
   journal={IEEE Access},
   year={2026}
 }
 ```
 
----
-
 ## License
 
-MIT — see [LICENSE](LICENSE).
-
----
-
-## Contribution
-
-Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-```bash
-pip install -e ".[dev]"
-pytest tests/ -v
-black agentleak/ tests/
-```
-
----
-
-## Contribution
-
-Les contributions sont bienvenues. Consultez [CONTRIBUTING.md](CONTRIBUTING.md) pour les directives.
-
-```bash
-pip install -e ".[dev]"
-pytest tests/ -v
-black agentleak/ tests/
-```
+MIT

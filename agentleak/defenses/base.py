@@ -65,13 +65,14 @@ class BaseDefense(ABC):
         self._decision_log: list[DefenseResult] = []
 
     @abstractmethod
-    def filter(self, content: str, channel: Channel) -> DefenseResult:
+    def filter(self, content: str, channel: Channel, metadata: Optional[dict[str, Any]] = None) -> DefenseResult:
         """
         Apply defense filter to content.
 
         Args:
             content: Content to filter
             channel: Channel where content is going
+            metadata: Additional context (e.g. source agent, target agent)
 
         Returns:
             DefenseResult with action and potentially modified content
@@ -80,10 +81,10 @@ class BaseDefense(ABC):
 
     def filter_batch(
         self,
-        items: list[tuple[str, Channel]],
+        items: list[tuple[str, Channel, Optional[dict[str, Any]]]],
     ) -> list[DefenseResult]:
         """Filter multiple items."""
-        return [self.filter(content, channel) for content, channel in items]
+        return [self.filter(content, channel, metadata) for content, channel, metadata in items]
 
     def should_monitor(self, channel: Channel) -> bool:
         """Check if this channel should be monitored."""

@@ -1,9 +1,9 @@
 # AgentLeak Detection Pipeline
 """
-MODERN Detection Architecture (Recommended)
+Detection Architecture (IEEE Paper Section 7)
 ==============================================
 
-Two-tier hybrid approach optimized for performance and accuracy:
+Three-tier hybrid approach: Presidio (Tier 1-2) + LLM-as-Judge (Tier 3)
 
 TIER 1 & 2: PRESIDIO (Pattern + NER)
 ├── Exact canary token matching
@@ -12,11 +12,12 @@ TIER 1 & 2: PRESIDIO (Pattern + NER)
 ├── ✅ Fast, deterministic, no API calls
 └── Detects: ~18% of leaks (direct pattern matches)
 
-TIER 3: GEMINI 2.0 FLASH (LLM-as-Judge)
+TIER 3: LLM-as-Judge (Model-Agnostic)
 ├── Semantic paraphrase detection
 ├── Inference & derivation analysis  
 ├── Context-aware evaluation
 ├── ✅ Handles complex semantic leakage
+├── Supports: OpenRouter, OpenAI, Anthropic, Google
 └── Detects: ~82% of leaks (semantic matches)
 
 Quick Start:
@@ -26,13 +27,11 @@ Quick Start:
     result = pipeline.analyze(text, vault)
     print(f"Leaks detected: {result.all_leaks}")
 
-================================================================================
-LEGACY API (For backward compatibility, use modern API instead)
-================================================================================
+Reference: AgentLeak IEEE Paper Section 7 (Detection Pipeline)
 """
 
 # =============================================================================
-# 🎯 RECOMMENDED: HYBRID PIPELINE (Presidio + Gemini)
+# 🎯 RECOMMENDED: HYBRID PIPELINE (Presidio + LLM-as-Judge)
 # =============================================================================
 from .hybrid_pipeline import (
     HybridPipeline,
@@ -54,42 +53,27 @@ from .presidio_detector import (
 )
 
 # =============================================================================
-# TIER 3: GEMINI JUDGE (LLM-as-Judge)
+# TIER 3: LLM JUDGE (Model-Agnostic LLM-as-Judge)
 # =============================================================================
-from .gemini_judge import (
-    GeminiJudge,
-    GeminiJudgeConfig,
+from .llm_judge import (
+    LLMJudge,
+    LLMJudgeConfig,
+    LLMConfig,  # Legacy alias
+    LLMProvider,
     JudgmentResult,
     SemanticLeak,
     LeakageSeverity,
     evaluate_semantic_leakage,
-)
-
-# =============================================================================
-# LEGACY API: PrivacyJudge (For backward compatibility with benchmarks)
-# =============================================================================
-from .privacy_judge import (
-    PrivacyJudge,
-    JudgeConfiguration,
-    LLMProvider,
-    PrivacyJudgment,
     quick_evaluate,
-    evaluate_trace,
-    evaluate_scenario,
-    evaluate_benchmark,
 )
 
 # =============================================================================
-# LEGACY API: Basic Detectors (For backward compatibility)
+# CORE TYPES (From detector module)
 # =============================================================================
-from .basic_detectors import (
-    ExactDetector,
-    PatternDetector,
-    SemanticDetector,
+from ..core.detector import (
     DetectionTier,
     DetectionResult,
 )
-from .llm_judge import LLMJudge, LLMConfig
 
 
 __all__ = [
@@ -110,30 +94,18 @@ __all__ = [
     "analyze_text",
     
     # ========== TIER 3 API ==========
-    # Gemini Judge
-    "GeminiJudge",
-    "GeminiJudgeConfig",
+    # LLM Judge (Model-Agnostic)
+    "LLMJudge",
+    "LLMJudgeConfig",
+    "LLMConfig",  # Legacy alias
+    "LLMProvider",
     "JudgmentResult",
     "SemanticLeak",
     "LeakageSeverity",
     "evaluate_semantic_leakage",
-    
-    # ========== LEGACY API (Benchmarks) ==========
-    "PrivacyJudge",
-    "JudgeConfiguration",
-    "LLMProvider",
-    "PrivacyJudgment",
     "quick_evaluate",
-    "evaluate_trace",
-    "evaluate_scenario",
-    "evaluate_benchmark",
     
-    # ========== LEGACY COMPATIBILITY ==========
-    "ExactDetector",
-    "PatternDetector",
-    "SemanticDetector",
+    # ========== CORE TYPES ==========
     "DetectionTier",
     "DetectionResult",
-    "LLMJudge",
-    "LLMConfig",
 ]

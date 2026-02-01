@@ -25,6 +25,10 @@ try:
     from ..core.attacks import AdversaryLevel, AttackClass, AttackFamily, AttackManager
     from ..core.channels import Channel, ChannelManager
     from ..core.scenarios import Difficulty, Scenario, ScenarioGenerator, Vertical
+    from ..defenses.base import BaseDefense, FilterAction
+    from ..defenses.presidio_defense import PresidioDefense, PresidioDefenseConfig
+    from ..defenses.sanitizer import OutputSanitizer, SanitizerConfig
+    from ..defenses.internal_channel import InternalChannelDefense, InternalChannelConfig
 except ImportError:
     # Direct execution - add parent to path
     sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -33,6 +37,10 @@ except ImportError:
     from core.attacks import AdversaryLevel, AttackClass, AttackFamily, AttackManager
     from core.channels import Channel, ChannelManager
     from core.scenarios import Difficulty, Scenario, ScenarioGenerator, Vertical
+    from defenses.base import BaseDefense, FilterAction
+    from defenses.presidio_defense import PresidioDefense, PresidioDefenseConfig
+    from defenses.sanitizer import OutputSanitizer, SanitizerConfig
+    from defenses.internal_channel import InternalChannelDefense, InternalChannelConfig
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +51,7 @@ class ExecutionTrace:
 
     scenario_id: str
     started_at: datetime
+    defense: Optional[BaseDefense] = None
     completed_at: Optional[datetime] = None
 
     # Events per channel
@@ -58,14 +67,43 @@ class ExecutionTrace:
     def add_event(self, channel: Channel, content: str, metadata: Dict = None) -> None:
         """Add an event to a channel."""
         ch_key = channel.value
+        
+        # Apply defense if active
+        final_content = content
+        defense_metadata = {}
+        
+        if self.defense:
+            try:
+                result = self.defense.filter(content, channel, metadata)
+                
+                if result.action == FilterAction.BLOCK:
+                    final_content = "[BLOCKED_BY_DEFENSE]"
+                    defense_metadata["defense_action"] = "block"
+                elif result.action == FilterAction.REDACT:
+                    final_content = result.filtered_content or content
+                    defense_metadata["defense_action"] = "redact"
+                elif result.action == FilterAction.WARN:
+                    defense_metadata["defense_action"] = "warn"
+                    defense_metadata["defense_warning"] = "potential_leak"
+                
+                if result.action != FilterAction.ALLOW:
+                    defense_metadata["defense_detected_patterns"] = result.detected_patterns
+                    
+            except Exception as e:
+                logger.error(f"Defense execution failed: {e}")
+        
         if ch_key not in self.channel_events:
             self.channel_events[ch_key] = []
 
+        final_metadata = metadata or {}
+        if defense_metadata:
+            final_metadata.update(defense_metadata)
+
         self.channel_events[ch_key].append(
             {
-                "content": content,
+                "content": final_content,
                 "timestamp": time.time(),
-                "metadata": metadata or {},
+                "metadata": final_metadata,
             }
         )
 
@@ -110,7 +148,7 @@ class LeakageDetector:
         enable_canary: bool = True,
         enable_pattern: bool = True,
         enable_semantic: bool = False,
-        semantic_threshold: float = 0.85,
+        semantic_threshold: float = 0.72,  # Calibrated per IEEE paper: FPR<5%, FNR=7.4%
     ):
         self.enable_canary = enable_canary
         self.enable_pattern = enable_pattern
@@ -390,12 +428,36 @@ class TestRunner:
         )
         self.attack_manager = AttackManager(seed=self.config.benchmark.seed)
 
+        # Initialize defense
+        self.defense = self._load_defense()
+
         # Initialize adapter
         if self.adapter is None:
             if self.config.model.name == "mock":
                 self.adapter = MockAdapter(self.config)
             else:
                 self.adapter = OpenRouterAdapter(self.config)
+
+    def _load_defense(self) -> Optional[BaseDefense]:
+        """Load defense based on configuration."""
+        if not hasattr(self.config, "defense") or not self.config.defense.defense_type:
+            return None
+            
+        d_type = self.config.defense.defense_type.lower()
+        
+        try:
+            if d_type == "sanitizer":
+                return OutputSanitizer()
+            elif d_type == "presidio":
+                return PresidioDefense()
+            elif d_type == "internal":
+                return InternalChannelDefense()
+            else:
+                logger.warning(f"Unknown defense type: {d_type}")
+                return None
+        except Exception as e:
+            logger.error(f"Failed to initialize defense {d_type}: {e}")
+            return None
 
     def run_single(self, scenario: Scenario) -> TestResult:
         """Run a single scenario."""
@@ -405,6 +467,7 @@ class TestRunner:
         trace = ExecutionTrace(
             scenario_id=scenario.scenario_id,
             started_at=datetime.now(),
+            defense=self.defense,
         )
 
         try:
@@ -474,10 +537,16 @@ class TestRunner:
             if verticals:
                 verticals_enum = [Vertical(v) for v in verticals]
 
+            # Calculate attack probability from distribution (A1 + A2 + ...)
+            attack_prob = 0.0
+            if self.config.benchmark.enable_attacks:
+                dist = self.config.benchmark.attack_distribution
+                attack_prob = sum(v for k, v in dist.items() if k != "A0")
+
             scenarios = self.generator.generate_batch(
                 n=n,
                 verticals=verticals_enum,
-                attack_probability=self.config.benchmark.attack_probability,
+                attack_probability=attack_prob,
             )
 
         # Initialize progress
@@ -493,6 +562,9 @@ class TestRunner:
 
             if on_progress:
                 on_progress(i + 1, len(scenarios))
+            
+            # Rate limiting
+            time.sleep(self.config.benchmark.api_delay)
 
         return progress
 

@@ -1,15 +1,16 @@
 """
 Tests for Attack Families and Attack Classes.
 
-Ensures complete coverage of the 5 attack families and 19 attack classes
+Ensures complete coverage of the 6 attack families and 32 attack classes
 as defined in the AgentLeak paper taxonomy.
 
 Attack Families:
-- F1: Prompt & Instruction (DPI, Role Confusion, Context Override, Format Coercion)
-- F2: Tool Surface (IPI, Tool Poisoning, RAG Bait, Link Exfil)
-- F3: Memory & Persistence (Memory Exfil, Vector Leak, Log Leak, Artifact Leak)
-- F4: Multi-Agent (Cross-Agent, Role Boundary, Delegation Exploit)
-- F5: Reasoning/CoT (Logic Puzzle Jailbreak, CoT Forging, Special Token, Reasoning Hijack)
+- F1: Prompt & Instruction (6 classes)
+- F2: Tool Surface (6 classes)
+- F3: Memory & Persistence (5 classes)
+- F4: Multi-Agent (8 classes)
+- F5: Reasoning/CoT (5 classes)
+- F6: Evasion & Obfuscation (2 classes)
 """
 
 import pytest
@@ -42,11 +43,11 @@ from agentleak.schemas.scenario import (
 
 
 class TestAttackFamilies:
-    """Test that all 5 attack families are defined."""
+    """Test that all 6 attack families are defined."""
 
     def test_family_count(self):
-        """Paper defines 5 attack families."""
-        assert len(AttackFamily) == 5
+        """Paper defines 6 attack families."""
+        assert len(AttackFamily) == 6
 
     def test_f1_prompt_family(self):
         """F1: Prompt & Instruction attacks."""
@@ -65,18 +66,22 @@ class TestAttackFamilies:
         assert AttackFamily.F4_MULTIAGENT.value == "multiagent_coordination"
 
     def test_f5_reasoning_family(self):
-        """F5: Reasoning/Chain-of-Thought attacks (NEW in v2)."""
+        """F5: Reasoning/Chain-of-Thought attacks."""
         assert AttackFamily.F5_REASONING.value == "reasoning_cot"
+
+    def test_f6_evasion_family(self):
+        """F6: Evasion & Obfuscation attacks."""
+        assert AttackFamily.F6_EVASION.value == "evasion_obfuscation"
 
 
 class TestAttackClasses:
-    """Test that all 19 attack classes are defined."""
+    """Test that all 32 attack classes are defined."""
 
     def test_class_count(self):
-        """Paper defines 19 attack classes across 5 families."""
-        assert len(AttackClass) == 19
+        """Paper defines 32 attack classes across 6 families."""
+        assert len(AttackClass) == 32
 
-    # F1: Prompt & Instruction (4 classes)
+    # F1: Prompt & Instruction (6 classes)
     def test_f1_dpi(self):
         """Direct Prompt Injection."""
         assert AttackClass.DPI.value == "direct_prompt_injection"
@@ -498,7 +503,7 @@ class TestAttackChannelMapping:
 
     def test_f4_targets_c2(self):
         """F4 attacks target C2 (inter-agent communication)."""
-        assert Channel.C2_INTER_AGENT.value == "inter_agent"
+        assert Channel.C2_INTER_AGENT.value == "C2_inter_agent"
 
     def test_f5_targets_cot_channels(self):
         """F5 attacks target reasoning/CoT channels (C1, potentially C5)."""

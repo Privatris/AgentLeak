@@ -81,29 +81,32 @@ class TestEnums:
         """Test all 7 leakage channels."""
         assert len(Channel) == 7
         channels = [c.value for c in Channel]
-        assert "final_output" in channels
-        assert "inter_agent" in channels
-        assert "tool_input" in channels
-        assert "artifact" in channels
+        assert "C1_final_output" in channels
+        assert "C2_inter_agent" in channels
+        assert "C3_tool_input" in channels
+        assert "C7_artifact" in channels
 
     def test_attack_family_values(self):
-        """Test 5 attack families as per paper Section 5."""
-        assert len(AttackFamily) == 5
+        """Test 6 attack families as per paper Section 5."""
+        assert len(AttackFamily) == 6
         assert AttackFamily.F1_PROMPT.value == "prompt_instruction"
         assert AttackFamily.F2_TOOL.value == "tool_surface"
         assert AttackFamily.F3_MEMORY.value == "memory_persistence"
         assert AttackFamily.F4_MULTIAGENT.value == "multiagent_coordination"
-        # F5 is the new reasoning/chain-of-thought family
+        # F5 is the reasoning/chain-of-thought family
         assert AttackFamily.F5_REASONING.value == "reasoning_cot"
+        # F6 is the evasion/obfuscation family
+        assert AttackFamily.F6_EVASION.value == "evasion_obfuscation"
 
     def test_attack_class_count(self):
-        """Test 19 attack classes as per paper Table 2."""
-        assert len(AttackClass) == 19
+        """Test 32 attack classes as per paper Table 2."""
+        assert len(AttackClass) == 32
         # Check some from each family
         assert AttackClass.DPI in AttackClass
         assert AttackClass.IPI in AttackClass
         assert AttackClass.MEMORY_EXFIL in AttackClass
         assert AttackClass.CROSS_AGENT in AttackClass
+        assert AttackClass.UNICODE_TAG_SMUGGLING in AttackClass
 
 
 # ============================================================================

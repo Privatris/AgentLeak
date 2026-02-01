@@ -62,54 +62,69 @@ class CanaryTier(str, Enum):
 
 
 class Channel(str, Enum):
-    """Seven leakage channels (C1-C7)."""
+    """Seven leakage channels (C1-C7). Values aligned with core/channels.py."""
 
-    C1_FINAL_OUTPUT = "final_output"
-    C2_INTER_AGENT = "inter_agent"
-    C3_TOOL_INPUT = "tool_input"
-    C4_TOOL_OUTPUT = "tool_output"
-    C5_MEMORY_WRITE = "memory_write"
-    C6_LOG = "log"
-    C7_ARTIFACT = "artifact"
+    C1_FINAL_OUTPUT = "C1_final_output"
+    C2_INTER_AGENT = "C2_inter_agent"
+    C3_TOOL_INPUT = "C3_tool_input"
+    C4_TOOL_OUTPUT = "C4_tool_output"
+    C5_MEMORY_WRITE = "C5_memory_write"
+    C6_LOG = "C6_log"
+    C7_ARTIFACT = "C7_artifact"
 
 
 class AttackFamily(str, Enum):
-    """Five attack families."""
+    """Six attack families."""
 
     F1_PROMPT = "prompt_instruction"
     F2_TOOL = "tool_surface"
     F3_MEMORY = "memory_persistence"
     F4_MULTIAGENT = "multiagent_coordination"
-    F5_REASONING = "reasoning_cot"  # Chain-of-Thought attacks (NEW)
+    F5_REASONING = "reasoning_cot"  # Chain-of-Thought attacks
+    F6_EVASION = "evasion_obfuscation"  # Evasion & Obfuscation attacks
 
 
 class AttackClass(str, Enum):
-    """Original 19 attack classes. See extended_taxonomy.py for full 32-class taxonomy."""
+    """32 attack classes organized by family."""
 
-    # Family 1: Prompt & Instruction
+    # Family 1: Prompt & Instruction Attacks (6)
     DPI = "direct_prompt_injection"
     ROLE_CONFUSION = "role_confusion"
     CONTEXT_OVERRIDE = "context_override"
     FORMAT_COERCION = "format_coercion"
-    # Family 2: Tool Surface
+    CRESCENDO_ESCALATION = "crescendo_escalation"
+    ACADEMIC_FRAMING = "academic_framing_bypass"
+    # Family 2: Tool Surface Attacks (6)
     IPI = "indirect_prompt_injection"
     TOOL_POISONING = "tool_output_poisoning"
     RAG_BAIT = "retrieval_trap"
     LINK_EXFIL = "link_following_exfiltration"
-    # Family 3: Memory & Persistence
+    API_PARAM_INJECTION = "api_parameter_injection"
+    HALLUCINATION_EXPLOITATION = "hallucination_exploitation"
+    # Family 3: Memory & Persistence Attacks (5)
     MEMORY_EXFIL = "memory_write_exfiltration"
     VECTOR_LEAK = "vector_store_leakage"
     LOG_LEAK = "log_leakage"
     ARTIFACT_LEAK = "artifact_leakage"
-    # Family 4: Multi-Agent
+    SESSION_STATE_POISONING = "session_state_poisoning"
+    # Family 4: Multi-Agent Attacks (8)
     CROSS_AGENT = "cross_agent_collusion"
     ROLE_BOUNDARY = "role_boundary_violation"
     DELEGATION_EXPLOIT = "delegation_exploit"
-    # Family 5: Reasoning/Chain-of-Thought (NEW - inspired by BackdoorLLM CoTA)
-    LOGIC_PUZZLE_JAILBREAK = "logic_puzzle_jailbreak"  # GPT-5 style logic grid bypass
-    COT_FORGING = "cot_forging"  # Inject fake <think> reasoning
-    SPECIAL_TOKEN_INJECTION = "special_token_injection"  # DeepSeek R1 style
-    REASONING_HIJACK = "reasoning_hijack"  # Hijack reasoning to leak data
+    SHARED_MEMORY_POISON = "shared_memory_poisoning"
+    ACTOR_NETWORK = "actor_network_manipulation"
+    CONSENSUS_MANIPULATION = "consensus_manipulation"
+    ORCHESTRATOR_HIJACKING = "orchestrator_hijacking"
+    AGENT_IMPERSONATION = "agent_identity_spoofing"
+    # Family 5: Reasoning/Chain-of-Thought Attacks (5)
+    LOGIC_PUZZLE_JAILBREAK = "logic_puzzle_jailbreak"
+    COT_FORGING = "cot_forging"
+    SPECIAL_TOKEN_INJECTION = "special_token_injection"
+    REASONING_HIJACK = "reasoning_hijack"
+    WORD_GAME = "word_game_obfuscation"
+    # Family 6: Evasion & Obfuscation Attacks (2)
+    UNICODE_TAG_SMUGGLING = "unicode_tag_smuggling"
+    TEXT_SHUFFLE = "text_shuffle_attack"
 
 
 # ============================================================================

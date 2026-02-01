@@ -160,6 +160,77 @@ class InternalChannelDefense(BaseDefense):
     def name(self) -> str:
         return "InternalChannelDefense"
     
+    def filter(self, content: str, channel: Channel, metadata: Optional[dict[str, Any]] = None) -> DefenseResult:
+        """
+        Filter content for internal channels.
+        
+        Implements BaseDefense interface.
+        """
+        metadata = metadata or {}
+        
+        if channel == Channel.C2_INTER_AGENT:
+            source = metadata.get("source_agent", "unknown_source")
+            target = metadata.get("target_agent", "unknown_target")
+            
+            res = self.filter_message(content, source, target)
+            
+            if not res.allowed:
+                action = FilterAction.BLOCK
+                filtered = None
+            elif res.original_message != res.filtered_message:
+                action = FilterAction.REDACT
+                filtered = res.filtered_message
+            else:
+                action = FilterAction.ALLOW
+                filtered = None
+                
+            result = DefenseResult(
+                action=action,
+                original_content=content,
+                filtered_content=filtered,
+                reason=res.reason,
+                detected_patterns=res.pii_detected,
+                latency_ms=res.latency_ms
+            )
+            self._log_decision(result)
+            return result
+            
+        elif channel == Channel.C5_MEMORY_WRITE:
+            key = metadata.get("memory_key", "unknown_key")
+            # Assuming filter_memory_write exists based on docstring, if not I fallback to simple redaction
+            if hasattr(self, "filter_memory_write"):
+                 res = self.filter_memory_write(content, key)
+                 if not res.allowed:
+                    action = FilterAction.BLOCK
+                 elif res.original_content != res.filtered_content:
+                    action = FilterAction.REDACT
+                 else:
+                    action = FilterAction.ALLOW
+                 
+                 result = DefenseResult(
+                    action=action,
+                    original_content=content,
+                    filtered_content=res.filtered_content if action == FilterAction.REDACT else None,
+                    reason=res.reason,
+                    detected_patterns=res.pii_detected,
+                    latency_ms=res.latency_ms
+                 )
+                 self._log_decision(result)
+                 return result
+        
+        # Default behavior: generic redaction if channel is monitored
+        if self.should_monitor(channel):
+            filtered, detected, _ = self._redact_text(content)
+            if filtered != content:
+               return DefenseResult(
+                   action=FilterAction.REDACT, 
+                   original_content=content, 
+                   filtered_content=filtered,
+                   detected_patterns=detected
+               )
+               
+        return DefenseResult(FilterAction.ALLOW, content)
+
     def _classify_severity(self, entity_type: str) -> str:
         """Classify entity severity."""
         if entity_type in self.config.high_severity_entities:
@@ -415,52 +486,7 @@ class InternalChannelDefense(BaseDefense):
         
         return result
     
-    def filter(self, content: str, channel: Channel) -> DefenseResult:
-        """
-        Filter content based on channel.
-        
-        Implements BaseDefense interface.
-        """
-        if channel == Channel.C2_INTER_AGENT:
-            # Default agent names for generic filtering
-            result = self.filter_message(content, "unknown", "unknown")
-            
-            action = FilterAction.ALLOW if result.allowed else FilterAction.BLOCK
-            if result.pii_redacted:
-                action = FilterAction.REDACT
-            
-            return DefenseResult(
-                action=action,
-                original_content=content,
-                filtered_content=result.filtered_message if result.pii_redacted else None,
-                confidence=1.0 if result.pii_detected else 0.0,
-                reason=result.reason,
-                detected_patterns=result.pii_detected,
-                latency_ms=result.latency_ms,
-            )
-        
-        elif channel == Channel.C5_MEMORY_WRITE:
-            result = self.filter_memory_write(content, "generic")
-            
-            action = FilterAction.REDACT if result.pii_redacted else FilterAction.ALLOW
-            
-            return DefenseResult(
-                action=action,
-                original_content=content,
-                filtered_content=result.filtered_content if result.pii_redacted else None,
-                confidence=1.0 if result.pii_detected else 0.0,
-                reason=result.reason,
-                detected_patterns=result.pii_detected,
-                latency_ms=result.latency_ms,
-            )
-        
-        else:
-            # Not an internal channel, allow through
-            return DefenseResult(
-                action=FilterAction.ALLOW,
-                original_content=content,
-            )
-    
+
     def get_statistics(self) -> dict[str, Any]:
         """Get defense statistics."""
         message_count = len(self._message_log)

@@ -7,7 +7,6 @@ Implements multiple mitigation approaches:
 3. Post-filtering: Check outputs for sensitive data after generation
 4. Output sanitization with differential privacy principles
 
-Based on AgentDAM Section 3.4 and experiments showing that
 CoT-enhanced system prompts are most effective at reducing leakage
 while maintaining task performance.
 """
@@ -21,7 +20,7 @@ from typing import Any, Optional, Union
 
 
 # =============================================================================
-# Sensitive Data Categories (from AgentDAM Table 2)
+# Sensitive Data Categories
 # =============================================================================
 
 

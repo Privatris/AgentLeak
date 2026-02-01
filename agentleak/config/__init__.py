@@ -110,6 +110,7 @@ class BenchmarkConfig:
     max_concurrent: int = 1
     timeout_per_scenario: float = 60.0
     max_retries: int = 2
+    api_delay: float = 0.5  # Seconds to wait between scenarios
 
     # Random seed
     seed: int = 42

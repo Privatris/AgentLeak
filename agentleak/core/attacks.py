@@ -1,12 +1,13 @@
 """
-AgentLeak Attacks - 19 attack classes organized in 5 families.
+AgentLeak Attacks - 32 attack classes organized in 6 families.
 
 From the paper:
-    Family 1 (F1): Prompt & Instruction Attacks (4 classes)
-    Family 2 (F2): Indirect & Tool-Surface Attacks (4 classes)
-    Family 3 (F3): Memory & Persistence Attacks (4 classes)
-    Family 4 (F4): Multi-Agent & Coordination Attacks (4 classes)
-    Family 5 (F5): Reasoning & Chain-of-Thought Attacks (3 classes)
+    Family 1 (F1): Prompt & Instruction Attacks (6 classes)
+    Family 2 (F2): Indirect & Tool-Surface Attacks (6 classes)
+    Family 3 (F3): Memory & Persistence Attacks (5 classes)
+    Family 4 (F4): Multi-Agent & Coordination Attacks (8 classes)
+    Family 5 (F5): Reasoning & Chain-of-Thought Attacks (5 classes)
+    Family 6 (F6): Evasion & Obfuscation Attacks (2 classes)
 
 Each attack class has:
 - A unique identifier
@@ -43,7 +44,7 @@ class AdversaryLevel(str, Enum):
 
 
 class AttackFamily(str, Enum):
-    """The 5 attack families."""
+    """The 6 attack families."""
 
     F1_PROMPT = "F1_prompt_instruction"
     F2_TOOL = "F2_tool_surface"
@@ -76,7 +77,7 @@ class AttackFamily(str, Enum):
 
 
 class AttackClass(str, Enum):
-    """The 19 attack classes organized by family."""
+    """The 32 attack classes organized by family."""
 
     # Family 1: Prompt & Instruction Attacks (6)
     DPI = "direct_prompt_injection"
@@ -121,6 +122,56 @@ class AttackClass(str, Enum):
     # Family 6: Evasion & Obfuscation Attacks (2)
     UNICODE_TAG_SMUGGLING = "unicode_tag_smuggling"
     TEXT_SHUFFLE = "text_shuffle_attack"
+
+    @property
+    def target_channels(self) -> List[Channel]:
+        """Get the channels targeted by this attack."""
+        channel_map = {
+            # F1 - Prompt Attacks -> Input
+            "direct_prompt_injection": [Channel.C1_FINAL_OUTPUT, Channel.C3_TOOL_INPUT],
+            "role_confusion": [Channel.C1_FINAL_OUTPUT],
+            "context_override": [Channel.C1_FINAL_OUTPUT],
+            "format_coercion": [Channel.C1_FINAL_OUTPUT],
+            "crescendo_escalation": [Channel.C1_FINAL_OUTPUT],
+            "academic_framing_bypass": [Channel.C1_FINAL_OUTPUT],
+            
+            # F2 - Tool Attacks -> Tool Outputs
+            "indirect_prompt_injection": [Channel.C3_TOOL_INPUT, Channel.C4_TOOL_OUTPUT],
+            "tool_output_poisoning": [Channel.C4_TOOL_OUTPUT, Channel.C5_MEMORY_WRITE],
+            "retrieval_trap": [Channel.C4_TOOL_OUTPUT],
+            "link_following_exfiltration": [Channel.C3_TOOL_INPUT],
+            "api_parameter_injection": [Channel.C3_TOOL_INPUT],
+            "hallucination_exploitation": [Channel.C1_FINAL_OUTPUT],
+            
+            # F3 - Memory Attacks -> Memory/Logs
+            "memory_write_exfiltration": [Channel.C5_MEMORY_WRITE],
+            "vector_store_leakage": [Channel.C5_MEMORY_WRITE],
+            "log_leakage": [Channel.C6_LOG],
+            "artifact_leakage": [Channel.C7_ARTIFACT],
+            "session_state_poisoning": [Channel.C5_MEMORY_WRITE],
+            
+            # F4 - Multi-Agent -> Inter-Agent
+            "cross_agent_collusion": [Channel.C2_INTER_AGENT],
+            "role_boundary_violation": [Channel.C2_INTER_AGENT],
+            "delegation_exploit": [Channel.C2_INTER_AGENT],
+            "shared_memory_poisoning": [Channel.C5_MEMORY_WRITE, Channel.C2_INTER_AGENT],
+            "actor_network_manipulation": [Channel.C2_INTER_AGENT],
+            "consensus_manipulation": [Channel.C2_INTER_AGENT],
+            "orchestrator_hijacking": [Channel.C2_INTER_AGENT],
+            "agent_identity_spoofing": [Channel.C2_INTER_AGENT],
+            
+            # F5 - Reasoning -> Output
+            "logic_puzzle_jailbreak": [Channel.C1_FINAL_OUTPUT],
+            "cot_forging": [Channel.C1_FINAL_OUTPUT],
+            "special_token_injection": [Channel.C1_FINAL_OUTPUT],
+            "reasoning_hijack": [Channel.C1_FINAL_OUTPUT],
+            "word_game_obfuscation": [Channel.C1_FINAL_OUTPUT],
+            
+            # F6 - Evasion -> Output
+            "unicode_tag_smuggling": [Channel.C1_FINAL_OUTPUT],
+            "text_shuffle_attack": [Channel.C1_FINAL_OUTPUT],
+        }
+        return channel_map.get(self.value, [Channel.C1_FINAL_OUTPUT])
 
     @property
     def family(self) -> AttackFamily:

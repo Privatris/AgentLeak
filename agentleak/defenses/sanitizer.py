@@ -26,6 +26,9 @@ class SanitizerConfig(DefenseConfig):
     detect_email: bool = True
     detect_credit_card: bool = True
     detect_canaries: bool = True
+    detect_iban: bool = True
+    detect_crypto: bool = True
+    detect_api_keys: bool = True
 
     # Redaction settings
     redaction_string: str = "[REDACTED]"
@@ -86,11 +89,59 @@ class OutputSanitizer(BaseDefense):
         if self.config.detect_canaries:
             patterns["canary"] = re.compile(r"CANARY_[A-Z]+_[A-Z0-9]{8}")
 
+        if self.config.detect_iban:
+            # Simplified IBAN (2 letters, 2 digits, then alphanumeric up to 30 chars)
+            patterns["iban"] = re.compile(r"\b[A-Z]{2}\d{2}[A-Z0-9]{10,30}\b")
+            
+        if self.config.detect_crypto:
+            # Ethereum-style (0x...) and Bitcoin-style (1..., 3..., bc1...) simple checks
+            patterns["crypto"] = re.compile(r"\b(0x[a-fA-F0-9]{40}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-zA-HJ-NP-Z0-9]{39,59})\b")
+
+        if self.config.detect_api_keys:
+            # Generic API keys (sk-..., ghp_..., etc)
+            patterns["api_key"] = re.compile(r"\b(sk-[a-zA-Z0-9]{32,}|ghp_[a-zA-Z0-9]{36}|mz_[a-zA-Z0-9]{24,})\b")
+
         # Add custom patterns
         for i, pattern_str in enumerate(self.config.custom_patterns):
             patterns[f"custom_{i}"] = re.compile(pattern_str)
 
         return patterns
+
+    def filter(self, content: str, channel: Channel, metadata: Optional[dict[str, Any]] = None) -> DefenseResult:
+        """
+        Apply sanitization filter.
+        
+        Implements BaseDefense interface with optional metadata.
+        """
+        if not self.should_monitor(channel):
+            return DefenseResult(
+                action=FilterAction.ALLOW,
+                original_content=content,
+            )
+
+        # Sanitize using build-in logic
+        res = self.sanitize(content)
+        
+        # Prepare result
+        if res.redactions_made > 0:
+            result = DefenseResult(
+                action=FilterAction.REDACT,
+                original_content=res.original,
+                filtered_content=res.sanitized,
+                detected_patterns=res.patterns_detected,
+                latency_ms=res.latency_ms,
+                confidence=1.0,
+                reason=f"Redacted {res.redactions_made} patterns"
+            )
+        else:
+            result = DefenseResult(
+                action=FilterAction.ALLOW,
+                original_content=content,
+                latency_ms=res.latency_ms
+            )
+            
+        self._log_decision(result)
+        return result
 
     def sanitize(self, content: str) -> SanitizationResult:
         """
@@ -120,40 +171,6 @@ class OutputSanitizer(BaseDefense):
             patterns_detected=patterns_detected,
             latency_ms=latency_ms,
         )
-
-    def filter(self, content: str, channel: Channel) -> DefenseResult:
-        """
-        Filter content using sanitization.
-
-        Implements BaseDefense interface.
-        """
-        if not self.should_monitor(channel):
-            return DefenseResult(
-                action=FilterAction.ALLOW,
-                original_content=content,
-            )
-
-        result = self.sanitize(content)
-
-        if result.redactions_made > 0:
-            action = FilterAction.REDACT
-            reason = f"Redacted {result.redactions_made} patterns"
-        else:
-            action = FilterAction.ALLOW
-            reason = None
-
-        defense_result = DefenseResult(
-            action=action,
-            original_content=content,
-            filtered_content=result.sanitized if result.redactions_made > 0 else None,
-            confidence=1.0 if result.redactions_made > 0 else 0.0,
-            reason=reason,
-            detected_patterns=result.patterns_detected,
-            latency_ms=result.latency_ms,
-        )
-
-        self._log_decision(defense_result)
-        return defense_result
 
     def add_pattern(self, name: str, pattern: str) -> None:
         """Add a custom pattern at runtime."""

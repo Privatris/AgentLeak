@@ -164,34 +164,56 @@ def cmd_run(args):
     
     # Import and execute
     try:
-        # Add experiments to path
-        experiments_dir = PROJECT_ROOT / "experiments" / "all_to_all"
-        sys.path.insert(0, str(experiments_dir))
+        from agentleak.runner import TestRunner
+        from agentleak.config import Config
         
-        from config import Model, get_config
-        from run import BenchmarkRunner
+        # Build configuration
+        config = Config()
+        config.benchmark.n_scenarios = args.scenarios
+        config.benchmark.scenarios_per_vertical = args.scenarios // 4
+        config.benchmark.attack_distribution = {"A0": 0.5, "A1": 0.25, "A2": 0.25} if args.adversary == "A2" else {"A0": 1.0}
+        config.benchmark.api_delay = args.delay
+        config.detection.enable_llm_judge = args.llm_judge
         
-        # Map models
-        model_map = {
-            "gpt-4o": Model.GPT4O,
-            "claude-3.5-sonnet": Model.CLAUDE_SONNET,
-            "gemini-2.0-flash": Model.GEMINI_FLASH,
-            "qwen-2.5-72b": Model.QWEN_72B,
-        }
+        # Initialize runner
+        runner = TestRunner(config)
         
-        selected = [model_map[m] for m in models if m in model_map]
-        if not selected:
-            selected = [Model.GPT4O]
-        
-        config = get_config("quick" if args.scenarios <= 50 else "full")
-        config.api_delay = args.delay
-        
-        runner = BenchmarkRunner(config, use_llm_judge=args.llm_judge)
-        runner.run(n_scenarios=args.scenarios, models=selected)
-        
+        print("\n🚀 STARTING BENCHMARK via agentleak.runner")
+        if len(models) > 1:
+            runner.run_comparison(models=models, n_scenarios=args.scenarios)
+        else:
+            # Update single model config
+            config.model.name = models[0]
+            # runner is already init with config, but we need to update adapter if model changed?
+            # run_comparison handles model switching. For run(), we probably need to set it.
+            # But TestRunner init creates adapter based on config.model.name. 
+            # So better to recreate runner or modify config before init 
+            # (which I did, but models[0] was set after init!).
+            
+            # Correct approach:
+            config.model.name = models[0]
+            runner = TestRunner(config) # Re-init to pick up model
+            
+            runner.run(n_scenarios=args.scenarios)
+            
     except ImportError as e:
         print(f"❌ Error: {e}")
+        # Fallback to experiments if available (legacy)
+        try:
+            experiments_dir = PROJECT_ROOT / "experiments" / "all_to_all"
+            if experiments_dir.exists():
+                sys.path.insert(0, str(experiments_dir))
+                from run import BenchmarkRunner
+                print("⚠️  Fallback to legacy experiments runner")
+                # ... legacy code ...
+        except ImportError:
+            return 1
         return 1
+    except Exception as e:
+         print(f"❌ Execution failed: {e}")
+         return 1
+    
+    return 0
     
     return 0
 

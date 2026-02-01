@@ -72,20 +72,25 @@ from .vignette_generator import (
 def __getattr__(name):
     """Lazy-load deprecated generators with deprecation warnings."""
     _deprecated = {
-        'CanaryGenerator', 'VaultGenerator', 'SeedDataGenerator', 
+        'CanaryGenerator', 'SeedDataGenerator', 
         'ComplexTaskGenerator', 'DataSeed', 'TaskConfig', 'TaskType',
         'CrossAgentAttackTemplate', 'ComplexTask', 'TaskStep',
     }
     
     if name in _deprecated:
         warnings.warn(
-            f"'{name}' is deprecated and has been moved to _archive/. "
+            f"'{name}' is deprecated. "
             "Consider using RealDataLoader or ScenarioGenerator instead.",
             DeprecationWarning,
             stacklevel=2
         )
         raise AttributeError(f"'{name}' is no longer available. "
                            f"Use RealDataLoader from agentleak.generators instead.")
+    
+    # VaultGenerator is now part of scenario_generator
+    if name == 'VaultGenerator':
+        from .scenario_generator import VaultGenerator
+        return VaultGenerator
     
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 

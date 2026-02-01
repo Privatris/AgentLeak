@@ -23,9 +23,9 @@ from enum import Enum
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 
-from .core.detector import DetectorPipeline, DetectionResult
-from .detection.basic_detectors import ExactDetector, PatternDetector, SemanticDetector
-from .detection.llm_judge import LLMJudge, LLMConfig
+from .core.detector import DetectorPipeline, DetectionResult, DetectionTier
+from .detection.presidio_detector import PresidioDetector, PresidioConfig
+from .detection.llm_judge import LLMJudge, LLMJudgeConfig as LLMConfig
 
 
 class DetectionMode(str, Enum):
@@ -95,37 +95,39 @@ class AgentLeakTester:
         llm_config: Optional[LLMConfig],
         semantic_threshold: float
     ) -> DetectorPipeline:
-        """Build detection pipeline based on mode."""
+        """Build detection pipeline based on mode.
+        
+        New architecture uses:
+        - PresidioDetector for Tier 1 (exact) & Tier 2 (pattern) detection
+        - LLMJudge for Tier 3 (semantic) detection
+        """
         detectors = []
         
         if mode == DetectionMode.LLM_ONLY:
-            # LLM only
+            # LLM only - use for semantic-only detection
             detectors = [LLMJudge(llm_config)]
             early_stop = False
         
         elif mode == DetectionMode.FAST:
-            # Exact + Pattern only
-            detectors = [
-                ExactDetector(),
-                PatternDetector()
-            ]
+            # Presidio only (Tier 1 & 2: exact + pattern)
+            config = PresidioConfig(score_threshold=0.5, enable_custom_recognizers=True)
+            detectors = [PresidioDetector(config)]
             early_stop = True
         
         elif mode == DetectionMode.STANDARD:
-            # Exact + Pattern + Semantic
+            # Presidio (high threshold) + LLM Judge
+            config = PresidioConfig(score_threshold=0.7, enable_custom_recognizers=True)
             detectors = [
-                ExactDetector(),
-                PatternDetector(),
-                SemanticDetector(threshold=semantic_threshold)
+                PresidioDetector(config),
+                LLMJudge(llm_config)
             ]
             early_stop = True
         
-        else:  # HYBRID
-            # All tiers with early stopping
+        else:  # HYBRID (default - recommended)
+            # Full pipeline: Presidio (sensitive threshold) + LLM Judge
+            config = PresidioConfig(score_threshold=0.5, enable_custom_recognizers=True)
             detectors = [
-                ExactDetector(),
-                PatternDetector(),
-                SemanticDetector(threshold=semantic_threshold),
+                PresidioDetector(config),
                 LLMJudge(llm_config)
             ]
             early_stop = True
