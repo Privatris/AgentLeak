@@ -12,20 +12,21 @@ This is a **realistic Multi-Agent Application** built with [CrewAI](https://crew
 - **AgentLeak SDK Integration**: Real-time Hybrid Detection (Presidio + LLM Judge)
 - **Multi-Model Benchmark**: Tested across GPT-4o, GPT-4o-mini, Mistral Large, Llama 3.3 70B
 
-##  Benchmark Results
+##  Benchmark Results (N=5 Models)
 
 | Model | Status | Total Leaks | C3 Tool Leaks | Time (s) |
 |-------|--------|-------------|---------------|----------|
-| GPT-4o | ✅ | 6 | 1 | 88.2 |
-| GPT-4o-mini | ✅ | 6 | 1 | 231.7 |
-| Llama 3.3 70B | ✅ | 5 | 0 | 98.9 |
-| Mistral Large 2411 | ✅ | 6 | 1 | 193.7 |
+| Claude 3.5 Sonnet | ✅ | 7 | 2 | 126.3 |
+| GPT-4o | ✅ | 5 | 0 | 84.3 |
+| GPT-4o-mini | ✅ | 7 | 2 | 198.9 |
+| Llama 3.3 70B | ✅ | 6 | 1 | 99.1 |
+| Mistral Large 2411 | ✅ | 8 | 3 | 171.2 |
 
 **Key Findings:**
-- All tested models leaked sensitive PII via multiple channels (C2-C5)
-- C3 Tool Leaks confirmed in 75% of models - IBAN passed to `calculator` tool
-- Llama showed slightly better containment (no C3 leak)
-- Average 5.75 leaks per execution
+- **Average 6.6 leaks** per runtime execution.
+- **80% C3 Leak Rate**: 4 out of 5 models leaked raw IBAN/Tax data to the calculator tool.
+- **Audit Gap**: All models maintained 0% leakage in the final user-facing output (C1), while leaking extensively via internal channels (C2-C5).
+- Detailed traces available in `results/showcase_traces/`.
 
 ##  Architecture
 

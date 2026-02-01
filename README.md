@@ -43,6 +43,7 @@ cd benchmarks/ieee_repro
 - `agentleak/`: The core framework SDK
 - `agentleak_data/`: The dataset of 1000 scenarios
 - `benchmarks/ieee_repro/`: Scripts to reproduce the paper's findings, including Finding 7 (Tools & Logs).
+- `benchmarks/showcase/`: Real-world CrewAI integration demo showing the SDK in action.
 - `paper/`: The LaTeX source of the IEEE Access paper
 
 ## Setup

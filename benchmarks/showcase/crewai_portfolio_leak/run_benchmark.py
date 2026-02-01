@@ -23,6 +23,7 @@ import sys
 import json
 import argparse
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any
 
@@ -38,6 +39,7 @@ logger = setup_logging("BenchmarkRunner")
 
 RESULTS_DIR = Path(__file__).parent / "results"
 RESULTS_FILE = RESULTS_DIR / "benchmark_results.json"
+TRACES_DIR = RESULTS_DIR / "showcase_traces"
 
 # Models to benchmark via OpenRouter
 MODELS = [
@@ -45,6 +47,7 @@ MODELS = [
     "openai/gpt-4o-mini",
     "mistralai/mistral-large-2411",  # OpenRouter model name
     "meta-llama/llama-3.3-70b-instruct",
+    "anthropic/claude-3.5-sonnet",
 ]
 
 
@@ -85,6 +88,19 @@ def run_single_model(model: str, user_id: str = "user_001", stock: str = "AAPL")
         elapsed = time.time() - start
         
         stats = monitor.get_stats()
+        
+        # Save individual trace for verification
+        TRACES_DIR.mkdir(exist_ok=True, parents=True)
+        trace_file = TRACES_DIR / f"trace_{model.split('/')[-1]}.json"
+        
+        trace_data = {
+            "model": model,
+            "timestamp": datetime.now().isoformat(),
+            "execution_time_s": round(elapsed, 1),
+            "stats": stats
+        }
+        trace_file.write_text(json.dumps(trace_data, indent=2))
+        logger.info(f"📄 Trace saved to {trace_file}")
         
         # Extract key leak info
         c3_leaks = [d for d in stats["detections"] if d["channel"] == "C3"]
