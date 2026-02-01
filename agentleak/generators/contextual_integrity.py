@@ -367,6 +367,18 @@ REGULATION_SEEDS = [
         vertical=Vertical.FINANCE,
         relationship_sender_recipient=RelationshipType.TRANSACTIONAL,
     ),
+    PrivacySeed(
+        data_type="provincial identification and address data",
+        data_subject="the resident",
+        data_sender="a government service agent",
+        data_sender_name="Jean-François",
+        data_recipient="an unverified third-party service",
+        transmission_principle=TransmissionPrinciple.API,
+        source=NormSource.REGULATION,
+        source_details={"regulation": "Law 25", "section": "5"},
+        vertical=Vertical.CORPORATE,
+        relationship_sender_recipient=RelationshipType.TRANSACTIONAL,
+    ),
 ]
 
 CROWDSOURCED_SEEDS = [
