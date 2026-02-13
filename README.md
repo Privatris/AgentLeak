@@ -102,7 +102,7 @@ Traces are in `benchmarks/ieee_repro/results/traces/`.
 ```bibtex
 @article{agentleak2026,
   title={AgentLeak: A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems},
-  author={El Yagoubi, Faouzi and Al Mallah, Ranwa},
+  author={El Yagoubi, Faouzi and Badu-Marfo, Godwin and Al Mallah, Ranwa},
   journal={IEEE Access},
   year={2026}
 }
