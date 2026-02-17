@@ -100,11 +100,14 @@ Traces are in `benchmarks/ieee_repro/results/traces/`.
 ## Citation
 
 ```bibtex
-@article{agentleak2026,
-  title={AgentLeak: A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems},
-  author={El Yagoubi, Faouzi and Badu-Marfo, Godwin and Al Mallah, Ranwa},
-  journal={IEEE Access},
-  year={2026}
+@article{el2026agentleak,
+  title        = {AgentLeak: A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems},
+  author       = {El Yagoubi, Faouzi and Badu-Marfo, Godwin and Al Mallah, Ranwa},
+  journal      = {arXiv preprint arXiv:2602.11510},
+  year         = {2026},
+  url          = {https://arxiv.org/abs/2602.11510},
+  abstract     = {Multi-agent Large Language Model (LLM) systems create privacy risks that current benchmarks cannot measure. When agents coordinate on tasks, sensitive data passes through inter-agent messages, shared memory, and tool arguments, pathways that output-only audits never inspect. We introduce AgentLeak, the first full-stack benchmark for privacy leakage covering internal channels, spanning 1,000 scenarios across healthcare, finance, legal, and corporate domains, paired with a 32-class attack taxonomy and a three-tier detection pipeline. Testing several models across thousands of traces shows that internal channels in multi-agent configurations are the primary privacy vulnerability and that output-only audits miss a large fraction of violations, underscoring the need for coordinated privacy protections on inter-agent communication.},
+  note         = {Submitted to arXiv on 12 Feb 2026.},
 }
 ```
 
