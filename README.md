@@ -30,7 +30,7 @@ This repository accompanies the IEEE Access paper: *AgentLeak: A Full-Stack Benc
 - 32 attack classes, 6 families
 - SDK: CrewAI, LangChain, AutoGPT, MetaGPT
 
-## 🚀 Reproduction
+## Reproduction
 
 ### Main Benchmark (C1, C2, C5)
 To reproduce the main results (Output, Internal, Memory):
