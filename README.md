@@ -4,6 +4,8 @@ Benchmark for privacy leakage in multi-agent LLM systems.
 
 This repository accompanies the IEEE Access paper: *AgentLeak: A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems*.
 
+Paper https://arxiv.org/abs/2602.11510
+
 ## Key Results (5,694 traces across 5 models)
 
 | Model | C1 (Output) | C2 (Internal) | H1 (Audit Gap) | Total Leak |
