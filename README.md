@@ -2,7 +2,7 @@
 
 Benchmark for privacy leakage in multi-agent LLM systems.
 
-This repository accompanies the IEEE Access paper: *AgentLeak: A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems*.
+This repository accompanies the IEEE Access paper: *AgentLeak: A Benchmark for Internal-Channel Privacy Leakage in Multi-Agent LLM Systems*.
 
 Preprint Paper: https://arxiv.org/abs/2602.11510
 
