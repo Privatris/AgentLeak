@@ -8,6 +8,23 @@ Preprint Paper: https://arxiv.org/abs/2602.11510
 
 IEEE ACCESS Paper: https://ieeexplore.ieee.org/document/11569042/
 
+## Use AgentLeak on your own agent traces
+
+For the installable privacy-testing tool, see **[yagobski/agentleak](https://github.com/yagobski/agentleak)** and **[agentleak.org](https://www.agentleak.org/?utm_source=research_repo&utm_medium=readme&utm_campaign=oss_visibility_202609)**.
+
+The practical tool provides a Python SDK, CLI, local web UI and CI checks for sensitive data disclosed through tool calls, shared memory, inter-agent messages, logs, generated files and final outputs. Core trace analysis runs locally without an LLM dependency; optional live-agent runs use the endpoint you configure.
+
+Try a bundled synthetic example with Python 3.10+:
+
+```bash
+pip install agentleak
+agentleak run --scenario healthcare_patient_summary
+```
+
+The example illustrates a clean final answer alongside internal-channel disclosures. It is a demonstration, not a production leakage-rate estimate. Follow the [tool quickstart](https://github.com/yagobski/agentleak/blob/main/docs/quickstart.md) to analyze your own traces.
+
+This repository remains the research benchmark and reproduction code. Its experiments, channel definitions and detection pipeline should be cited separately from the practical tool's deterministic analysis and bundled examples.
+
 ## Key Results (5,694 traces across 5 models)
 
 | Model | C1 (Output) | C2 (Internal) | H1 (Audit Gap) | Total Leak |
