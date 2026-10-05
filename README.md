@@ -4,9 +4,9 @@ Benchmark for privacy leakage in multi-agent LLM systems.
 
 This repository accompanies the IEEE Access paper: *AgentLeak: A Benchmark for Internal-Channel Privacy Leakage in Multi-Agent LLM Systems*.
 
-Preprint Paper: https://arxiv.org/abs/2602.11510
+Preprint (v3): https://arxiv.org/abs/2602.11510v3
 
-IEEE ACCESS Paper: https://ieeexplore.ieee.org/document/11569042/
+IEEE Access (2026): https://doi.org/10.1109/ACCESS.2026.3704541
 
 ## Use AgentLeak on your own agent traces
 
@@ -25,7 +25,13 @@ The example illustrates a clean final answer alongside internal-channel disclosu
 
 This repository remains the research benchmark and reproduction code. Its experiments, channel definitions and detection pipeline should be cited separately from the practical tool's deterministic analysis and bundled examples.
 
-## Key Results (5,694 traces across 5 models)
+## Paper evaluation scope
+
+The [paper (v3)](https://arxiv.org/abs/2602.11510v3) evaluates **1,000 scenarios** across healthcare, finance, legal, and corporate domains, with **4,979 validated execution traces** across five models. AgentLeak instruments seven channels: **C1** final outputs, **C2** inter-agent messages, **C3** tool inputs, **C4** tool outputs, **C5** shared memory, **C6** logs, and **C7** artifacts. The large-scale analysis covers **C1/C2/C5**; **C3/C6** are evaluated on a sample; **C4/C7** are examined in an integration study. These channels therefore do not all have the same empirical coverage. The validated trace count is also recorded in [`paper_stats.json`](benchmarks/ieee_repro/results/paper_stats.json).
+
+## Separate unreconciled repository summary (5,694 traces across 5 models)
+
+The table and findings below are preserved from the existing README as a separate repository summary. Their stated 5,694-trace basis and reported rates have **not been reconciled** with the paper's 4,979 validated traces. Do not interpret them as the paper's validated results or combine the two denominators; consult the paper for its reported results and evaluation scope.
 
 | Model | C1 (Output) | C2 (Internal) | H1 (Audit Gap) | Total Leak |
 |-------|-------------|---------------|----------------|------------|
@@ -36,7 +42,7 @@ This repository remains the research benchmark and reproduction code. Its experi
 | Mistral-Large | 47.5% | 96.2% | 48.7% | 99.3% |
 | **Average** | **28.2%** | **74.0%** | **45.9%** | **79.7%** |
 
-### Key Findings
+### Findings from the unreconciled repository summary
 
 - **Internal channels leak 2.6× more** than external (74.0% vs 28.2%)
 - **Output-only audits miss 45.9%** of violations
@@ -122,13 +128,12 @@ Traces are in `benchmarks/ieee_repro/results/traces/`.
 
 ```bibtex
 @article{el2026agentleak,
-  title        = {AgentLeak: A Full-Stack Benchmark for Privacy Leakage in Multi-Agent LLM Systems},
-  author       = {El Yagoubi, Faouzi and Badu-Marfo, Godwin and Al Mallah, Ranwa},
-  journal      = {arXiv preprint arXiv:2602.11510},
-  year         = {2026},
-  url          = {https://arxiv.org/abs/2602.11510},
-  abstract     = {Multi-agent Large Language Model (LLM) systems create privacy risks that current benchmarks cannot measure. When agents coordinate on tasks, sensitive data passes through inter-agent messages, shared memory, and tool arguments, pathways that output-only audits never inspect. We introduce AgentLeak, the first full-stack benchmark for privacy leakage covering internal channels, spanning 1,000 scenarios across healthcare, finance, legal, and corporate domains, paired with a 32-class attack taxonomy and a three-tier detection pipeline. Testing several models across thousands of traces shows that internal channels in multi-agent configurations are the primary privacy vulnerability and that output-only audits miss a large fraction of violations, underscoring the need for coordinated privacy protections on inter-agent communication.},
-  note         = {Submitted to arXiv on 12 Feb 2026.},
+  title   = {AgentLeak: A Benchmark for Internal-Channel Privacy Leakage in Multi-Agent LLM Systems},
+  author  = {El Yagoubi, Faouzi and Badu-Marfo, Godwin and Al Mallah, Ranwa},
+  journal = {IEEE Access},
+  year    = {2026},
+  doi     = {10.1109/ACCESS.2026.3704541},
+  url     = {https://doi.org/10.1109/ACCESS.2026.3704541}
 }
 ```
 
